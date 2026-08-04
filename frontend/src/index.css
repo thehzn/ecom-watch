@@ -1,1 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&family=Work+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 @import "tailwindcss";
+
+@theme {
+  --color-sidebar-bg: #F9F9F9;
+  --color-sidebar-border: #CFC4C5;
+  --color-nav-text: #5E5E5E;
+  --color-nav-hover: #F3F3F4;
+  --color-brand-black: #000000;
+  --color-subtitle-gray: #838484;
+  --color-badge-red: #BA1A1A;
+  --color-icon-dark: #1A1C1C;
+
+  --font-caslon: "Libre Caslon Text", serif;
+  --font-worksans: "Work Sans", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
