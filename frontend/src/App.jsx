@@ -1,22 +1,46 @@
 import { Routes, Route } from 'react-router-dom';
-
+import UserLayout from './layouts/UserLayout';
+import Login from './pages/auth/Login';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
-
+import AdminProfile from './pages/admin/AdminProfile';
 import UnauthorizedPage from './pages/errors/UnauthorizedPage';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
+import Navbar from './components/Navbar';
 
 function App() {
 
 
   return (
     <>
+    
       <Routes>
+        
+   {/* user routes  */}
 
-   
+     <Route element={<UserLayout />}>
+        <Route path="/login" element={<Login />} />
+     </Route>
+
+
+
+
+
+       {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin/>}/>
 
+        {/* admin routes */}
+       
+      {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}> */}
+         <Route path="/admin" element={<AdminLayout />}>
+             <Route path="profile" element={<AdminProfile />} />
+         </Route>
+     {/* </Route> */}
 
+
+           {/* error routes */}
          <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/not-found" element={<NotFoundPage />} />
       <Route path="/server-error" element={<ServerErrorPage />} />
