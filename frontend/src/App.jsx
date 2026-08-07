@@ -11,6 +11,7 @@ import ServerErrorPage from './pages/errors/ServerErrorPage';
 import Navbar from './components/Navbar';
 import AddProduct from './pages/admin/AddProduct';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import { Edit } from 'lucide-react';
 
 function App() {
 
@@ -40,6 +41,8 @@ function App() {
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="profile" element={<AdminProfile />} />
              <Route path="add" element={<AddProduct />} />
+             <Route path="edit" element={<EditProduct />} />
+             <Route path="products" element={<ProductList />} />
          </Route>
      {/* </Route> */}
 
