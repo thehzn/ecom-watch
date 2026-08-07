@@ -53,7 +53,7 @@ export default function EditProduct() {
       setLoadingProduct(true);
       setError(null);
       try {
-        const res = await fetch(`${BASE_URL}/apiproduct/${id}`, {
+        const res = await fetch(`${BASE_URL}/apiproduct/getsingleproduct/${id}`, {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
         if (!res.ok) throw new Error(`Failed to load product: ${res.status}`);
