@@ -43,7 +43,7 @@ function App() {
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="profile" element={<AdminProfile />} />
              <Route path="add" element={<AddProduct />} />
-             <Route path="edit" element={<EditProduct />} />
+             <Route path="edit/:id" element={<EditProduct />} />
              <Route path="products" element={<ProductList />} />
          </Route>
      {/* </Route> */}
