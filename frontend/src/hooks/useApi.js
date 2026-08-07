@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../redux/authSlice';
- const BASE_URL = 'http://localhost:5000';
+ const BASE_URL = 'http://localhost:3000';
 
 export function useApi() {
   const token = useSelector((state) => state.auth.token);
