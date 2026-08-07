@@ -9,6 +9,8 @@ import UnauthorizedPage from './pages/errors/UnauthorizedPage';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
 import Navbar from './components/Navbar';
+import AddProduct from './pages/admin/AddProduct';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
 
@@ -35,7 +37,9 @@ function App() {
        
       {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}> */}
          <Route path="/admin" element={<AdminLayout />}>
+             <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="profile" element={<AdminProfile />} />
+             <Route path="add" element={<AddProduct />} />
          </Route>
      {/* </Route> */}
 

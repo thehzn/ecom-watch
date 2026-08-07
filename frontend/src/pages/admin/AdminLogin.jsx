@@ -41,11 +41,11 @@ export default function AdminLogin() {
     onSubmit: async (values, { setSubmitting }) => {
       setAuthError('');
       try {
-        const res = await fetch('http://localhost:5000/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
-        });
+       const res = await fetch('http://localhost:3000/apiadmin/admin/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(values),
+});
         const data = await res.json();
 
         if (!res.ok) {
