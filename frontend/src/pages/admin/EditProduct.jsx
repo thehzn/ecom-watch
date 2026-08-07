@@ -21,31 +21,15 @@ const initialFormState = {
   strapBracelet: '',
 };
 
-function UploadCard({ label, preview, onChange, tall }) {
+function ImagePreview({ label, src }) {
   return (
-    <label
-      className={`relative flex flex-col items-center justify-center gap-2 border border-dashed border-[#CFC4C5] bg-[#F3F3F1] cursor-pointer transition-colors duration-300 hover:bg-[#ECECEA] ${
-        tall ? 'h-[320px]' : 'h-[130px]'
-      }`}
-    >
-      <input
-        type="file"
-        accept="image/png,image/jpeg"
-        className="hidden"
-        onChange={onChange}
-      />
-      {preview ? (
-        <img src={preview} alt={label} className="absolute inset-0 w-full h-full object-cover" />
+    <div className="relative flex flex-col items-center justify-center gap-2 border border-[#CFC4C5] bg-[#F3F3F1] h-[130px] overflow-hidden">
+      {src ? (
+        <img src={src} alt={label} className="absolute inset-0 w-full h-full object-cover" />
       ) : (
-        <>
-          <span className="text-[#5E5E5E] text-2xl leading-none">↑</span>
-          <span className={`text-[#1A1C1C] ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
-          {tall && (
-            <span className="text-[10px] text-[#5E5E5E]">Supports PNG and JPG up to 10MB</span>
-          )}
-        </>
+        <span className="text-[10px] text-[#5E5E5E]">No image</span>
       )}
-    </label>
+    </div>
   );
 }
 
@@ -56,21 +40,14 @@ export default function EditProduct() {
 
   const [form, setForm] = useState(initialFormState);
 
-  // Existing images (URLs already saved on the product)
+  // Existing images — display only, not editable on this page
   const [existingMainImage, setExistingMainImage] = useState(null);
   const [existingImages, setExistingImages] = useState([null, null, null]);
-
-  // Newly selected files (only sent if the user replaces an image)
-  const [mainImage, setMainImage] = useState(null);
-  const [mainImagePreview, setMainImagePreview] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([null, null, null]);
-  const [additionalPreviews, setAdditionalPreviews] = useState([null, null, null]);
 
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch the existing product and pre-fill the form
   useEffect(() => {
     const fetchProduct = async () => {
       setLoadingProduct(true);
@@ -118,50 +95,19 @@ export default function EditProduct() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleMainImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setMainImage(file);
-    setMainImagePreview(URL.createObjectURL(file));
-  };
-
-  const handleAdditionalImageChange = (index) => (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAdditionalImages((prev) => {
-      const next = [...prev];
-      next[index] = file;
-      return next;
-    });
-    setAdditionalPreviews((prev) => {
-      const next = [...prev];
-      next[index] = URL.createObjectURL(file);
-      return next;
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
 
     try {
-      const payload = new FormData();
-      Object.entries(form).forEach(([key, value]) => payload.append(key, value));
-
-      // Only attach new files if the user actually replaced them —
-      // otherwise the backend should keep the existing saved image(s)
-      if (mainImage) payload.append('mainImage', mainImage);
-      additionalImages.forEach((file) => {
-        if (file) payload.append('images', file);
-      });
-
       const res = await fetch(`${BASE_URL}/apiproduct/updateproduct/${id}`, {
         method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: payload,
+        body: JSON.stringify(form),
       });
 
       if (!res.ok) {
@@ -200,7 +146,7 @@ export default function EditProduct() {
             Edit Product
           </h1>
           <p className="text-sm text-[#5E5E5E] max-w-[448px] mx-auto">
-            Update this timepiece's specifications, imagery, and pricing details.
+            Update this timepiece's specifications and pricing details.
           </p>
         </header>
 
@@ -231,35 +177,38 @@ export default function EditProduct() {
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU *</label>
                 <input
                   type="text"
                   name="sku"
                   value={form.sku}
                   onChange={handleChange}
                   placeholder="e.g. CHR-2024-0142"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand *</label>
                 <input
                   type="text"
                   name="brand"
                   value={form.brand}
                   onChange={handleChange}
                   placeholder="e.g. Chronos"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number *</label>
                 <input
                   type="text"
                   name="modelNumber"
                   value={form.modelNumber}
                   onChange={handleChange}
                   placeholder="e.g. MC-450"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
@@ -432,7 +381,7 @@ export default function EditProduct() {
             </div>
           </section>
 
-          {/* Media Assets — pre-filled with existing images, replaceable */}
+          {/* Media Assets — read only, images are not editable on this page */}
           <section>
             <h2
               className="text-xl text-black mb-6"
@@ -440,22 +389,15 @@ export default function EditProduct() {
             >
               Media Assets
             </h2>
+            <p className="text-[11px] text-[#5E5E5E] mb-4">
+              Images can't be changed from this page.
+            </p>
 
-            <UploadCard
-              label="Click or drag to replace"
-              preview={mainImagePreview || existingMainImage}
-              onChange={handleMainImageChange}
-              tall
-            />
+            <ImagePreview label="Main image" src={existingMainImage} />
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
               {[0, 1, 2].map((i) => (
-                <UploadCard
-                  key={i}
-                  label="Add Pose"
-                  preview={additionalPreviews[i] || existingImages[i]}
-                  onChange={handleAdditionalImageChange(i)}
-                />
+                <ImagePreview key={i} label={`Pose ${i + 1}`} src={existingImages[i]} />
               ))}
             </div>
           </section>

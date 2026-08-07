@@ -105,7 +105,7 @@ export default function AddProduct() {
       additionalImages.forEach((file) => {
         if (file) payload.append('images', file);
       });
-
+      console.log('token:', token);
      const res = await fetch(`http://localhost:3000/apiproduct/addproduct`, {
   method: 'POST',
   headers: {
@@ -173,35 +173,38 @@ export default function AddProduct() {
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU *</label>
                 <input
                   type="text"
                   name="sku"
                   value={form.sku}
                   onChange={handleChange}
                   placeholder="e.g. CHR-2024-0142"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand *</label>
                 <input
                   type="text"
                   name="brand"
                   value={form.brand}
                   onChange={handleChange}
                   placeholder="e.g. Chronos"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number *</label>
                 <input
                   type="text"
                   name="modelNumber"
                   value={form.modelNumber}
                   onChange={handleChange}
                   placeholder="e.g. MC-450"
+                  required
                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
                 />
               </div>
