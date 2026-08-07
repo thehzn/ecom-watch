@@ -10,6 +10,7 @@ import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
 import Navbar from './components/Navbar';
 import AddProduct from './pages/admin/AddProduct';
+import EditProduct from './pages/admin/EditProduct';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { Edit } from 'lucide-react';
 
