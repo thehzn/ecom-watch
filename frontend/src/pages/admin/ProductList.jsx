@@ -49,7 +49,7 @@ export default function ProductList() {
     const query = search.trim().toLowerCase();
     if (!query) return products;
     return products.filter((p) =>
-      [p.modelName, p.sku, p.brand, p.modelNumber, p.category]
+      [p.modelName, p.sku, p.brand, p.modelNumber, p.category, p.productFor]
         .filter(Boolean)
         .some((field) => field.toLowerCase().includes(query))
     );
