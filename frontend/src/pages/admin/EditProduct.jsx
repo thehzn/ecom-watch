@@ -57,7 +57,8 @@ export default function EditProduct() {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
         if (!res.ok) throw new Error(`Failed to load product: ${res.status}`);
-        const product = await res.json();
+        
+        const {product} = await res.json();
 
         setForm({
           modelName: product.modelName || '',
