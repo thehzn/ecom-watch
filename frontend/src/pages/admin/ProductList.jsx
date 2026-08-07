@@ -111,7 +111,7 @@ export default function ProductList() {
 
             {/* Add Button */}
             <button
-              onClick={() => navigate('/admin/products/add')}
+              onClick={() => navigate('/admin/add')}
               className="flex items-center gap-2 bg-black text-white px-8 py-3 text-[11px] font-medium uppercase tracking-[0.1em] transition-transform duration-200 hover:scale-[1.02] active:scale-95"
             >
               <Plus size={14} />
@@ -224,7 +224,7 @@ export default function ProductList() {
                     <td className="px-6 py-6">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={() => navigate(`/admin/products/edit/${p._id}`)}
+                          onClick={() => navigate(`/admin/edit/${p._id}`)}
                           className="text-[#5E5E5E] hover:text-black transition-colors duration-200"
                           aria-label="Edit product"
                         >
