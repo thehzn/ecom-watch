@@ -8,6 +8,7 @@ import userRoutes from "./routes/userRoutes.js"
 import adminauthroutes from "./routes/adminauthRoutes.js"
 import productroutes from "./routes/productRoutes.js"
 import cartroutes from "./routes/cartRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
 import { createAdmin } from "./utils/createAdmin.js";
 
 
@@ -28,7 +29,8 @@ app.use("/apiauth",authRoutes)
 app.use("/apiuser",userRoutes)
 app.use("/apiadmin",adminauthroutes)
 app.use("/apiproduct",productroutes)
-app.use("/carts",cartroutes)
+app.use("/apicarts",cartroutes)
+app.use("/apiorders",orderRoutes)
 
 app.listen(PORT, async()=>{
    await createAdmin()
