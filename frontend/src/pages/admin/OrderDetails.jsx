@@ -240,7 +240,7 @@ export default function OrderDetails() {
                     {/* Actions */}
                     <td className="py-6 pl-4 text-right">
                       <button
-                        onClick={() => navigate(`/admin/orders/${o._id}`)}
+                        onClick={() => navigate(`/admin/order/${o._id}`)}
                         className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-[#5E5E5E] hover:text-black transition-colors duration-200"
                         aria-label="View order"
                       >

@@ -1,5 +1,8 @@
+
 import { Routes, Route } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
+import Home from './pages/Home';
+import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layouts/AdminLayout';
@@ -9,6 +12,7 @@ import UnauthorizedPage from './pages/errors/UnauthorizedPage';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
 import Navbar from './components/Navbar';
+import Shop from './pages/Shop';
 import AddProduct from './pages/admin/AddProduct';
 import EditProduct from './pages/admin/EditProduct';
 import ProductList from './pages/admin/ProductList';
@@ -16,31 +20,27 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import OrderDetails from './pages/admin/OrderDetails';
 import OrderDetail from './pages/admin/OrderDetail';
 import Customers from './pages/admin/Customers';
-import { Edit } from 'lucide-react';
 
 function App() {
-
-
   return (
     <>
-    
       <Routes>
-        
-   {/* user routes  */}
 
-     <Route element={<UserLayout />}>
+        {/* site routes — shared Navbar/Footer via UserLayout */}
+        <Route element={<UserLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+        </Route>
+
+        {/* auth routes — each page ships its own header, not the site UserLayout */}
         <Route path="/login" element={<Login />} />
-     </Route>
+        <Route path="/register" element={<Register />} />
 
-
-
-
-
-       {/* admin login route */}
+        {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin/>}/>
 
         {/* admin routes */}
-       
+
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
          <Route path="/admin" element={<AdminLayout />}>
              <Route path="dashboard" element={<AdminDashboard />} />
@@ -51,15 +51,14 @@ function App() {
              <Route path="orders" element={<OrderDetails />} />
              <Route path="order/:id" element={<OrderDetail />} />
              <Route path="users" element={<Customers />} />
-             
+
          </Route>
      </Route>
 
-
-           {/* error routes */}
-         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      <Route path="/not-found" element={<NotFoundPage />} />
-      <Route path="/server-error" element={<ServerErrorPage />} />
+        {/* error routes */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="/not-found" element={<NotFoundPage />} />
+        <Route path="/server-error" element={<ServerErrorPage />} />
       </Routes>
     </>
   )
