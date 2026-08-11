@@ -82,11 +82,9 @@ export const addProduct = async (req, res) => {
     }
 }
 
+
 export const getAllProducts = async (req, res) => {
   try {
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.max(1, Number(req.query.limit) || 12);
-
     const { category, productFor, caseMaterial } = req.query;
 
     const filter = {};
@@ -95,19 +93,11 @@ export const getAllProducts = async (req, res) => {
     if (productFor) filter.productFor = productFor;
     if (caseMaterial) filter.caseMaterial = caseMaterial;
 
-    const skip = (page - 1) * limit;
+    const products = await Product.find(filter).sort({ createdAt: -1 });
 
-    const products = await Product.find(filter) .sort({ createdAt: -1 }).skip(skip).limit(limit);
-    const totalProducts = await Product.countDocuments(filter);
-
-    return res.status(200).json({ status: true, message: "Products fetched successfully", products,
-      currentPage: page,
-      totalPages: Math.ceil(totalProducts / limit),
-      totalProducts
-    });
-
+    return res.status(200).json({status: true,message: "Products fetched successfully",products });
   } catch (error) {
-    return res.status(500).json({ status: false, message: error.message,});
+    return res.status(500).json({status: false,message: error.message,});
   }
 }
 
