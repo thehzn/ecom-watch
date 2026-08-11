@@ -16,6 +16,7 @@ import AddProduct from './pages/admin/AddProduct';
 import EditProduct from './pages/admin/EditProduct';
 import ProductList from './pages/admin/ProductList';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ProductDetails from './pages/ProductDetails';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route element={<UserLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+           <Route path="/product/:id" element={<ProductDetails />} />
         </Route>
 
         {/* auth routes — each page ships its own header, not the site UserLayout */}
