@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
+import Home from './pages/Home';
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -25,6 +26,10 @@ function App() {
       <Routes>
         
    {/* user routes  */}
+
+   <Route element={<UserLayout />}>
+          <Route path="/" element={<Home />} />
+        </Route>
 
      <Route element={<UserLayout />}>
         <Route path="/login" element={<Login />} />
