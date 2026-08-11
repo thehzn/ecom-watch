@@ -11,60 +11,45 @@ import UnauthorizedPage from './pages/errors/UnauthorizedPage';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
 import Navbar from './components/Navbar';
+import Shop from './pages/Shop';
 import AddProduct from './pages/admin/AddProduct';
 import EditProduct from './pages/admin/EditProduct';
 import ProductList from './pages/admin/ProductList';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import { Edit } from 'lucide-react';
 
 function App() {
-
-
   return (
     <>
-    
       <Routes>
-        
-   {/* user routes  */}
 
-   <Route element={<UserLayout />}>
+        {/* site routes — shared Navbar/Footer via UserLayout */}
+        <Route element={<UserLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
         </Route>
 
-     <Route element={<UserLayout />}>
+        {/* auth routes — each page ships its own header, not the site UserLayout */}
         <Route path="/login" element={<Login />} />
-     </Route>
+        <Route path="/register" element={<Register />} />
 
-
-
-
-
-       {/* admin login route */}
+        {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin/>}/>
 
         {/* admin routes */}
-
-        <Route element={<UserLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
-       
-      {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}> */}
+        {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}> */}
          <Route path="/admin" element={<AdminLayout />}>
-            
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="profile" element={<AdminProfile />} />
              <Route path="add" element={<AddProduct />} />
              <Route path="edit/:id" element={<EditProduct />} />
              <Route path="products" element={<ProductList />} />
          </Route>
-     {/* </Route> */}
+        {/* </Route> */}
 
-
-           {/* error routes */}
-         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      <Route path="/not-found" element={<NotFoundPage />} />
-      <Route path="/server-error" element={<ServerErrorPage />} />
+        {/* error routes */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="/not-found" element={<NotFoundPage />} />
+        <Route path="/server-error" element={<ServerErrorPage />} />
       </Routes>
     </>
   )
