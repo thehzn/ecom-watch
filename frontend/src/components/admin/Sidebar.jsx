@@ -1,11 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const navItems = [
-  { label: 'Dashboard', icon: 'dashboard', path: '/admin' },
+  { label: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard' },
   { label: 'Product List', icon: 'inventory_2', path: '/admin/products' },
-  { label: 'Add Product', icon: 'add_box', path: '/admin/products/add' },
-  { label: 'Edit Product', icon: 'edit', path: '/admin/products/edit' },
-  { label: 'Customer Details', icon: 'group', path: '/admin/customers' },
+  { label: 'Order Details', icon: 'receipt', path: '/admin/orders' },
+  { label: 'Customer Details', icon: 'group', path: '/admin/users' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -14,7 +13,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/admin/login');
   };
 
   return (

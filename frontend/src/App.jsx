@@ -13,6 +13,9 @@ import AddProduct from './pages/admin/AddProduct';
 import EditProduct from './pages/admin/EditProduct';
 import ProductList from './pages/admin/ProductList';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import OrderDetails from './pages/admin/OrderDetails';
+import OrderDetail from './pages/admin/OrderDetail';
+import Customers from './pages/admin/Customers';
 import { Edit } from 'lucide-react';
 
 function App() {
@@ -38,15 +41,19 @@ function App() {
 
         {/* admin routes */}
        
-      {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}> */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
          <Route path="/admin" element={<AdminLayout />}>
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="profile" element={<AdminProfile />} />
              <Route path="add" element={<AddProduct />} />
              <Route path="edit/:id" element={<EditProduct />} />
              <Route path="products" element={<ProductList />} />
+             <Route path="orders" element={<OrderDetails />} />
+             <Route path="order/:id" element={<OrderDetail />} />
+             <Route path="users" element={<Customers />} />
+             
          </Route>
-     {/* </Route> */}
+     </Route>
 
 
            {/* error routes */}
