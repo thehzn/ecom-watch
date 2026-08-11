@@ -184,32 +184,16 @@ export const getSingleOrder = async (req, res) => {
 }
 
 
-
 export const getAllOrders = async (req, res) => {
   try {
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.max(1, Number(req.query.limit) || 10);
-
-    const skip = (page - 1) * limit;
-
-    const [orders, totalOrders] = await Promise.all([Order.find().populate("user", "firstName lastName email phone").populate("items.product").sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Order.countDocuments()]);
-
-    const totalPages = Math.ceil(totalOrders / limit);
-
-    return res.status(200).json({
-      status: true,
-      message: "Orders fetched successfully",
-      orders,
-      currentPage: page,
-      totalPages,
-      totalOrders
-    });
-
+    const orders = await Order.find().populate("user", "firstName lastName email phone").populate("items.product").sort({ createdAt: -1 });
+    return res.status(200).json({status: true,message: "Orders fetched successfully",orders});
   } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({status: false, message: error.message});
   }
 }
+
+
 
 export const getsingleOrderDetails = async (req, res) => {
   try {
