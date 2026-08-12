@@ -1,16 +1,17 @@
+
 import { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../redux/authSlice';
  const BASE_URL = 'http://localhost:3000';
-
+ 
 export function useApi() {
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+ 
   const request = useCallback(async (url, options = {}) => {
     setLoading(true);
     setError(null);
@@ -23,7 +24,7 @@ export function useApi() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
-
+ 
       // Try to parse body regardless of status (errors often have a message)
       let data = null;
       const text = await res.text();
@@ -34,7 +35,7 @@ export function useApi() {
           data = text; // non-JSON response, keep as raw text
         }
       }
-
+ 
       if (!res.ok) {
         if (res.status === 401) {
           localStorage.removeItem('token');
@@ -43,16 +44,16 @@ export function useApi() {
           navigate('/login');
         } else if (res.status === 403) {
           navigate('/unauthorized');
-        } else if (res.status === 404) {
+        } else if (res.status === 404 && !options.allowNotFound) {
           navigate('/not-found');
         } else if (res.status >= 500) {
           navigate('/server-error');
         }
-
+ 
         const message = (data && data.message) || `Request failed: ${res.status}`;
         throw new Error(message);
       }
-
+ 
       return data;
     } catch (err) {
       setError(err.message);
@@ -61,12 +62,12 @@ export function useApi() {
       setLoading(false);
     }
   }, [token, navigate, dispatch]);
-
-  const get = (url) => request(url);
+ 
+  const get = (url, options) => request(url, options);
   const post = (url, body) => request(url, { method: 'POST', body: JSON.stringify(body) });
   const put = (url, body) => request(url, { method: 'PUT', body: JSON.stringify(body) });
   const patch = (url, body) => request(url, { method: 'PATCH', body: JSON.stringify(body) });
   const del = (url) => request(url, { method: 'DELETE' });
-
+ 
   return { request, get, post, put, patch, del, loading, error };
 }
