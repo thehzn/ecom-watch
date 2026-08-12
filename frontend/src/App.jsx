@@ -22,7 +22,7 @@ import OrderDetails from './pages/admin/OrderDetails';
 import OrderDetail from './pages/admin/OrderDetail';
 import Customers from './pages/admin/Customers';
 import Categories from './pages/Categories';
-import Wishlist from './Whishlist';
+import Wishlist from './pages/Wishlist';
 
 function App() {
   return (
