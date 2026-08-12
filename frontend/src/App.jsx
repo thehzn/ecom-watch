@@ -21,6 +21,7 @@ import ProductDetails from './pages/ProductDetails';
 import OrderDetails from './pages/admin/OrderDetails';
 import OrderDetail from './pages/admin/OrderDetail';
 import Customers from './pages/admin/Customers';
+import Categories from './pages/Categories';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/categories" element={<Categories />} />
         </Route>
 
         {/* auth routes — each page ships its own header, not the site UserLayout */}
