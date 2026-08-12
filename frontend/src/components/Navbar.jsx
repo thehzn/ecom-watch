@@ -21,6 +21,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -32,24 +33,35 @@ export default function Navbar() {
         setProfileOpen(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
+
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+
     if (!query.trim()) return;
+
     navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
   };
 
   const handleLogout = () => {
     dispatch(logoutAction());
     setProfileOpen(false);
+    navigate('/login');
+  };
+
+  const handleMyAccount = () => {
+    setProfileOpen(false);
+    navigate('/myaccount');
   };
 
   return (
     <header className="w-full bg-white border-b border-[#C4C7C7]/20">
       <div className="max-w-screen-2xl mx-auto px-5 py-4 flex items-center justify-between">
+
         {/* Title */}
         <button
           onClick={() => navigate('/')}
@@ -73,12 +85,17 @@ export default function Navbar() {
 
         {/* Action Icons */}
         <div className="flex items-center gap-4">
+
           {/* Search Field */}
           <form
             onSubmit={handleSearchSubmit}
             className="flex items-center w-48 bg-[#F3F3F4] px-4 py-2"
           >
-            <Search size={20} className="text-[#5D5E63] shrink-0" />
+            <Search
+              size={20}
+              className="text-[#5D5E63] shrink-0"
+            />
+
             <input
               type="text"
               value={query}
@@ -89,31 +106,59 @@ export default function Navbar() {
           </form>
 
           {/* Shopping Bag Icon */}
-          <button onClick={() => navigate('/cart')} aria-label="Shopping cart">
-            <ShoppingBag size={24} className="text-black" />
+          <button
+            onClick={() => navigate('/cart')}
+            aria-label="Shopping cart"
+          >
+            <ShoppingBag
+              size={24}
+              className="text-black"
+            />
           </button>
 
           {/* Profile Icon + Action Panel */}
-          <div className="relative" ref={profileRef}>
+          <div
+            className="relative"
+            ref={profileRef}
+          >
             <button
               onClick={() => setProfileOpen((prev) => !prev)}
               aria-label="Account"
             >
-              <User size={24} className="text-black" />
+              <User
+                size={24}
+                className="text-black"
+              />
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white border border-[#CFC4C5] shadow-sm p-3 flex flex-col gap-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-[#CFC4C5] shadow-sm p-3 flex flex-col gap-2 z-50">
+
                 {user ? (
                   <>
-                    <p className="truncate font-['Inter'] text-xs font-semibold text-[#1A1C1C]">
+                    {/* User Name */}
+                    <p className="truncate font-['Inter'] text-xs font-semibold text-[#1A1C1C] px-1">
                       {user.firstName} {user.lastName}
                     </p>
-                    <button onClick={handleLogout} className={ACTION_BUTTON_CLASS}>
+
+                    {/* My Account */}
+                    <button
+                      onClick={handleMyAccount}
+                      className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
+                    >
+                      My Account
+                    </button>
+
+                    {/* Logout */}
+                    <button
+                      onClick={handleLogout}
+                      className={ACTION_BUTTON_CLASS}
+                    >
                       Logout
                     </button>
                   </>
                 ) : (
+                  /* Login */
                   <button
                     onClick={() => {
                       setProfileOpen(false);
@@ -124,6 +169,7 @@ export default function Navbar() {
                     Login
                   </button>
                 )}
+
               </div>
             )}
           </div>
