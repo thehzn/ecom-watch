@@ -8,8 +8,11 @@ import userRoutes from "./routes/userRoutes.js"
 import adminauthroutes from "./routes/adminauthRoutes.js"
 import productroutes from "./routes/productRoutes.js"
 import cartroutes from "./routes/cartRoutes.js"
+import wishlistroutes from "./routes/wishlistRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import customerRoutes from "./routes/customerRoutes.js"
+import newsletterRoutes from "./routes/newsletterRoutes.js"
+import dashboardRoutes from "./routes/dashboardRoutes.js"
 import { createAdmin } from "./utils/createAdmin.js";
 
 
@@ -31,8 +34,12 @@ app.use("/apiuser",userRoutes)
 app.use("/apiadmin",adminauthroutes)
 app.use("/apiproduct",productroutes)
 app.use("/apicarts",cartroutes)
+app.use("/apiwishlist",wishlistroutes)
 app.use("/apiorders",orderRoutes)
 app.use("/apicustomers",customerRoutes)
+app.use("/newsletter",newsletterRoutes)
+app.use("/dashboard", dashboardRoutes)
+
 
 
 app.listen(PORT, async()=>{
