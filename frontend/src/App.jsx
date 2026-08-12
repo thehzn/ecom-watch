@@ -27,6 +27,7 @@ import Customers from './pages/admin/Customers';
 import Categories from './pages/Categories';
 import Wishlist from './pages/Wishlist';
 import Cart from './pages/Cart';
+import FAQ from './pages/FAQ';
 
 function App() {
   return (
@@ -41,10 +42,11 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-           <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/cart" element={<Cart />} />
+          <Route path='/faq' element={<FAQ />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/cart" element={<Cart />} />
 
         </Route>
 
@@ -53,23 +55,23 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* admin login route */}
-        <Route path="/admin/login" element={<AdminLogin/>}/>
+        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* admin routes */}
 
-      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-         <Route path="/admin" element={<AdminLayout />}>
-             <Route path="dashboard" element={<AdminDashboard />} />
-             <Route path="profile" element={<AdminProfile />} />
-             <Route path="add" element={<AddProduct />} />
-             <Route path="edit/:id" element={<EditProduct />} />
-             <Route path="products" element={<ProductList />} />
-             <Route path="orders" element={<OrderDetails />} />
-             <Route path="order/:id" element={<OrderDetail />} />
-             <Route path="users" element={<Customers />} />
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="add" element={<AddProduct />} />
+            <Route path="edit/:id" element={<EditProduct />} />
+            <Route path="products" element={<ProductList />} />
+            <Route path="orders" element={<OrderDetails />} />
+            <Route path="order/:id" element={<OrderDetail />} />
+            <Route path="users" element={<Customers />} />
 
-         </Route>
-     </Route>
+          </Route>
+        </Route>
 
         {/* error routes */}
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
