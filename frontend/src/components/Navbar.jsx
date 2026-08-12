@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search, ShoppingBag, User } from 'lucide-react';
-import { logout as logoutAction } from '../../redux/authSlice';
+import { logout as logoutAction } from '../redux/authSlice';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
