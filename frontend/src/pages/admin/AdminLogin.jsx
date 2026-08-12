@@ -59,7 +59,7 @@ export default function AdminLogin() {
         }
 
         dispatch(login({ token: data.token, user: data.user }));
-        navigate('/admin/orders');
+        navigate('/admin/dashboard');
       } catch {
         setAuthError('Invalid email or password');
       } finally {
