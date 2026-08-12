@@ -9,9 +9,9 @@ import {
 import { useApi } from '../../hooks/useApi';
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -44,15 +44,25 @@ function NotificationBadge({ stock }) {
   );
 }
 
+// Handles all four backend order statuses: Processing, Shipped, Delivered, Cancelled
 function StatusBadge({ status }) {
   const base = 'inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wide';
-  if (status === 'delivered') {
+  const normalized = (status || '').toLowerCase();
+
+  if (normalized === 'delivered') {
     return <span className={`${base} bg-black text-white`}>Delivered</span>;
   }
-  if (status === 'shipped') {
+  if (normalized === 'shipped') {
     return (
       <span className={`${base} border border-[#CFC4C5] text-[#1A1C1C] opacity-70`}>
         Shipped
+      </span>
+    );
+  }
+  if (normalized === 'cancelled') {
+    return (
+      <span className={`${base} bg-[#FCEBEB] text-[#A32D2D]`}>
+        Cancelled
       </span>
     );
   }
@@ -80,6 +90,14 @@ const SORT_MODES = [
   { key: 'amount-asc', label: 'Lowest amount' },
 ];
 
+const STATUS_FILTER_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'shipped', label: 'Shipped' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
 export default function AdminDashboard() {
   const { get, loading, error } = useApi();
   const navigate = useNavigate();
@@ -91,8 +109,28 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const result = await get('/api/admin/dashboard');
-        setData(result);
+        const result = await get('/dashboard/getdashboard');
+
+        // --- Adapter: map raw backend response into the shape this page renders ---
+        setData({
+          metrics: [
+            { label: 'Total Orders', value: result.totalOrders, format: 'number' },
+            { label: 'Total Revenue', value: result.totalRevenue, format: 'currency' },
+            { label: 'Total Customers', value: result.totalCustomers, format: 'number' },
+          ],
+          inventoryAlerts: (result.inventoryNotifications || []).map((n) => ({
+            sku: n.sku,
+            name: n.modelName,
+            stock: n.stock,
+          })),
+          recentOrders: (result.recentOrders || []).map((o) => ({
+            id: o._id,
+            customer: `${o.user?.firstName ?? ''} ${o.user?.lastName ?? ''}`.trim(),
+            date: o.createdAt,
+            amount: o.total,
+            status: (o.orderStatus || '').toLowerCase(),
+          })),
+        });
       } catch (err) {
         // error state already captured by useApi
       }
@@ -252,10 +290,11 @@ export default function AdminDashboard() {
                       onChange={(e) => setStatusFilter(e.target.value)}
                       className="text-[10px] font-normal uppercase text-[#5E5E5E] tracking-wide bg-transparent border-none cursor-pointer transition-opacity duration-300 hover:opacity-60 focus:outline-none"
                     >
-                      <option value="all">All</option>
-                      <option value="processing">Processing</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
+                      {STATUS_FILTER_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -296,7 +335,9 @@ export default function AdminDashboard() {
                     ) : (
                       visibleOrders.map((o) => (
                         <tr key={o.id} className="border-b border-[#CFC4C5]/60 last:border-b-0">
-                          <td className="px-6 py-4 text-sm font-bold text-black">#{o.id}</td>
+                          <td className="px-6 py-4 text-sm font-bold text-black">
+                            #{o.id.slice(-6).toUpperCase()}
+                          </td>
                           <td className="px-6 py-4 text-sm text-[#1A1C1C]">{o.customer}</td>
                           <td className="px-6 py-4 text-sm opacity-60">{formatDate(o.date)}</td>
                           <td className="px-6 py-4 text-sm text-[#1A1C1C]">

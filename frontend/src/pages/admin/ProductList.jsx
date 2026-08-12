@@ -69,7 +69,7 @@ export default function ProductList() {
       await del(`/apiproduct/deleteproduct/${id}`);
       setProducts((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
-      // error already captured by useApi
+    
     } finally {
       setDeletingId(null);
     }
