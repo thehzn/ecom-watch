@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&family=Work+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Libre+Caslon+Text&family=Work+Sans:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 @import "tailwindcss";
 
@@ -14,6 +14,7 @@
 
   --font-caslon: "Libre Caslon Text", serif;
   --font-worksans: "Work Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
 
 .material-symbols-outlined {
