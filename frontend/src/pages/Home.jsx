@@ -195,7 +195,7 @@ function Newsletter() {
         >
           Join the Inner Circle
         </h2>
-        <p
+        <p  
           className="mb-8"
           style={{
             fontFamily: 'Inter, sans-serif',
