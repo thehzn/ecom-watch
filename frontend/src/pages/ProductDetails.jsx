@@ -1,28 +1,40 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useApi } from '../hooks/useApi';
+import { useEffect, useState, useRef } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useApi } from "../hooks/useApi";
 
 const SPEC_FIELDS = [
-  { key: 'movement', label: 'Movement' },
-  { key: 'caliber', label: 'Caliber' },
-  { key: 'powerReserve', label: 'Power Reserve' },
-  { key: 'caseMaterial', label: 'Case Material' },
-  { key: 'waterResistance', label: 'Water Resistance' },
-  { key: 'caseSize', label: 'Case Size' },
+  { key: "movement", label: "Movement" },
+  { key: "caliber", label: "Caliber" },
+  { key: "powerReserve", label: "Power Reserve" },
+  { key: "caseMaterial", label: "Case Material" },
+  { key: "waterResistance", label: "Water Resistance" },
+  { key: "caseSize", label: "Case Size" },
 ];
 
 function InfoField({ label, value }) {
   if (!value) return null;
+
   return (
     <div>
       <p
         className="uppercase"
-        style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', color: '#5D5E63' }}
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontSize: "10px",
+          color: "#5D5E63",
+        }}
       >
         {label}
       </p>
-      <p className="mt-1 text-black" style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px' }}>
+
+      <p
+        className="mt-1 text-black"
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontSize: "16px",
+        }}
+      >
         {value}
       </p>
     </div>
@@ -37,7 +49,7 @@ function RelatedCard({ product }) {
     >
       <div
         className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden"
-        style={{ backgroundColor: '#F3F3F4' }}
+        style={{ backgroundColor: "#F3F3F4" }}
       >
         <img
           src={product.mainImage}
@@ -45,17 +57,27 @@ function RelatedCard({ product }) {
           className="h-full w-full object-contain p-6 transition-transform duration-700 ease-out group-hover:scale-105"
         />
       </div>
+
       <h4
         className="mt-4 text-black"
-        style={{ fontFamily: "'Libre Caslon Text', serif", fontSize: '20px', fontWeight: 400 }}
+        style={{
+          fontFamily: "'Libre Caslon Text', serif",
+          fontSize: "20px",
+          fontWeight: 400,
+        }}
       >
         {product.modelName}
       </h4>
+
       <p
         className="mt-1 uppercase"
-        style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: '#5D5E63' }}
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontSize: "12px",
+          color: "#5D5E63",
+        }}
       >
-        ${Number(product.price).toLocaleString()}
+        ₹{Number(product.price).toLocaleString()}
       </p>
     </Link>
   );
@@ -73,8 +95,11 @@ export default function ProductDetails() {
   const scrollerRef = useRef(null);
 
   const [adding, setAdding] = useState(false);
-  const [addedMessage, setAddedMessage] = useState('');
-  const [cartError, setCartError] = useState('');
+  const [addedMessage, setAddedMessage] = useState("");
+  const [cartError, setCartError] = useState("");
+
+  // Selected main image
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -82,47 +107,83 @@ export default function ProductDetails() {
     const fetchProduct = async () => {
       setLoading(true);
       setNotFound(false);
-      try {
-        const data = await get(`/apiproduct/getsingleproduct/${id}`);
-        if (cancelled) return;
-        setProduct(data.product || null);
 
-        // Related products: same category, excluding current
-        if (data.product?.category) {
+      try {
+        const data = await get(
+          `/apiproduct/getsingleproduct/${id}`
+        );
+
+        if (cancelled) return;
+
+        const fetchedProduct = data.product || null;
+
+        setProduct(fetchedProduct);
+
+        // Set main image
+        if (fetchedProduct?.mainImage) {
+          setSelectedImage(fetchedProduct.mainImage);
+        }
+
+        // Related products
+        if (fetchedProduct?.category) {
           try {
             const relatedData = await get(
-              `/apiproduct/getallproducts?category=${encodeURIComponent(data.product.category)}&limit=6`
+              `/apiproduct/getallproducts?category=${encodeURIComponent(
+                fetchedProduct.category
+              )}&limit=6`
             );
+
             if (!cancelled) {
-              setRelated((relatedData.products || []).filter((p) => p._id !== id));
+              setRelated(
+                (relatedData.products || []).filter(
+                  (p) => p._id !== id
+                )
+              );
             }
-          } catch {
-            // related products are non-critical, fail silently
+          } catch (error) {
+            console.log("Related products error:", error);
           }
         }
       } catch (err) {
-        if (!cancelled) setNotFound(true);
+        console.log(err);
+
+        if (!cancelled) {
+          setNotFound(true);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProduct();
+
     return () => {
       cancelled = true;
     };
-  }, [id, get]);
+  }, [id]);
 
   const handleAddToCart = async () => {
     setAdding(true);
-    setCartError('');
-    setAddedMessage('');
+    setCartError("");
+    setAddedMessage("");
+
     try {
-      await post('/apicarts/addtocart', { ProductId: id, quantity: 1 });
-      setAddedMessage('Added to your collection.');
-      setTimeout(() => setAddedMessage(''), 2500);
+      await post("/apicarts/addtocart", {
+        ProductId: id,
+        quantity: 1,
+      });
+
+      setAddedMessage("Added to your collection.");
+
+      setTimeout(() => {
+        setAddedMessage("");
+      }, 2500);
     } catch (err) {
-      setCartError('Unable to add to cart. Please try again.');
+      setCartError(
+        "Unable to add to cart. Please try again."
+      );
     } finally {
       setAdding(false);
     }
@@ -130,58 +191,135 @@ export default function ProductDetails() {
 
   const scrollRelated = (direction) => {
     if (!scrollerRef.current) return;
+
     const amount = 280;
-    scrollerRef.current.scrollBy({ left: direction === 'next' ? amount : -amount, behavior: 'smooth' });
+
+    scrollerRef.current.scrollBy({
+      left: direction === "next" ? amount : -amount,
+      behavior: "smooth",
+    });
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F9F9F9' }}>
-        <p style={{ fontFamily: 'Inter, sans-serif', color: '#5D5E63' }}>Loading…</p>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ backgroundColor: "#F9F9F9" }}
+      >
+        <p
+          style={{
+            fontFamily: "Inter, sans-serif",
+            color: "#5D5E63",
+          }}
+        >
+          Loading…
+        </p>
       </div>
     );
   }
 
   if (notFound || !product) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4" style={{ backgroundColor: '#F9F9F9' }}>
-        <p style={{ fontFamily: 'Inter, sans-serif', color: '#5D5E63' }}>Product not found.</p>
-        <Link to="/shop" className="text-black underline">
+      <div
+        className="flex min-h-screen flex-col items-center justify-center gap-4"
+        style={{ backgroundColor: "#F9F9F9" }}
+      >
+        <p
+          style={{
+            fontFamily: "Inter, sans-serif",
+            color: "#5D5E63",
+          }}
+        >
+          Product not found.
+        </p>
+
+        <Link
+          to="/shop"
+          className="text-black underline"
+        >
           Back to Collection
         </Link>
       </div>
     );
   }
 
-  const availableSpecs = SPEC_FIELDS.filter((f) => product[f.key]);
+  // Main image + additional images
+  const allImages = [
+    product.mainImage,
+    ...(Array.isArray(product.images)
+      ? product.images
+      : []),
+  ].filter(Boolean);
+
+  const availableSpecs = SPEC_FIELDS.filter(
+    (field) => product[field.key]
+  );
 
   return (
     <div className="w-full">
-      {/* Hero */}
-      <section className="w-full px-5 py-16" style={{ backgroundColor: '#F9F9F9' }}>
+
+      {/* HERO */}
+      <section
+        className="w-full px-5 py-16"
+        style={{ backgroundColor: "#F9F9F9" }}
+      >
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* Image */}
-          <div
-            className="group flex aspect-square w-full items-center justify-center overflow-hidden"
-            style={{ backgroundColor: '#F3F3F4' }}
-          >
-            <img
-              src={product.mainImage}
-              alt={product.modelName}
-              className="h-full w-full object-contain p-12 transition-transform duration-700 ease-out group-hover:scale-105"
-            />
+
+          {/* IMAGE SECTION */}
+          <div className="w-full">
+
+            {/* MAIN IMAGE */}
+            <div
+              className="flex aspect-square w-full items-center justify-center overflow-hidden"
+              style={{ backgroundColor: "#F3F3F4" }}
+            >
+              <img
+                src={selectedImage || product.mainImage}
+                alt={product.modelName}
+                className="h-full w-full object-contain p-12"
+              />
+            </div>
+
+            {/* THUMBNAILS */}
+            {allImages.length > 1 && (
+              <div className="mt-4 flex gap-3 overflow-x-auto">
+
+                {allImages.map((image, index) => (
+                  <button
+                    key={`${image}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedImage(image)}
+                    className={`flex h-24 w-24 flex-shrink-0 items-center justify-center border transition-all ${
+                      selectedImage === image
+                        ? "border-black"
+                        : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: "#F3F3F4" }}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.modelName} ${index + 1}`}
+                      className="h-full w-full object-contain p-2"
+                    />
+                  </button>
+                ))}
+
+              </div>
+            )}
+
           </div>
 
-          {/* Info */}
+          {/* PRODUCT INFORMATION */}
           <div className="flex flex-col gap-6">
+
             <span
               className="uppercase"
               style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '12px',
+                fontFamily: "Inter, sans-serif",
+                fontSize: "12px",
                 fontWeight: 600,
-                letterSpacing: '0.1em',
-                color: '#5D5E63',
+                letterSpacing: "0.1em",
+                color: "#5D5E63",
               }}
             >
               {product.category}
@@ -191,113 +329,222 @@ export default function ProductDetails() {
               className="text-black"
               style={{
                 fontFamily: "'Libre Caslon Text', serif",
-                fontSize: '40px',
+                fontSize: "40px",
                 fontWeight: 400,
-                lineHeight: '48px',
+                lineHeight: "48px",
               }}
             >
               {product.modelName}
             </h1>
 
-            <p style={{ fontFamily: "'Libre Caslon Text', serif", fontSize: '24px', color: '#5D5E63' }}>
-              ${Number(product.price).toLocaleString()}
+            <p
+              style={{
+                fontFamily: "'Libre Caslon Text', serif",
+                fontSize: "24px",
+                color: "#5D5E63",
+              }}
+            >
+              ₹{Number(product.price).toLocaleString()}
             </p>
 
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', lineHeight: '24px', color: '#5D5E63' }}>
+            <p
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontSize: "16px",
+                lineHeight: "24px",
+                color: "#5D5E63",
+              }}
+            >
               {product.description}
             </p>
 
-            <div className="grid grid-cols-2 gap-6 border-t border-b py-6" style={{ borderColor: 'rgba(196,199,199,0.3)' }}>
-              <InfoField label="Product Name" value={product.modelName} />
-              <InfoField label="SKU" value={product.sku} />
-              <InfoField label="Collection" value={product.category} />
-              <InfoField label="Description" value={product.description} />
+            {/* PRODUCT DETAILS */}
+            <div
+              className="grid grid-cols-2 gap-6 border-t border-b py-6"
+              style={{
+                borderColor: "rgba(196,199,199,0.3)",
+              }}
+            >
+              <InfoField
+                label="Product Name"
+                value={product.modelName}
+              />
+
+              <InfoField
+                label="SKU"
+                value={product.sku}
+              />
+
+              <InfoField
+                label="Collection"
+                value={product.category}
+              />
+
+              <InfoField
+                label="Description"
+                value={product.description}
+              />
             </div>
 
+            {/* BUTTONS */}
             <div className="flex flex-col gap-3 sm:flex-row">
+
               <button
+                type="button"
                 onClick={handleAddToCart}
                 disabled={adding}
                 className="flex-1 bg-black uppercase text-white transition-opacity duration-300 hover:opacity-90 disabled:opacity-60"
-                style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: 600, padding: '16px' }}
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  padding: "16px",
+                }}
               >
-                {adding ? 'Adding…' : 'Add to Cart'}
+                {adding
+                  ? "Adding…"
+                  : "Add to Cart"}
               </button>
+
               <Link
                 to="/enquiry"
                 className="flex-1 border border-black text-center uppercase text-black transition-colors duration-300 hover:bg-black hover:text-white"
-                style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: 600, padding: '16px' }}
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  padding: "16px",
+                }}
               >
                 Enquire for Bespoke
               </Link>
+
             </div>
 
             {addedMessage && (
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#000000' }}>{addedMessage}</p>
+              <p
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "14px",
+                  color: "#000000",
+                }}
+              >
+                {addedMessage}
+              </p>
             )}
+
             {cartError && (
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#DC2626' }}>{cartError}</p>
+              <p
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "14px",
+                  color: "#DC2626",
+                }}
+              >
+                {cartError}
+              </p>
             )}
+
           </div>
         </div>
       </section>
 
-      {/* Technical Specs */}
+      {/* TECHNICAL SPECS */}
       {availableSpecs.length > 0 && (
         <section className="w-full px-5 py-16">
           <div className="mx-auto max-w-[1440px]">
+
             <h2
               className="mb-10 text-black"
-              style={{ fontFamily: "'Libre Caslon Text', serif", fontSize: '32px', fontWeight: 400 }}
+              style={{
+                fontFamily:
+                  "'Libre Caslon Text', serif",
+                fontSize: "32px",
+                fontWeight: 400,
+              }}
             >
               Technical Specs
             </h2>
+
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">
-              {availableSpecs.map((f) => (
-                <InfoField key={f.key} label={f.label} value={product[f.key]} />
+              {availableSpecs.map((field) => (
+                <InfoField
+                  key={field.key}
+                  label={field.label}
+                  value={product[field.key]}
+                />
               ))}
             </div>
+
           </div>
         </section>
       )}
 
-      {/* Related Products */}
+      {/* RELATED PRODUCTS */}
       {related.length > 0 && (
-        <section className="w-full px-5 py-16" style={{ backgroundColor: '#F9F9F9' }}>
+        <section
+          className="w-full px-5 py-16"
+          style={{ backgroundColor: "#F9F9F9" }}
+        >
           <div className="mx-auto max-w-[1440px]">
+
             <div className="mb-8 flex items-center justify-between">
+
               <h2
                 className="text-black"
-                style={{ fontFamily: "'Libre Caslon Text', serif", fontSize: '32px', fontWeight: 400 }}
+                style={{
+                  fontFamily:
+                    "'Libre Caslon Text', serif",
+                  fontSize: "32px",
+                  fontWeight: 400,
+                }}
               >
                 The Collection
               </h2>
+
               <div className="flex items-center gap-2">
+
                 <button
-                  onClick={() => scrollRelated('prev')}
+                  type="button"
+                  onClick={() =>
+                    scrollRelated("prev")
+                  }
                   className="flex h-10 w-10 items-center justify-center border border-black transition-colors duration-200 hover:bg-black hover:text-white"
                   aria-label="Previous"
                 >
                   <ChevronLeft size={16} />
                 </button>
+
                 <button
-                  onClick={() => scrollRelated('next')}
+                  type="button"
+                  onClick={() =>
+                    scrollRelated("next")
+                  }
                   className="flex h-10 w-10 items-center justify-center border border-black transition-colors duration-200 hover:bg-black hover:text-white"
                   aria-label="Next"
                 >
                   <ChevronRight size={16} />
                 </button>
+
               </div>
             </div>
 
-            <div ref={scrollerRef} className="flex gap-8 overflow-x-auto scroll-smooth pb-4">
-              {related.map((p) => (
-                <RelatedCard key={p._id} product={p} />
+            <div
+              ref={scrollerRef}
+              className="flex gap-8 overflow-x-auto scroll-smooth pb-4"
+            >
+              {related.map((relatedProduct) => (
+                <RelatedCard
+                  key={relatedProduct._id}
+                  product={relatedProduct}
+                />
               ))}
             </div>
+
           </div>
         </section>
       )}
+
     </div>
   );
 }
