@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi';
 
 import classicWatch from '../assets/classic-watch.jpg';
@@ -51,7 +52,7 @@ function ProductCard({ product }) {
   const details = [product.caseMaterial, product.glassType].filter(Boolean).join(' \u00b7 ');
 
   return (
-    <a href={`/product/${product._id}`} className="group block cursor-pointer">
+    <Link to={`/product/${product._id}`} className="group block cursor-pointer">
       <div className="aspect-[4/5] w-full overflow-hidden">
         <img
           src={product.mainImage}
@@ -83,7 +84,7 @@ function ProductCard({ product }) {
           ${Number(product.price).toLocaleString()}
         </p>
       </div>
-    </a>
+    </Link>
   );
 }
 
