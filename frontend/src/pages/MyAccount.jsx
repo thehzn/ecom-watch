@@ -12,7 +12,7 @@ const QUICK_ACCESS_CARDS = [
 
 const ADDITIONAL_LINKS = [
   { label: "About Us", route: "/about" },
-  { label: "Terms & Policies", route: "/terms" },
+  { label: "Terms & Policies", route: "/privacy-policy" },
   { label: "FAQ", route: "/faq" },
 ];
 
@@ -20,8 +20,6 @@ export default function MyAccount() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Assumed shape, matching how Login/Register presumably populate this slice —
-  // adjust the selector path if your auth slice is named differently.
   const user = useSelector((state) => state.auth?.user) || {};
 
   const handleLogout = () => {

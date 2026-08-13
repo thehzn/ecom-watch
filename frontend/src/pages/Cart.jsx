@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
+import { useSelector } from "react-redux";
 
 // ---------------------------------------------------------------------------
 // REAL backend contract (confirmed against backend/routes/cartRoutes.js +
@@ -23,7 +24,7 @@ export default function Cart() {
   const [orderSummary, setOrderSummary] = useState({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
   const [itemCount, setItemCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const {user,token} = useSelectore((state)=>state.auth);
+  const {user,token} = useSelector((state)=>state.auth);
 
   useEffect(() => {
     loadCart();
