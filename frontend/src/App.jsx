@@ -33,6 +33,8 @@ import Checkout from './pages/Checkout';
 import OrderConfirmed from './pages/OrderConfirmed';
 import MyAccount from './pages/MyAccount';
 import MyOrders from './pages/MyOrders';
+import ForgotPassword from './pages/ForgotPassword';
+import Security from './pages/Security';
 
  
 
@@ -63,6 +65,7 @@ function App() {
             <Route path="/order-confirmed" element={<OrderConfirmed/>} />
              <Route path="/myaccount" element={<MyAccount />} />
              <Route path="/my-orders" element={<MyOrders />} />
+             <Route path="/security" element={<Security />} />
 
  
 
@@ -71,6 +74,7 @@ function App() {
         {/* auth routes — each page ships its own header, not the site UserLayout */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin />} />
