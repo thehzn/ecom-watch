@@ -125,8 +125,8 @@ export default function Wishlist() {
     setLoading(true);
     setFetchError('');
     try {
-      const data = await get('/apiwishlist/getwishlist');
-      setItems(data?.wishlist?.items || []);
+      const data = await get('/apiwishlist/getwishlists');
+      setItems(data?.products || []);
     } catch (err) {
       // Treat "no wishlist yet" as empty rather than an error, same as
       // getCart returning 404 when nothing has been added yet.
@@ -147,7 +147,7 @@ export default function Wishlist() {
   const handleRemove = async (productId) => {
     const prevItems = items;
     // optimistic remove
-    setItems((curr) => curr.filter((item) => item.product._id !== productId));
+    setItems((curr) => curr.filter((item) => item._id !== productId));
     try {
       await del(`/apiwishlist/deletewishlistproduct/${productId}`);
     } catch {
@@ -205,13 +205,13 @@ export default function Wishlist() {
       {!loading && !fetchError && items.length > 0 && (
         <section className="mx-auto max-w-[1536px] px-5 py-16">
           <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((item) => (
+            {items.map((product) => (
               <WishlistCard
-                key={item.product._id}
-                product={item.product}
+                key={product._id}
+                product={product}
                 onRemove={handleRemove}
                 onAddToCart={handleAddToCart}
-                addState={addStateByProduct[item.product._id] || 'idle'}
+                addState={addStateByProduct[product._id] || 'idle'}
               />
             ))}
           </div>
