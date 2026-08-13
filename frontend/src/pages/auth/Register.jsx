@@ -83,7 +83,7 @@ export default function Register() {
           return;
         }
 
-        navigate('/login');
+        navigate('/');
       } catch {
         setFormError('Unable to reach the server. Please try again.');
       } finally {

@@ -23,6 +23,7 @@ export default function Cart() {
   const [orderSummary, setOrderSummary] = useState({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
   const [itemCount, setItemCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const {user,token} = useSelectore((state)=>state.auth);
 
   useEffect(() => {
     loadCart();
@@ -61,6 +62,14 @@ export default function Cart() {
       loadCart();
     } catch {
       loadCart(); // resync on failure
+    }
+  };
+   const handleCheckout = () => {
+    if (user && token) {
+      navigate("/checkout");
+    } else {
+      // send them to register, but remember where they were headed
+      navigate("/login", { state: { from: "/checkout" } });
     }
   };
 
@@ -233,7 +242,7 @@ export default function Cart() {
             </div>
 
             <button
-              onClick={() => navigate("/checkout")}
+              onClick={handleCheckout}
               className="w-full mt-6 py-3 bg-black text-white font-['Inter'] text-sm tracking-wide hover:bg-[#5D5E63] transition-colors"
             >
               Proceed to Checkout

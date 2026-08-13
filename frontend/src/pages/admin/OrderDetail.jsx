@@ -25,7 +25,7 @@ function StatusBadge({ status }) {
 export default function OrderDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { get, put, loading, error } = useApi();
+  const { get, put, loading, error,patch } = useApi();
 
   const [order, setOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
