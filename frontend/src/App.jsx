@@ -36,6 +36,7 @@ import MyOrders from './pages/MyOrders';
 import ForgotPassword from './pages/ForgotPassword';
 import Security from './pages/Security';
 import EditProfile from './pages/EditProfile';
+import Enquiry from './pages/Enquiry';
 
  
 
@@ -57,7 +58,9 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path='//enquiry' element={<Enquiry/>}/>
 
+          
            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/wishlist" element={<Wishlist />} />
