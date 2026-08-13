@@ -47,7 +47,7 @@ export default function Security() {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       setApiError('');
       try {
-        const res = await fetch('http://localhost:3000/apiuser/updateprofile', {
+        const res = await fetch('http://localhost:3000/apiuser/user/updateprofile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
