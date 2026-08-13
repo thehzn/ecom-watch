@@ -35,6 +35,7 @@ import MyAccount from './pages/MyAccount';
 import MyOrders from './pages/MyOrders';
 import ForgotPassword from './pages/ForgotPassword';
 import Security from './pages/Security';
+import EditProfile from './pages/EditProfile';
 
  
 
@@ -66,6 +67,7 @@ function App() {
              <Route path="/myaccount" element={<MyAccount />} />
              <Route path="/my-orders" element={<MyOrders />} />
              <Route path="/security" element={<Security />} />
+             <Route path="/edit-profile" element={<EditProfile />} />
 
  
 

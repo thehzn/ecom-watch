@@ -21,6 +21,8 @@ export default function MyAccount() {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.auth?.user) || {};
+  // Backend stores firstName/lastName, not a combined "name" field.
+  const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ');
 
   const handleLogout = () => {
     // Assumed action name — swap for whatever your auth slice actually exports
@@ -36,12 +38,12 @@ export default function MyAccount() {
           <div className="flex items-center gap-6">
             <img
               src={user.profileImage || "/default-avatar.png"}
-              alt={user.name || "Profile"}
+              alt={displayName || "Profile"}
               className="w-24 h-24 rounded-full object-cover bg-[#E2E2E2]"
             />
             <div>
               <h1 className="font-['Libre_Caslon_Text'] text-[40px] font-normal text-black leading-tight">
-                {user.name || "Guest"}
+                {displayName || "Guest"}
               </h1>
               <p className="text-base text-[#5D5E63] mt-2">
                 {user.email || "—"}
