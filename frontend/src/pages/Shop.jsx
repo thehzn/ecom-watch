@@ -316,7 +316,7 @@
 // }
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Heart } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 
 const LIMIT = 12;
@@ -334,16 +334,45 @@ const MATERIAL_OPTIONS = [
 const FOR_OPTIONS = ['Men', 'Women', 'Children'];
 
 function ProductCard({ product }) {
+  const { post } = useApi();
   const details = [product.caseMaterial, product.glassType].filter(Boolean).join(' · ');
+  const [wishlisted, setWishlisted] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleWishlist = async (e) => {
+    e.preventDefault(); // don't follow the card's Link
+    e.stopPropagation();
+    if (saving || wishlisted) return;
+    setSaving(true);
+    try {
+      await post(`/apiwishlist/addwishlist/${product._id}`);
+      setWishlisted(true);
+    } catch (err) {
+      // silently ignore — button stays available to retry
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <Link to={`/product/${product._id}`} className="group block cursor-pointer">
-      <div className="aspect-[4/5] w-full overflow-hidden">
+    <Link to={`/product/${product._id}`} className="group relative block cursor-pointer">
+      <div className="relative aspect-[4/5] w-full overflow-hidden">
         <img
           src={product.mainImage}
           alt={product.modelName}
           className="h-full w-full object-cover grayscale-[0.2] transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
         />
+        <button
+          onClick={handleWishlist}
+          disabled={saving}
+          aria-label={wishlisted ? 'Added to wishlist' : 'Add to wishlist'}
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 transition-transform duration-200 hover:scale-105 disabled:opacity-60"
+        >
+          <Heart
+            size={18}
+            className={wishlisted ? 'fill-black text-black' : 'text-black'}
+          />
+        </button>
       </div>
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
