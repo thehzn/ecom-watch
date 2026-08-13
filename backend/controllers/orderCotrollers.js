@@ -184,6 +184,38 @@ export const getSingleOrder = async (req, res) => {
 }
 
 
+export const cancelMyOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({
+      _id: id,
+      user: userId
+    });
+
+    if (!order) {
+      return res.status(404).json({status: false,message: "Order not found"});
+    }
+
+    if (order.status === "Shipped" || order.status === "Delivered") {
+      return res.status(400).json({status: false,message: "This order cannot be cancelled"});
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    return res.status(200).json({status: true,message: "Order cancelled successfully",order});
+
+  } catch (error) {
+    return res.status(500).json({status: false,message: error.message});
+  }
+}
+
+
+
+//for admin 
+
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate("user", "firstName lastName email phone").populate("items.product").sort({ createdAt: -1 });

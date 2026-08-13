@@ -25,7 +25,7 @@ function StatusBadge({ status }) {
 export default function OrderDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { get, put, loading, error,patch } = useApi();
+  const { get, put,patch,del, loading, error } = useApi();
 
   const [order, setOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
@@ -61,7 +61,7 @@ export default function OrderDetail() {
     setActionError(null);
     setUpdating(true);
     try {
-      const data = await put(`/apiorders/cancelorder/${id}`);
+      const data = await del(`/apiorders/cancelorder/${id}`);
       setOrder(data.order);
     } catch (err) {
       setActionError(err.message);

@@ -30,7 +30,9 @@ import Cart from './pages/Cart';
 
 import FAQ from './pages/FAQ';
 import Checkout from './pages/Checkout';
+import OrderConfirmed from './pages/OrderConfirmed';
 import MyAccount from './pages/MyAccount';
+
  
 
 function App() {
@@ -57,7 +59,9 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-confirmed" element={<OrderConfirmed/>} />
              <Route path="/myaccount" element={<MyAccount />} />
+
  
 
         </Route>
