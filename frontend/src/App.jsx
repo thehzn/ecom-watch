@@ -32,6 +32,7 @@ import FAQ from './pages/FAQ';
 import Checkout from './pages/Checkout';
 import OrderConfirmed from './pages/OrderConfirmed';
 import MyAccount from './pages/MyAccount';
+import MyOrders from './pages/MyOrders';
 
  
 
@@ -61,6 +62,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmed" element={<OrderConfirmed/>} />
              <Route path="/myaccount" element={<MyAccount />} />
+             <Route path="/my-orders" element={<MyOrders />} />
 
  
 
