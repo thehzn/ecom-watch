@@ -347,7 +347,9 @@ export default function AdminDashboard() {
                             <StatusBadge status={o.status} />
                           </td>
                           <td className="px-6 py-4">
-                            <button className="text-[10px] uppercase text-[#5E5E5E] tracking-wide hover:text-black transition-colors duration-300">
+                            <button 
+                            onClick={() => navigate(`/admin/order/${o.id}`)}
+                            className="text-[10px] uppercase text-[#5E5E5E] tracking-wide hover:text-black transition-colors duration-300">
                               View
                             </button>
                           </td>
