@@ -47,7 +47,7 @@ export default function OrderDetail() {
     setActionError(null);
     setUpdating(true);
     try {
-      const data = await put(`/apiorders/markasshipped/${id}`);
+      const data = await patch(`/apiorders/markasshipped/${id}`);
       setOrder(data.order);
     } catch (err) {
       setActionError(err.message);
