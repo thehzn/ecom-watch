@@ -3,14 +3,14 @@ import Admin from "../models/AdminModel.js"
 
 export const createAdmin = async () =>{
     try {
-        const existAdmin = await Admin.findOne({ email:"najishaadmin123@gmail.com" })
+        const existAdmin = await Admin.findOne({ email:"najisha1913@gmail.com" })
         if(existAdmin) {
             console.log("Admin already exist");
             return  
          }
-            const hashedPassword = await argon.hash("Admin@123")
+            const hashedPassword = await argon.hash("Admin@123#")
             await Admin.create({
-                email:"najishaadmin123@gmail.com",
+                email:"najisha1913@gmail.com",
                 password:hashedPassword
              })
           console.log("Default Admin created");
