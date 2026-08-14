@@ -1,4 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom';
+import adminAvatar from '../../assets/admin-avatar.webp';
 
 export default function AdminNavbar({ onMenuClick }) {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export default function AdminNavbar({ onMenuClick }) {
                        flex items-center justify-center shrink-0"
           >
             <img
-              src="/admin-avatar.jpg"
+              src={adminAvatar}
               alt="Admin"
               className="w-full h-full object-cover"
             />
