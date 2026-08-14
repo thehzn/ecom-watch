@@ -198,11 +198,11 @@ export const cancelMyOrder = async (req, res) => {
       return res.status(404).json({status: false,message: "Order not found"});
     }
 
-    if (order.status === "Shipped" || order.status === "Delivered") {
+    if (order.orderStatus === "Shipped" || order.orderStatus === "Delivered") {
       return res.status(400).json({status: false,message: "This order cannot be cancelled"});
     }
 
-    order.status = "Cancelled";
+    order.orderStatus = "Cancelled";
     await order.save();
 
     return res.status(200).json({status: true,message: "Order cancelled successfully",order});
