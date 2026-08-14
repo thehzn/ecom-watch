@@ -141,22 +141,22 @@ export default function Navbar() {
                       {user.firstName} {user.lastName}
                     </p>
 
-                   
+{/*                    
                     <button
                       onClick={handleMyAccount}
                       className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
                     >
                       My Account
-                    </button>
+                    </button> */}
                     {/* My Account — hidden for admins */}
-    {/* {user.role !== 'admin' && (
+    {user.role !== 'admin' && (
       <button
         onClick={handleMyAccount}
         className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
       >
         My Account
       </button>
-    )} */}
+    )}
 
                     {/* Logout */}
                     <button
