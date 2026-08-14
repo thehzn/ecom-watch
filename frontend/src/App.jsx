@@ -58,7 +58,7 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path='//enquiry' element={<Enquiry/>}/>
+          <Route path='/enquiry' element={<Enquiry/>}/>
 
           
            <Route path="/product/:id" element={<ProductDetails />} />

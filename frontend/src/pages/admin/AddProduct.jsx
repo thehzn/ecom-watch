@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Complications'];
 const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const initialFormState = {
   modelName: '',
@@ -106,7 +106,7 @@ export default function AddProduct() {
         if (file) payload.append('images', file);
       });
       console.log('token:', token);
-     const res = await fetch(`http://localhost:3000/apiproduct/addproduct`, {
+     const res = await fetch(`${import.meta.env.VITE_API_URL}/apiproduct/addproduct`, {
   method: 'POST',
   headers: {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

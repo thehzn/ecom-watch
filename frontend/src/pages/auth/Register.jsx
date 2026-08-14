@@ -62,7 +62,7 @@ export default function Register() {
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       setFormError('');
       try {
-        const res = await fetch('http://localhost:3000/apiauth/user/register', {
+       const res = await fetch(`${import.meta.env.VITE_API_URL}/apiauth/user/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

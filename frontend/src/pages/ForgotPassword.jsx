@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Mail, ArrowLeft, Eye, EyeOff, Check } from "lucide-react";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Same policy the backend enforces (register / resetpassword controllers) —
 // kept in sync so the client never accepts something the server would reject.

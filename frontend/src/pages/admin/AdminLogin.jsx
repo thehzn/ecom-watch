@@ -41,7 +41,7 @@ export default function AdminLogin() {
     onSubmit: async (values, { setSubmitting }) => {
       setAuthError('');
       try {
-       const res = await fetch('http://localhost:3000/apiadmin/admin/login', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apiadmin/admin/login`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(values),

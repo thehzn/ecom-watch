@@ -30,7 +30,7 @@ export default function Login() {
     onSubmit: async (values, { setSubmitting }) => {
       setAuthError('');
       try {
-        const res = await fetch('http://localhost:3000/apiauth/user/login', {
+       const res = await fetch(`${import.meta.env.VITE_API_URL}/apiauth/user/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
