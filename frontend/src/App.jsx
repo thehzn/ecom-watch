@@ -32,6 +32,11 @@ import FAQ from './pages/FAQ';
 import Checkout from './pages/Checkout';
 import OrderConfirmed from './pages/OrderConfirmed';
 import MyAccount from './pages/MyAccount';
+import MyOrders from './pages/MyOrders';
+import ForgotPassword from './pages/ForgotPassword';
+import Security from './pages/Security';
+import EditProfile from './pages/EditProfile';
+import Enquiry from './pages/Enquiry';
 
  
 
@@ -53,7 +58,9 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path='//enquiry' element={<Enquiry/>}/>
 
+          
            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/wishlist" element={<Wishlist />} />
@@ -61,6 +68,9 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmed" element={<OrderConfirmed/>} />
              <Route path="/myaccount" element={<MyAccount />} />
+             <Route path="/my-orders" element={<MyOrders />} />
+             <Route path="/security" element={<Security />} />
+             <Route path="/edit-profile" element={<EditProfile />} />
 
  
 
@@ -69,6 +79,7 @@ function App() {
         {/* auth routes — each page ships its own header, not the site UserLayout */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin />} />

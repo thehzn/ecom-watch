@@ -98,7 +98,7 @@ export default function OrderConfirmed() {
         <div className="mt-16 flex flex-col sm:flex-row justify-center gap-4">
 
           <button
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/my-orders")}
             className="bg-black text-white rounded px-8 py-4 font-['Inter'] text-xs font-semibold uppercase tracking-[1px]"
           >
             View Order Details

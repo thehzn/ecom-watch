@@ -8,7 +8,7 @@ export const createAdmin = async () =>{
             console.log("Admin already exist");
             return  
          }
-            const hashedPassword = await argon.hash("Admin@123")
+            const hashedPassword = await argon.hash("Admin@1234")
             await Admin.create({
                 email:"najishaadmin123@gmail.com",
                 password:hashedPassword
