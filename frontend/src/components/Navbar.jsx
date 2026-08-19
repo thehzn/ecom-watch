@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Search, ShoppingBag, User } from 'lucide-react';
+import { Search, ShoppingBag, User,Heart } from 'lucide-react';
 import { logout as logoutAction } from '../redux/authSlice';
 
 const NAV_LINKS = [
@@ -25,6 +25,10 @@ export default function Navbar() {
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const cartCount = useSelector((state) =>
+    state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+  const wishlistCount = useSelector((state) => state.wishlist.items.length);
 
   // Close the profile panel when clicking outside it
   useEffect(() => {
@@ -106,7 +110,7 @@ export default function Navbar() {
           </form>
 
           {/* Shopping Bag Icon */}
-          <button
+          {/* <button
             onClick={() => navigate('/cart')}
             aria-label="Shopping cart"
           >
@@ -114,7 +118,32 @@ export default function Navbar() {
               size={24}
               className="text-black"
             />
-          </button>
+          </button> */}
+          <button
+  onClick={() => navigate('/cart')}
+  aria-label="Shopping cart"
+  className="relative"
+>
+  <ShoppingBag size={24} className="text-black" />
+  {cartCount > 0 && (
+    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+      {cartCount}
+    </span>
+  )}
+</button>
+{/* wishlist heart icon  and count */}
+<button
+  onClick={() => navigate('/wishlist')}
+  aria-label="Wishlist"
+  className="relative"
+>
+  <Heart size={24} className="text-black" />
+  {wishlistCount > 0 && (
+    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+      {wishlistCount}
+    </span>
+  )}
+</button>
 
           {/* Profile Icon + Action Panel */}
           <div
