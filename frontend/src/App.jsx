@@ -37,6 +37,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Security from './pages/Security';
 import EditProfile from './pages/EditProfile';
 import Enquiry from './pages/Enquiry';
+import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 
  
 
@@ -83,6 +84,7 @@ function App() {
 
         {/* admin login route */}
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/reset-request" element={<AdminForgotPassword />} />
 
         {/* admin routes */}
 
