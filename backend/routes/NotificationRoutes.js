@@ -6,7 +6,7 @@ import { getNotifications, getUnreadNotificationCount, markNotificationAsRead } 
 const router = express.Router();
 
 router.get("/notifications", verifyAdmin,getNotifications);
-router.get("/getcountofnotifify", verifyAdmin, getUnreadNotificationCount)
+router.get("/getcountofnotify", verifyAdmin, getUnreadNotificationCount)
 router.patch("/markasread/:id", verifyAdmin, markNotificationAsRead)
 
 export default router;
