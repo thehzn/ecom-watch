@@ -38,6 +38,7 @@ import Security from './pages/Security';
 import EditProfile from './pages/EditProfile';
 import Enquiry from './pages/Enquiry';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
+import AdminNotifications from './pages/admin/AdminNotifications';
 
  
 
@@ -98,6 +99,7 @@ function App() {
             <Route path="orders" element={<OrderDetails />} />
             <Route path="order/:id" element={<OrderDetail />} />
             <Route path="users" element={<Customers />} />
+            <Route path="notifications" element={<AdminNotifications />} />
 
           </Route>
         </Route>

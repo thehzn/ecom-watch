@@ -1,8 +1,38 @@
+import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useApi } from '../../hooks/useApi';
+import { setUnreadCount } from '../../redux/notificationSlice';
 import adminAvatar from '../../assets/admin-avatar.webp';
 
 export default function AdminNavbar({ onMenuClick }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { get } = useApi();
+
+  const unreadCount = useSelector((state) => state.notification.unreadCount);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchCount = async () => {
+      try {
+        const data = await get('/apinotify/getcountofnotify');
+        if (!cancelled) {
+          dispatch(setUnreadCount(data?.count ?? 0));
+        }
+      } catch {
+        // silently ignore — badge just won't show a number this session
+      }
+    };
+
+    fetchCount();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <header
@@ -23,13 +53,23 @@ export default function AdminNavbar({ onMenuClick }) {
       <div className="flex items-center gap-6">
         {/* Notification button */}
         <button
+          onClick={() => navigate('/admin/notifications')}
+          aria-label="Notifications"
           className="relative bg-transparent border-none cursor-pointer
                      transition-opacity duration-300 ease-in-out hover:opacity-70"
         >
           <span className="material-symbols-outlined text-[22px] text-icon-dark">
             notifications
           </span>
-          <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-badge-red" />
+          {unreadCount > 0 && (
+            <span
+              className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] px-1
+                         flex items-center justify-center rounded-full
+                         bg-badge-red text-white text-[9px] font-semibold leading-none"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </button>
 
         {/* Home link */}
