@@ -110,6 +110,7 @@ let discount = 0;
 
 }
 
+
 export const verifyPayment = async (req, res) => {
    try {
     const userId = req.user.id;

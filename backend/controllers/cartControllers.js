@@ -1,5 +1,6 @@
 import Cart from "../models/CartModel.js"
 import Product from "../models/ProductModel.js"
+import Newsletter from "../models/NewsletterModel.js";
 
 
 export const addtoCart = async ( req, res ) =>{
@@ -49,39 +50,52 @@ export const addtoCart = async ( req, res ) =>{
 }
 
 
-export const getCart =  async ( req, res ) =>{
-      try {
+export const getCart = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-        const userId = req.user.id;
-        const cart = await Cart.findOne({ user: userId }).populate("items.product");
+    const cart = await Cart.findOne({ user: userId })
+      .populate("items.product");
 
-        if (!cart) {
-        return res.status(404).json({status: false,message: "Cart is empty"});
-        }
-
-        let subtotal = 0;
-
-        cart.items.forEach((item) => {
-         subtotal += item.product.price * item.quantity;
-        });
-
-        const shipping = 0; 
-        const tax = 0;     
-        const total = subtotal + shipping + tax;
-        const itemCount = cart.items.reduce((total, item) => total + item.quantity,0);
-
-        return res.status(200).json({status: true, message: "Cart fetched successfully",cart, itemCount,
-            orderSummary: {
-                subtotal,
-                shipping,
-                tax,
-                total
-            }
-        });
-
-    } catch (error) {
-        return res.status(500).json({ status: false, message: error.message});
+    if (!cart) {
+      return res.status(404).json({status: false,message: "Cart is empty"});
     }
+
+    let subtotal = 0;
+
+    cart.items.forEach((item) => {
+      if (item.product) {
+        subtotal += item.product.price * item.quantity;
+      }
+    });
+
+    const subscriber = await Newsletter.findOne({user: userId});
+    let discount = 0;
+
+    if (subscriber) {
+      discount = subtotal * 0.10;
+    }
+
+    const shipping = 0;
+    const tax = 0;
+    const total =subtotal - discount + shipping + tax;
+
+    const itemCount = cart.items.reduce(
+      (total, item) => total + item.quantity,0);
+
+    return res.status(200).json({status: true,message: "Cart fetched successfully",cart,itemCount,
+      orderSummary: {
+        subtotal,
+        discount,
+        shipping,
+        tax,
+        total,
+      },
+    });
+
+  } catch (error) {
+    return res.status(500).json({status: false,message: error.message});
+  }
 }
 
 

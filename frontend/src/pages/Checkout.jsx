@@ -44,12 +44,13 @@ const shippingSchema = Yup.object({
 });
 
 // Shipping methods
+// These values now match the backend
 const SHIPPING_METHODS = [
   {
     value: "Standard",
     label: "Standard Delivery",
     detail: "5-7 business days",
-    charge: 0,
+    charge: 100,
   },
   {
     value: "Express",
@@ -81,6 +82,9 @@ export default function Checkout() {
   const [cartLoading, setCartLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
 
+  // Backend order summary
+  const [orderSummary, setOrderSummary] = useState(null);
+
   // ============================================================
   // LOAD CART FROM BACKEND
   // ============================================================
@@ -101,9 +105,19 @@ export default function Checkout() {
       console.log("Checkout cart response:", res);
 
       setCartItems(res?.cart?.items ?? []);
+
+      // Save backend order summary
+      setOrderSummary(res?.orderSummary ?? null);
+
+      console.log(
+        "Checkout order summary:",
+        res?.orderSummary
+      );
     } catch (error) {
       console.error("Checkout cart error:", error);
+
       setCartItems([]);
+      setOrderSummary(null);
     } finally {
       setCartLoading(false);
     }
@@ -113,13 +127,18 @@ export default function Checkout() {
   // SUBTOTAL
   // ============================================================
 
-  const subtotal = cartItems.reduce(
+  const calculatedSubtotal = cartItems.reduce(
     (sum, item) =>
       sum +
       (item.product?.price || 0) *
         (item.quantity || 1),
     0
   );
+
+  // Use backend subtotal if available
+  const subtotal =
+    Number(orderSummary?.subtotal) ||
+    calculatedSubtotal;
 
   // ============================================================
   // FORMIK
@@ -173,8 +192,14 @@ export default function Checkout() {
           }
         );
 
-        console.log("========== CREATE ORDER RESPONSE ==========");
-        console.log("Create order response:", res);
+        console.log(
+          "========== CREATE ORDER RESPONSE =========="
+        );
+
+        console.log(
+          "Create order response:",
+          res
+        );
 
         if (!res?.status) {
           throw new Error(
@@ -187,11 +212,28 @@ export default function Checkout() {
           order,
           razorpayOrder,
           razorpayKey,
+          discount,
         } = res;
 
-        console.log("MongoDB Order:", order);
-        console.log("Razorpay Order:", razorpayOrder);
-        console.log("Razorpay Key:", razorpayKey);
+        console.log(
+          "MongoDB Order:",
+          order
+        );
+
+        console.log(
+          "Razorpay Order:",
+          razorpayOrder
+        );
+
+        console.log(
+          "Razorpay Key:",
+          razorpayKey
+        );
+
+        console.log(
+          "Subscription Discount:",
+          discount
+        );
 
         // ======================================================
         // 2. CHECK RAZORPAY SDK
@@ -222,6 +264,7 @@ export default function Checkout() {
         const options = {
           key: razorpayKey,
 
+          // Backend sends the discounted final amount
           amount: razorpayOrder.amount,
 
           currency: razorpayOrder.currency,
@@ -394,11 +437,38 @@ export default function Checkout() {
         formik.values.shippingMethod
     );
 
-  const shippingCharge =
+  const selectedShippingCharge =
     selectedShipping?.charge || 0;
 
+  // ============================================================
+  // ORDER SUMMARY VALUES
+  // ============================================================
+
+  /*
+    The backend cart API may already provide orderSummary.
+
+    However, shipping depends on the shipping method selected
+    on this page, so we calculate the currently selected
+    shipping charge here.
+
+    The final order itself is still calculated securely
+    by the backend when Place Order is clicked.
+  */
+
+  const discount =
+    Number(orderSummary?.discount) || 0;
+
+  const tax =
+    Number(orderSummary?.tax) || 10;
+
+  const shippingCharge =
+    selectedShippingCharge;
+
   const total =
-    subtotal + shippingCharge;
+    subtotal -
+    discount +
+    shippingCharge +
+    tax;
 
   // ============================================================
   // INPUT CLASS
@@ -714,9 +784,7 @@ export default function Checkout() {
                     </span>
 
                     <span className="text-sm text-black">
-                      {method.charge === 0
-                        ? "Free"
-                        : `₹${method.charge}`}
+                      ₹{method.charge.toFixed(2)}
                     </span>
 
                   </label>
@@ -814,6 +882,8 @@ export default function Checkout() {
             Order Summary
           </h2>
 
+          {/* ================= CART ITEMS ================= */}
+
           <div className="flex flex-col gap-4 mb-6">
 
             {cartLoading ? (
@@ -871,7 +941,11 @@ export default function Checkout() {
 
           </div>
 
+          {/* ================= ORDER CALCULATION ================= */}
+
           <div className="flex flex-col gap-3 font-['Inter'] text-base">
+
+            {/* SUBTOTAL */}
 
             <div className="flex justify-between text-[#5D5E63]">
 
@@ -885,6 +959,24 @@ export default function Checkout() {
 
             </div>
 
+            {/* SUBSCRIPTION DISCOUNT */}
+
+            <div className="flex justify-between text-[#5D5E63]">
+
+              <span>
+                Subscription Discount
+              </span>
+
+              <span className="text-green-600">
+                {discount > 0
+                  ? `-₹${discount.toFixed(2)}`
+                  : "₹0.00"}
+              </span>
+
+            </div>
+
+            {/* SHIPPING */}
+
             <div className="flex justify-between text-[#5D5E63]">
 
               <span>
@@ -892,12 +984,26 @@ export default function Checkout() {
               </span>
 
               <span>
-                {shippingCharge === 0
-                  ? "Free"
-                  : `₹${shippingCharge.toFixed(2)}`}
+                ₹{shippingCharge.toFixed(2)}
               </span>
 
             </div>
+
+            {/* TAX */}
+
+            <div className="flex justify-between text-[#5D5E63]">
+
+              <span>
+                Tax
+              </span>
+
+              <span>
+                ₹{tax.toFixed(2)}
+              </span>
+
+            </div>
+
+            {/* TOTAL */}
 
             <div className="flex justify-between font-bold text-black border-t border-[#E2E2E2] pt-4">
 

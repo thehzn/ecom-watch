@@ -1,5 +1,5 @@
 import express from "express"
-import { subscribeNewsletter } from "../controllers/newsLetterController.js"
+import { subscribeNewsletter } from "../controllers/NewsLetterController.js"
 import { verifyUser } from "../middleware/authVerify.js"
 
 
