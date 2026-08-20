@@ -109,7 +109,7 @@ export default function Footer() {
               Precision timepieces, crafted to be worn for generations.
             </p>
           </div>
-
+                  
           {/* Explore */}
           <div className="flex flex-col gap-4">
             <span className={COLUMN_TITLE_CLASS}>Explore</span>
