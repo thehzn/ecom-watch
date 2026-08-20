@@ -23,8 +23,7 @@ export const subscribeNewsletter = async (req, res) => {
     email: currentUser.email
   });
 
-  await Notification.create({
-  type: "subscription",
+  await Notification.create({ type: "subscription",
   message: `${currentUser.firstName} ${currentUser.lastName} subscribed to the newsletter`,
   user: userId
  });
