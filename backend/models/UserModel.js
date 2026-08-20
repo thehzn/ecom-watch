@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
     email:{ type:String, trim:true, required:[true,"Email is required"], 
     match:[/^\S+@\S+\.\S+$/, "Please enter a valid email"], lowercase:true, unique:true},  
 
+    countryCode: {type: String,required: [true, "Country code is required"],trim: true},
+
+    mobileNumber: {type: String,required: [true, "Mobile number is required"],
+    match: [/^[0-9]{10}$/, "Please enter a valid mobile number"],trim: true},
+
     password:{ type:String, required:[true,"Password is required"] },
 
     role:{ type:String, enum:[ "user", "admin"], default:"user"},

@@ -1,27 +1,43 @@
 import Newsletter from "../models/NewsletterModel.js";
+import Notification from "../models/NotificationModel.js";
+import User from "../models/UserModel.js";
 
 export const subscribeNewsletter = async (req, res) => {
   try {
-    const { email } = req.body;
+  const userId = req.user.id;
 
-    if (!email) {
-    return res.status(400).json({status: false,message: "Email is required"});
-    }
+  const currentUser = await User.findById(userId);
 
-    const existingSubscriber = await Newsletter.findOne({ email });
+  if (!currentUser) {
+  return res.status(404).json({status: false,message: "User not found"})
+  }
 
-    if (existingSubscriber) {
-    return res.status(400).json({status: false,message: "Email is already subscribed"});
-    }
+  const existingSubscriber = await Newsletter.findOne({user: userId });
 
-    const subscriber = await Newsletter.create({ email });
-    return res.status(201).json({status: true,message: "Newsletter subscription successful",
+  if (existingSubscriber) {
+  return res.status(400).json({status: false,message: "You are already subscribed"});
+  }
+
+  const subscriber = await Newsletter.create({
+    user: userId,
+    email: currentUser.email
+  });
+
+  await Notification.create({
+  type: "subscription",
+  message: `${currentUser.firstName} ${currentUser.lastName} subscribed to the newsletter`,
+  user: userId
+ });
+
+    return res.status(201).json({ status: true, message: "Newsletter subscription successful",
       subscriber: {
         id: subscriber._id,
-        email: subscriber.email,
-      },
+        email: subscriber.email
+       }
     });
+
   } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({status: false, message: error.message
+    });
   }
 };

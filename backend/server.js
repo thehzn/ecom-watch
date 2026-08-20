@@ -12,6 +12,7 @@ import wishlistroutes from "./routes/wishlistRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import customerRoutes from "./routes/customerRoutes.js"
 import newsletterRoutes from "./routes/newsletterRoutes.js"
+import notificationRoutes from "./routes/NotificationRoutes.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
 import { createAdmin } from "./utils/createAdmin.js";
 
@@ -43,6 +44,7 @@ app.use("/apiwishlist",wishlistroutes)
 app.use("/apiorders",orderRoutes)
 app.use("/apicustomers",customerRoutes)
 app.use("/newsletter",newsletterRoutes)
+app.use("/apinotify",notificationRoutes)
 app.use("/dashboard", dashboardRoutes)
 
 

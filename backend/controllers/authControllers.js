@@ -7,14 +7,24 @@ dotenv.config()
 
 export const register = async ( req, res ) =>{
      try {
-        const { firstName, lastName, email, password } = req.body;
-        if( !firstName || !lastName || !email || !password ) return res.status(400).json({status:false, message:"Must Fill all Fields"})
+        const { firstName, lastName, email, countryCode,mobileNumber, password, confirmPassword } = req.body;
+        if( !firstName || !lastName || !email || !countryCode || !mobileNumber || !password || !confirmPassword ) return res.status(400).json({status:false, message:"Must Fill all Fields"})
         const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+        if(password !== confirmPassword){
+         return res.status(400).json({ status:false, message:"Passwords do not match"})
+        }
 
      if (!passwordRegex.test(password)) {
       return res.status(400).json({ status:false,
       message:"Password must be at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character" })
      }
+
+      const mobileRegex = /^[0-9]{10}$/;
+
+      if (!mobileRegex.test(mobileNumber)) {
+      return res.status(400).json({status: false,message: "Please enter a valid mobile number"});
+      }
 
      const existingUser = await User.findOne({ email })
      if(existingUser) return res.status(400).json({ status:false, message:"User already exist" })
@@ -24,6 +34,8 @@ export const register = async ( req, res ) =>{
         firstName,
         lastName,
         email,
+        countryCode,
+        mobileNumber,
         password:hashedPassword
      })
      return res.status(200).json({ status:true, message:"User Registered Successfully" })
@@ -50,6 +62,8 @@ export const login = async ( req, res ) =>{
             firstName:currentUser.firstName,
             lastName:currentUser.lastName,
             email:currentUser.email,
+            countryCode: currentUser.countryCode,
+            mobileNumber: currentUser.mobileNumber,
             role:currentUser.role
       }})
    } catch (error) {

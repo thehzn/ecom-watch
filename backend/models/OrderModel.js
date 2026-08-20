@@ -16,6 +16,8 @@ user: {type: mongoose.Schema.Types.ObjectId,ref: "user",required: true},
 
     subtotal: {type: Number,required: true},
 
+    discount: {type: Number,default: 0},
+
     shipping: {type: Number,default: 0},
 
     tax: {type: Number,default: 0},

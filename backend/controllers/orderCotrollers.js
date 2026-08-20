@@ -1,5 +1,6 @@
 import Cart from "../models/CartModel.js";
 import Order from "../models/OrderModel.js";
+import Newsletter from "../models/NewsletterModel.js";
 import razorpay from "../config/razorpay.js"
 import crypto from "crypto"
 
@@ -45,11 +46,18 @@ export const createOrder = async ( req, res ) =>{
  };
 });
 
+const subscriber = await Newsletter.findOne({ user: userId });
+let discount = 0;
+
+  if (subscriber) {
+  discount = subtotal * 0.10;
+}
+
     // 5. Shipping charge
     let shipping = 0;
 
     if (shippingMethod === "Standard") {
-      shipping = 0;
+      shipping = 100;
     } else if (shippingMethod === "Express") {
       shipping = 500;
     } else if (shippingMethod === "White Glove") {
@@ -57,9 +65,9 @@ export const createOrder = async ( req, res ) =>{
     }
 
     // 6. Tax
-    const tax = 0;
+    const tax = 10;
     // 7. Total
-    const total = subtotal + shipping + tax;
+    const total = subtotal - discount + shipping + tax;
     // 8. Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({
       amount: total * 100,
@@ -73,6 +81,7 @@ export const createOrder = async ( req, res ) =>{
       items: orderItems,
       shippingMethod,
       subtotal,
+      discount,
       shipping,
       tax,
       total,
@@ -86,6 +95,7 @@ export const createOrder = async ( req, res ) =>{
     // 10. Send response
     return res.status(201).json({ status: true, message: "Order created successfully",
       order,
+      discount,
       razorpayOrder: {
         id: razorpayOrder.id,
         amount: razorpayOrder.amount,
