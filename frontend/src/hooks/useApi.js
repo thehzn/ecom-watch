@@ -18,6 +18,12 @@ export function useApi() {
     async (url, options = {}) => {
       setLoading(true);
       setError(null);
+      console.log('[useApi] sending request', {
+      url: `${BASE_URL}${url}`,
+      method: options.method || 'GET',
+      hasToken: !!token,
+      body: options.body,
+    });
 
       try {
         const res = await fetch(`${BASE_URL}${url}`, {

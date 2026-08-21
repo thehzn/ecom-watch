@@ -64,3 +64,4 @@ user: {type: mongoose.Schema.Types.ObjectId,ref: "user",required: true},
 
 const Order = mongoose.model("order",orderSchema)
 export default Order
+   
