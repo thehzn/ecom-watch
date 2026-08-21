@@ -7,6 +7,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import watchImage from '../../assets/admin-watch.avif';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
+const MOBILE_REGEX = /^[0-9]{10}$/;
 const PASSWORD_ERROR =
   'Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.';
 
@@ -27,6 +28,11 @@ const validationSchema = Yup.object({
     .transform((value) => (value ? value.trim().toLowerCase() : value))
     .required('Email address is required')
     .email('Please enter a valid email address'),
+  countryCode: Yup.string().trim().required('Required'),
+  mobileNumber: Yup.string()
+    .trim()
+    .required('Mobile number is required')
+    .matches(MOBILE_REGEX, 'Enter a valid 10-digit mobile number'),
   password: Yup.string()
     .required('Password is required')
     .min(8, PASSWORD_ERROR)
@@ -34,6 +40,9 @@ const validationSchema = Yup.object({
     .matches(/[A-Z]/, PASSWORD_ERROR)
     .matches(/\d/, PASSWORD_ERROR)
     .matches(/[^A-Za-z0-9\s]/, PASSWORD_ERROR),
+  confirmPassword: Yup.string()
+    .required('Please confirm your password')
+    .oneOf([Yup.ref('password')], 'Passwords do not match'),
 });
 
 const inputClasses =
@@ -54,10 +63,19 @@ function FieldError({ children }) {
 export default function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formError, setFormError] = useState('');
 
   const formik = useFormik({
-    initialValues: { firstName: '', lastName: '', email: '', password: '' },
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      countryCode: '+91',
+      mobileNumber: '',
+      password: '',
+      confirmPassword: '',
+    },
     validationSchema,
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       setFormError('');
@@ -69,7 +87,10 @@ export default function Register() {
             firstName: values.firstName.trim(),
             lastName: values.lastName.trim(),
             email: values.email.trim().toLowerCase(),
+            countryCode: values.countryCode.trim(),
+            mobileNumber: values.mobileNumber.trim(),
             password: values.password,
+            confirmPassword: values.confirmPassword,
           }),
         });
         const data = await res.json().catch(() => null);
@@ -228,6 +249,49 @@ export default function Register() {
               {formik.touched.email && <FieldError>{formik.errors.email}</FieldError>}
             </div>
 
+            {/* Country Code / Mobile Number */}
+            <div className="grid grid-cols-[88px_1fr] gap-4">
+              <div className="relative">
+                <input
+                  id="countryCode"
+                  name="countryCode"
+                  type="text"
+                  placeholder="+91"
+                  autoComplete="tel-country-code"
+                  value={formik.values.countryCode}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={inputClasses}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                />
+                <label htmlFor="countryCode" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Code
+                </label>
+                {formik.touched.countryCode && <FieldError>{formik.errors.countryCode}</FieldError>}
+              </div>
+
+              <div className="relative">
+                <input
+                  id="mobileNumber"
+                  name="mobileNumber"
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="Mobile Number"
+                  autoComplete="tel-national"
+                  maxLength={10}
+                  value={formik.values.mobileNumber}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={inputClasses}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                />
+                <label htmlFor="mobileNumber" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Mobile Number
+                </label>
+                {formik.touched.mobileNumber && <FieldError>{formik.errors.mobileNumber}</FieldError>}
+              </div>
+            </div>
+
             {/* Password */}
             <div className="relative">
               <input
@@ -255,6 +319,35 @@ export default function Register() {
                 {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
               </button>
               {formik.touched.password && <FieldError>{formik.errors.password}</FieldError>}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm Password"
+                autoComplete="new-password"
+                value={formik.values.confirmPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`${inputClasses} pr-10`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              />
+              <label htmlFor="confirmPassword" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+                Confirm Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((s) => !s)}
+                className="absolute right-0 top-4 text-[#5D5E63] hover:text-black"
+                tabIndex={-1}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
+              </button>
+              {formik.touched.confirmPassword && <FieldError>{formik.errors.confirmPassword}</FieldError>}
             </div>
 
             {formError && <FieldError>{formError}</FieldError>}
