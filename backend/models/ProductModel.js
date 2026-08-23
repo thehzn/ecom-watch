@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
         "Luxury Watch",
         "Heritage",
         "Contemporary",
-        "Complications",]},
+        "Sports",]},
 
     productFor: {type: String, enum: ["Men", "Women", "Children"],default: "Men"},
 
