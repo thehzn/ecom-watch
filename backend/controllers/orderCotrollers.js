@@ -1,6 +1,7 @@
 import Cart from "../models/CartModel.js";
 import Order from "../models/OrderModel.js";
 import Newsletter from "../models/NewsletterModel.js";
+import Product from "../models/ProductModel.js";
 import razorpay from "../config/razorpay.js"
 import crypto from "crypto"
 
@@ -305,6 +306,86 @@ export const cancelOrder = async (req, res) => {
   } catch (error) {
     return res.status(500).json({status: false,message: error.message});
   }
-};
+}
 
 
+export const confirmOrderReceived = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({_id: id,user: userId});
+
+    if (!order) {
+    return res.status(404).json({status: false,message: "Order not found"
+    });
+    }
+
+    if (order.paymentStatus !== "Paid") {
+    return res.status(400).json({ status: false, message: "Order payment is not completed"
+    });
+    }
+
+    if (order.orderStatus !== "Shipped") {
+    return res.status(400).json({status: false,message: "Only shipped orders can be marked as delivered"
+    });
+    }
+
+  order.orderStatus = "Delivered";
+  await order.save();
+
+  return res.status(200).json({status: true,message: "Order marked as delivered successfully",order});
+
+  } catch (error) {
+  return res.status(500).json({status: false,message: error.message
+  });
+  }
+}
+
+
+
+export const getTrendingProducts = async (req, res) => {
+  try {
+    const trendingProducts = await Order.aggregate([{
+        $match: {
+          paymentStatus: "Paid",
+          orderStatus: { $ne: "Cancelled" }
+        }
+      },
+      {
+      $unwind: "$items"
+      },
+      {
+        $group: {
+          _id: "$items.product",
+          totalOrdered: {
+          $sum: "$items.quantity"
+          }
+        }
+      },
+      {
+        $sort: {
+        totalOrdered: -1
+        }
+      },
+      {
+        $limit: 5
+      }
+    ])
+
+    const productIds = trendingProducts.map(item => item._id);
+    const products = await Product.find({_id: { $in: productIds }});
+    const result = trendingProducts.map(item => {
+    const product = products.find(product => product._id.toString() === item._id.toString());
+   return {
+        product,
+        totalOrdered: item.totalOrdered
+      };
+    });
+
+    return res.status(200).json({status: true,message: "Trending products fetched successfully",products: result});
+
+  } catch (error) {
+  return res.status(500).json({status: false, message: error.message});
+  }
+}
