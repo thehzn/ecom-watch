@@ -1,8 +1,442 @@
+// import { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+
+// const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Sports'];
+// const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
+// const BASE_URL = import.meta.env.VITE_API_URL;
+
+// const initialFormState = {
+//   modelName: '',
+//   sku: '',
+//   brand: '',
+//   modelNumber: '',
+//   category: 'Luxury Watch',
+//   productFor: 'Men',
+//   price: '',
+//   stock: 1,
+//   description: '',
+//   caseMaterial: '',
+//   glassType: '',
+//   strapBracelet: '',
+// };
+
+// function UploadCard({ label, preview, onChange, tall }) {
+//   return (
+//     <label
+//       className={`relative flex flex-col items-center justify-center gap-2 border border-dashed border-[#CFC4C5] bg-[#F3F3F1] cursor-pointer transition-colors duration-300 hover:bg-[#ECECEA] ${
+//         tall ? 'h-[320px]' : 'h-[130px]'
+//       }`}
+//     >
+//       <input
+//         type="file"
+//         accept="image/png,image/jpeg"
+//         className="hidden"
+//         onChange={onChange}
+//       />
+//       {preview ? (
+//         <img src={preview} alt={label} className="absolute inset-0 w-full h-full object-cover" />
+//       ) : (
+//         <>
+//           <span className="text-[#5E5E5E] text-2xl leading-none">↑</span>
+//           <span className={`text-[#1A1C1C] ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
+//           {tall && (
+//             <span className="text-[10px] text-[#5E5E5E]">Supports PNG and JPG up to 10MB</span>
+//           )}
+//         </>
+//       )}
+//     </label>
+//   );
+// }
+
+// export default function AddProduct() {
+//   const navigate = useNavigate();
+//   const token = useSelector((state) => state.auth.token);
+
+//   const [form, setForm] = useState(initialFormState);
+//   const [mainImage, setMainImage] = useState(null);
+//   const [mainImagePreview, setMainImagePreview] = useState(null);
+//   const [additionalImages, setAdditionalImages] = useState([null, null, null]);
+//   const [additionalPreviews, setAdditionalPreviews] = useState([null, null, null]);
+//   const [submitting, setSubmitting] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleMainImageChange = (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+//     setMainImage(file);
+//     setMainImagePreview(URL.createObjectURL(file));
+//   };
+
+//   const handleAdditionalImageChange = (index) => (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+//     setAdditionalImages((prev) => {
+//       const next = [...prev];
+//       next[index] = file;
+//       return next;
+//     });
+//     setAdditionalPreviews((prev) => {
+//       const next = [...prev];
+//       next[index] = URL.createObjectURL(file);
+//       return next;
+//     });
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     if (!mainImage) {
+//       setError('A primary image is required.');
+//       return;
+//     }
+
+//     setSubmitting(true);
+//     try {
+//       const payload = new FormData();
+//       Object.entries(form).forEach(([key, value]) => payload.append(key, value));
+//       payload.append('mainImage', mainImage);
+//       additionalImages.forEach((file) => {
+//         if (file) payload.append('images', file);
+//       });
+//       console.log('token:', token);
+//      const res = await fetch(`${import.meta.env.VITE_API_URL}/apiproduct/addproduct`, {
+//   method: 'POST',
+//   headers: {
+//     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+//   },
+//   body: payload,
+// });
+
+//       if (!res.ok) {
+//         const data = await res.json().catch(() => null);
+//         throw new Error(data?.message || `Request failed: ${res.status}`);
+//       }
+
+//       navigate('/admin/products');
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   return (
+//     <main className="min-h-screen flex flex-col items-center py-24 px-6 bg-[#F9F9F9]">
+//       <div className="w-full max-w-[800px] mx-auto">
+//         {/* Page Header */}
+//         <header className="mb-20 text-center">
+//           <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5E5E5E] mb-4">
+//             Product Registration
+//           </p>
+//           <h1
+//             className="text-[32px] leading-10 font-normal uppercase tracking-wide text-black mb-4"
+//             style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//           >
+//             Add New Piece
+//           </h1>
+//           <p className="text-sm text-[#5E5E5E] max-w-[448px] mx-auto">
+//             Register a new timepiece to the Chronos catalogue with full specifications, imagery, and pricing details.
+//           </p>
+//         </header>
+
+//         <form onSubmit={handleSubmit} className="flex flex-col gap-24">
+//           {/* Section 01 — General Information */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">01</span>
+//               <h2
+//                 className="text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 General Information
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Name *</label>
+//                 <input
+//                   type="text"
+//                   name="modelName"
+//                   value={form.modelName}
+//                   onChange={handleChange}
+//                   placeholder="e.g. Meridian Chronograph"
+//                   required
+//                   className="w-full border-0 border-b border-[#1A1C1C] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU *</label>
+//                 <input
+//                   type="text"
+//                   name="sku"
+//                   value={form.sku}
+//                   onChange={handleChange}
+//                   placeholder="e.g. CHR-2024-0142"
+//                   required
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand *</label>
+//                 <input
+//                   type="text"
+//                   name="brand"
+//                   value={form.brand}
+//                   onChange={handleChange}
+//                   placeholder="e.g. Chronos"
+//                   required
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number *</label>
+//                 <input
+//                   type="text"
+//                   name="modelNumber"
+//                   value={form.modelNumber}
+//                   onChange={handleChange}
+//                   placeholder="e.g. MC-450"
+//                   required
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 02 — Classification */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">02</span>
+//               <h2
+//                 className="text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Classification
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Category</label>
+//                 <select
+//                   name="category"
+//                   value={form.category}
+//                   onChange={handleChange}
+//                   className="w-full border border-[#CFC4C5] bg-white py-2 px-3 text-sm focus:outline-none focus:border-black"
+//                 >
+//                   {CATEGORIES.map((c) => (
+//                     <option key={c} value={c}>{c}</option>
+//                   ))}
+//                 </select>
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Product For</label>
+//                 <div className="flex items-center gap-6 h-10">
+//                   {PRODUCT_FOR_OPTIONS.map((option) => (
+//                     <label key={option} className="flex items-center gap-2 cursor-pointer">
+//                       <input
+//                         type="radio"
+//                         name="productFor"
+//                         value={option}
+//                         checked={form.productFor === option}
+//                         onChange={handleChange}
+//                         className="accent-black w-3.5 h-3.5"
+//                       />
+//                       <span className="text-sm text-[#1A1C1C]">{option}</span>
+//                     </label>
+//                   ))}
+//                 </div>
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 03 — Inventory & Pricing */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">03</span>
+//               <h2
+//                 className="text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Inventory &amp; Pricing
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
+//                 <input
+//                   type="number"
+//                   name="price"
+//                   value={form.price}
+//                   onChange={handleChange}
+//                   placeholder="0.00"
+//                   min="0"
+//                   step="0.01"
+//                   required
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity</label>
+//                 <input
+//                   type="number"
+//                   name="stock"
+//                   value={form.stock}
+//                   onChange={handleChange}
+//                   placeholder="1"
+//                   min="1"
+//                   step="1"
+//                   required
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 04 — Content */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">04</span>
+//               <h2
+//                 className="text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Content
+//               </h2>
+//             </div>
+
+//             <div>
+//               <label className="block text-[11px] text-[#5E5E5E] mb-2">Description</label>
+//               <textarea
+//                 name="description"
+//                 value={form.description}
+//                 onChange={handleChange}
+//                 rows={4}
+//                 required
+//                 placeholder="Describe the heritage, craftsmanship, and character of this timepiece..."
+//                 className="w-full border border-[#CFC4C5] bg-white p-3 text-sm resize-none focus:outline-none focus:border-black"
+//               />
+//             </div>
+//           </section>
+
+//           {/* Section 05 — Technical Specifications */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">05</span>
+//               <h2
+//                 className="text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Technical Specifications
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Case Material</label>
+//                 <input
+//                   type="text"
+//                   name="caseMaterial"
+//                   value={form.caseMaterial}
+//                   onChange={handleChange}
+//                   placeholder="18K Rose Gold"
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Glass Type</label>
+//                 <input
+//                   type="text"
+//                   name="glassType"
+//                   value={form.glassType}
+//                   onChange={handleChange}
+//                   placeholder="Anti-Reflective Sapphire"
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Strap / Bracelet</label>
+//                 <input
+//                   type="text"
+//                   name="strapBracelet"
+//                   value={form.strapBracelet}
+//                   onChange={handleChange}
+//                   placeholder="Hand-stitched Alligator"
+//                   className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Media Assets */}
+//           <section>
+//             <h2
+//               className="text-xl text-black mb-6"
+//               style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//             >
+//               Media Assets
+//             </h2>
+
+//             <UploadCard
+//               label="Click or drag to upload"
+//               preview={mainImagePreview}
+//               onChange={handleMainImageChange}
+//               tall
+//             />
+
+//             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+//               {[0, 1, 2].map((i) => (
+//                 <UploadCard
+//                   key={i}
+//                   label="Add Pose"
+//                   preview={additionalPreviews[i]}
+//                   onChange={handleAdditionalImageChange(i)}
+//                 />
+//               ))}
+//             </div>
+//           </section>
+
+//           {error && (
+//             <p className="text-sm text-[#A32D2D] text-center -mt-16">{error}</p>
+//           )}
+
+//           {/* Buttons */}
+//           <footer className="pt-16 pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
+//             <button
+//               type="submit"
+//               disabled={submitting}
+//               className="w-full sm:w-[256px] bg-black text-white py-3 text-sm font-medium uppercase tracking-wide transition-opacity duration-300 hover:opacity-90 active:scale-95 disabled:opacity-50"
+//             >
+//               {submitting ? 'Adding...' : 'Add Product'}
+//             </button>
+//             <button
+//               type="button"
+//               onClick={() => navigate('/admin/products')}
+//               className="w-full sm:w-[256px] border border-black text-black py-3 text-sm font-medium uppercase tracking-wide transition-colors duration-300 hover:bg-black hover:text-white active:scale-95"
+//             >
+//               Cancel
+//             </button>
+//           </footer>
+//         </form>
+//       </div>
+//     </main>
+//   );
+// }
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Complications'];
+const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Sports'];
 const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -25,7 +459,7 @@ function UploadCard({ label, preview, onChange, tall }) {
   return (
     <label
       className={`relative flex flex-col items-center justify-center gap-2 border border-dashed border-[#CFC4C5] bg-[#F3F3F1] cursor-pointer transition-colors duration-300 hover:bg-[#ECECEA] ${
-        tall ? 'h-[320px]' : 'h-[130px]'
+        tall ? 'h-[220px] sm:h-[280px] lg:h-[320px]' : 'h-[110px] sm:h-[130px]'
       }`}
     >
       <input
@@ -39,9 +473,9 @@ function UploadCard({ label, preview, onChange, tall }) {
       ) : (
         <>
           <span className="text-[#5E5E5E] text-2xl leading-none">↑</span>
-          <span className={`text-[#1A1C1C] ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
+          <span className={`text-[#1A1C1C] text-center px-2 ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
           {tall && (
-            <span className="text-[10px] text-[#5E5E5E]">Supports PNG and JPG up to 10MB</span>
+            <span className="text-[10px] text-[#5E5E5E] text-center px-4">Supports PNG and JPG up to 10MB</span>
           )}
         </>
       )}
@@ -128,15 +562,15 @@ export default function AddProduct() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center py-24 px-6 bg-[#F9F9F9]">
+    <main className="min-h-screen flex flex-col items-center py-10 px-4 sm:py-16 sm:px-6 lg:py-24 bg-[#F9F9F9]">
       <div className="w-full max-w-[800px] mx-auto">
         {/* Page Header */}
-        <header className="mb-20 text-center">
+        <header className="mb-12 sm:mb-16 lg:mb-20 text-center">
           <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5E5E5E] mb-4">
             Product Registration
           </p>
           <h1
-            className="text-[32px] leading-10 font-normal uppercase tracking-wide text-black mb-4"
+            className="text-[24px] leading-8 sm:text-[28px] sm:leading-9 lg:text-[32px] lg:leading-10 font-normal uppercase tracking-wide text-black mb-4"
             style={{ fontFamily: "'Libre Caslon Text', serif" }}
           >
             Add New Piece
@@ -146,20 +580,20 @@ export default function AddProduct() {
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-24">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-14 sm:gap-20 lg:gap-24">
           {/* Section 01 — General Information */}
           <section>
-            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">01</span>
               <h2
-                className="text-xl text-black"
+                className="text-lg sm:text-xl text-black"
                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
               >
                 General Information
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
               <div>
                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Name *</label>
                 <input
@@ -213,17 +647,17 @@ export default function AddProduct() {
 
           {/* Section 02 — Classification */}
           <section>
-            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">02</span>
               <h2
-                className="text-xl text-black"
+                className="text-lg sm:text-xl text-black"
                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
               >
                 Classification
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
               <div>
                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Category</label>
                 <select
@@ -239,7 +673,7 @@ export default function AddProduct() {
               </div>
               <div>
                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Product For</label>
-                <div className="flex items-center gap-6 h-10">
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6 min-h-10">
                   {PRODUCT_FOR_OPTIONS.map((option) => (
                     <label key={option} className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -260,17 +694,17 @@ export default function AddProduct() {
 
           {/* Section 03 — Inventory & Pricing */}
           <section>
-            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">03</span>
               <h2
-                className="text-xl text-black"
+                className="text-lg sm:text-xl text-black"
                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
               >
                 Inventory &amp; Pricing
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
               <div>
                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
                 <input
@@ -304,10 +738,10 @@ export default function AddProduct() {
 
           {/* Section 04 — Content */}
           <section>
-            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">04</span>
               <h2
-                className="text-xl text-black"
+                className="text-lg sm:text-xl text-black"
                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
               >
                 Content
@@ -330,17 +764,17 @@ export default function AddProduct() {
 
           {/* Section 05 — Technical Specifications */}
           <section>
-            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">05</span>
               <h2
-                className="text-xl text-black"
+                className="text-lg sm:text-xl text-black"
                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
               >
                 Technical Specifications
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 lg:gap-x-8 gap-y-8 lg:gap-y-10">
               <div>
                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Case Material</label>
                 <input
@@ -380,7 +814,7 @@ export default function AddProduct() {
           {/* Media Assets */}
           <section>
             <h2
-              className="text-xl text-black mb-6"
+              className="text-lg sm:text-xl text-black mb-6"
               style={{ fontFamily: "'Libre Caslon Text', serif" }}
             >
               Media Assets
@@ -406,11 +840,11 @@ export default function AddProduct() {
           </section>
 
           {error && (
-            <p className="text-sm text-[#A32D2D] text-center -mt-16">{error}</p>
+            <p className="text-sm text-[#A32D2D] text-center -mt-10 sm:-mt-16 lg:-mt-20">{error}</p>
           )}
 
           {/* Buttons */}
-          <footer className="pt-16 pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <footer className="pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               type="submit"
               disabled={submitting}
