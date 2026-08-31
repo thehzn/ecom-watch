@@ -1,26 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Libre+Caslon+Text&family=Work+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 @import "tailwindcss";
 
 @theme {
-  --color-sidebar-bg: #F9F9F9;
-  --color-sidebar-border: #CFC4C5;
-  --color-nav-text: #5E5E5E;
-  --color-nav-hover: #F3F3F4;
-  --color-brand-black: #000000;
-  --color-subtitle-gray: #838484;
-  --color-badge-red: #BA1A1A;
-  --color-icon-dark: #1A1C1C;
+  --color-obsidian-950: #050608;
+  --color-obsidian-900: #090A0E;
+  --color-graphite-850: #0F1116;
+  --color-graphite-800: #151820;
+  --color-graphite-700: #1F2430;
+  --color-graphite-600: #2B3242;
 
-  --font-caslon: "Libre Caslon Text", serif;
-  --font-worksans: "Work Sans", sans-serif;
-  --font-inter: "Inter", sans-serif;
+  --color-platinum-white: #FFFFFF;
+  --color-platinum-100: #F8F9FA;
+  --color-platinum-200: #E2E8F0;
+  --color-platinum-300: #CBD5E1;
+  --color-platinum-muted: #8E95A5;
+
+  --font-stealth: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
+/* Brushed Titanium Light Reflection Animation */
+@keyframes titaniumSweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(150%) skewX(-25deg);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+/* Micro 3D Floating Motion for Timepiece */
+@keyframes stealthFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) rotate(0.6deg) scale(1.02);
+  }
+}
+
+/* Ambient Radial Pulse */
+@keyframes stealthPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.06);
+  }
+}
+
+.animate-titanium-sweep {
+  animation: titaniumSweep 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-stealth-float {
+  animation: stealthFloat 8s ease-in-out infinite;
+}
+
+.animate-stealth-pulse {
+  animation: stealthPulse 6s ease-in-out infinite;
+}
+
+.platinum-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body {
+  background-color: #08090C;
+  color: #FFFFFF;
+  font-family: var(--font-stealth);
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+}
+
+/* Sleek Titanium Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #08090C;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F2430;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
 }
