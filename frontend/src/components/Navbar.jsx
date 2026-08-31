@@ -1,241 +1,16 @@
-// import { useState, useRef, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { Search, ShoppingBag, User,Heart } from 'lucide-react';
-// import { logout as logoutAction } from '../redux/authSlice';
-
-// const NAV_LINKS = [
-//   { label: 'Home', to: '/' },
-//   { label: 'Categories', to: '/categories' },
-//   { label: 'About Us', to: '/about' },
-//   { label: 'Contact Us', to: '/contact' },
-// ];
-
-// const NAV_LINK_CLASS =
-//   "font-['Inter'] text-xs font-semibold text-[#5D5E63] transition-colors duration-200 hover:text-black";
-
-// const ACTION_BUTTON_CLASS =
-//   "w-full rounded font-['Inter'] text-xs font-semibold bg-black text-white px-4 py-2.5";
-
-// export default function Navbar() {
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
-//   const user = useSelector((state) => state.auth.user);
-
-//   const [query, setQuery] = useState('');
-//   const [profileOpen, setProfileOpen] = useState(false);
-//   const profileRef = useRef(null);
-//   const cartCount = useSelector((state) =>
-//     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
-//   );
-//   const wishlistCount = useSelector((state) => state.wishlist.items.length);
-
-//   // Close the profile panel when clicking outside it
-//   useEffect(() => {
-//     const handleClickOutside = (e) => {
-//       if (profileRef.current && !profileRef.current.contains(e.target)) {
-//         setProfileOpen(false);
-//       }
-//     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-
-//     return () => document.removeEventListener('mousedown', handleClickOutside);
-//   }, []);
-
-//   const handleSearchSubmit = (e) => {
-//     e.preventDefault();
-
-//     if (!query.trim()) return;
-
-//     navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
-//   };
-
-//   const handleLogout = () => {
-//     dispatch(logoutAction());
-//     setProfileOpen(false);
-//     navigate('/login');
-//   };
-
-//   const handleMyAccount = () => {
-//     setProfileOpen(false);
-//     navigate('/myaccount');
-//   };
-
-//   return (
-//     <header className="w-full bg-white border-b border-[#C4C7C7]/20">
-//       <div className="max-w-screen-2xl mx-auto px-5 py-4 flex items-center justify-between">
-
-//         {/* Title */}
-//         <button
-//           onClick={() => navigate('/')}
-//           className="font-['Libre_Caslon_Text'] text-2xl font-bold text-black tracking-wide"
-//         >
-//           CHRONOS
-//         </button>
-
-//         {/* Navigation Links */}
-//         <nav className="flex items-center gap-4">
-//           {NAV_LINKS.map((link) => (
-//             <button
-//               key={link.label}
-//               onClick={() => navigate(link.to)}
-//               className={NAV_LINK_CLASS}
-//             >
-//               {link.label}
-//             </button>
-//           ))}
-//         </nav>
-
-//         {/* Action Icons */}
-//         <div className="flex items-center gap-4">
-
-//           {/* Search Field */}
-//           <form
-//             onSubmit={handleSearchSubmit}
-//             className="flex items-center w-48 bg-[#F3F3F4] px-4 py-2"
-//           >
-//             <Search
-//               size={20}
-//               className="text-[#5D5E63] shrink-0"
-//             />
-
-//             <input
-//               type="text"
-//               value={query}
-//               onChange={(e) => setQuery(e.target.value)}
-//               placeholder="Search heritage..."
-//               className="bg-transparent outline-none w-full ml-2 font-['Inter'] text-xs placeholder:text-[#C6C6CB]"
-//             />
-//           </form>
-
-//           {/* Shopping Bag Icon */}
-//           {/* <button
-//             onClick={() => navigate('/cart')}
-//             aria-label="Shopping cart"
-//           >
-//             <ShoppingBag
-//               size={24}
-//               className="text-black"
-//             />
-//           </button> */}
-//           <button
-//   onClick={() => navigate('/cart')}
-//   aria-label="Shopping cart"
-//   className="relative"
-// >
-//   <ShoppingBag size={24} className="text-black" />
-//   {cartCount > 0 && (
-//     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-//       {cartCount}
-//     </span>
-//   )}
-// </button>
-// {/* wishlist heart icon  and count */}
-// <button
-//   onClick={() => navigate('/wishlist')}
-//   aria-label="Wishlist"
-//   className="relative"
-// >
-//   <Heart size={24} className="text-black" />
-//   {wishlistCount > 0 && (
-//     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-//       {wishlistCount}
-//     </span>
-//   )}
-// </button>
-
-//           {/* Profile Icon + Action Panel */}
-//           <div
-//             className="relative"
-//             ref={profileRef}
-//           >
-//             <button
-//               onClick={() => setProfileOpen((prev) => !prev)}
-//               aria-label="Account"
-//             >
-//               <User
-//                 size={24}
-//                 className="text-black"
-//               />
-//             </button>
-
-//             {profileOpen && (
-//               <div className="absolute right-0 mt-2 w-48 bg-white border border-[#CFC4C5] shadow-sm p-3 flex flex-col gap-2 z-50">
-
-//                 {user ? (
-//                   <>
-//                     {/* User Name */}
-//                     <p className="truncate font-['Inter'] text-xs font-semibold text-[#1A1C1C] px-1">
-//                       {user.firstName} {user.lastName}
-//                     </p>
-
-// {/*                    
-//                     <button
-//                       onClick={handleMyAccount}
-//                       className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
-//                     >
-//                       My Account
-//                     </button> */}
-//                     {/* My Account — hidden for admins */}
-//     {user.role !== 'admin' && (
-//       <button
-//         onClick={handleMyAccount}
-//         className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
-//       >
-//         My Account
-//       </button>
-//     )}
-
-//                     {/* Logout */}
-//                     <button
-//                       onClick={handleLogout}
-//                       className={ACTION_BUTTON_CLASS}
-//                     >
-//                       Logout
-//                     </button>
-//                   </>
-//                 ) : (
-//                   /* Login */
-//                   <button
-//                     onClick={() => {
-//                       setProfileOpen(false);
-//                       navigate('/login');
-//                     }}
-//                     className={ACTION_BUTTON_CLASS}
-//                   >
-//                     Login
-//                   </button>
-//                 )}
-
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
-
-
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search, ShoppingBag, User, Heart, Menu, X } from 'lucide-react';
 import { logout as logoutAction } from '../redux/authSlice';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
-  { label: 'Categories', to: '/categories' },
-  { label: 'About Us', to: '/about' },
-  { label: 'Contact Us', to: '/contact' },
+  { label: 'Collections', to: '/categories' },
+  { label: 'Timepieces', to: '/shop' },
+  { label: 'The Manufacture', to: '/about' },
+  { label: 'Concierge', to: '/contact' },
 ];
-
-const NAV_LINK_CLASS =
-  "font-['Inter'] text-xs font-semibold text-[#5D5E63] transition-colors duration-200 hover:text-black";
-
-const ACTION_BUTTON_CLASS =
-  "w-full rounded font-['Inter'] text-xs font-semibold bg-black text-white px-4 py-2.5";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -246,27 +21,32 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const profileRef = useRef(null);
 
   const cartCount = useSelector((state) =>
     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
-  const wishlistCount = useSelector((state) => state.wishlist.items.length);
+  const wishlistCount = useSelector((state) => state.wishlist?.items?.length || 0);
 
-  // Close the profile panel when clicking outside it
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close the mobile menu/search whenever the viewport grows back to desktop size
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -280,9 +60,7 @@ export default function Navbar() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-
     if (!query.trim()) return;
-
     navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
     setMobileSearchOpen(false);
     setMobileMenuOpen(false);
@@ -295,256 +73,215 @@ export default function Navbar() {
     navigate('/login');
   };
 
-  const handleMyAccount = () => {
-    setProfileOpen(false);
-    setMobileMenuOpen(false);
-    navigate('/myaccount');
-  };
-
-  const handleNavClick = (to) => {
-    navigate(to);
-    setMobileMenuOpen(false);
-  };
-
-  const handleMobileWishlist = () => {
-    navigate('/wishlist');
-    setMobileMenuOpen(false);
-  };
-
-  const handleMobileLogin = () => {
-    setMobileMenuOpen(false);
-    navigate('/login');
-  };
-
   return (
-    <header className="w-full bg-white border-b border-[#C4C7C7]/20 sticky top-0 z-40">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between gap-3">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        isScrolled
+          ? 'bg-[#08090C]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl py-3.5'
+          : 'bg-[#08090C]/80 backdrop-blur-md border-b border-white/5 py-4 sm:py-5'
+      }`}
+    >
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
+        
+        {/* Brand Logo */}
+        <Link to="/" className="flex flex-col items-start group">
+          <span className="text-xl sm:text-2xl font-bold tracking-[0.25em] text-white group-hover:text-gray-300 transition-colors">
+            CHRONOS
+          </span>
+          <span className="text-[8px] sm:text-[9px] tracking-[0.35em] text-gray-400 uppercase font-semibold">
+            Haute Horlogerie
+          </span>
+        </Link>
 
-        {/* Title */}
-        <button
-          onClick={() => navigate('/')}
-          className="font-['Libre_Caslon_Text'] text-lg sm:text-xl md:text-2xl font-bold text-black tracking-wide shrink-0"
-        >
-          CHRONOS
-        </button>
-
-        {/* Navigation Links — desktop only */}
-        <nav className="hidden md:flex items-center gap-4 lg:gap-6">
+        {/* Desktop Nav Links */}
+        <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
           {NAV_LINKS.map((link) => (
-            <button
+            <Link
               key={link.label}
-              onClick={() => navigate(link.to)}
-              className={NAV_LINK_CLASS}
+              to={link.to}
+              className="relative text-xs uppercase tracking-[0.18em] text-gray-300 hover:text-white font-semibold transition-colors py-1 group"
             >
               {link.label}
-            </button>
+              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white transition-all duration-300 group-hover:w-full" />
+            </Link>
           ))}
         </nav>
 
-        {/* Action Icons */}
-        <div className="flex items-center gap-3 sm:gap-4">
-
-          {/* Search Field — desktop only */}
+        {/* Right Actions */}
+        <div className="flex items-center gap-3 sm:gap-5">
+          
+          {/* Desktop Search */}
           <form
             onSubmit={handleSearchSubmit}
-            className="hidden md:flex items-center w-40 lg:w-48 bg-[#F3F3F4] px-4 py-2"
+            className="hidden md:flex items-center w-48 xl:w-60 bg-[#12151B] border border-white/15 focus-within:border-white/50 rounded-full px-4 py-2 transition-all"
           >
-            <Search size={20} className="text-[#5D5E63] shrink-0" />
+            <Search size={15} className="text-gray-400 shrink-0" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search product..."
-              className="bg-transparent outline-none w-full ml-2 font-['Inter'] text-xs placeholder:text-[#C6C6CB]"
+              placeholder="Search timepieces..."
+              className="bg-transparent outline-none w-full ml-2.5 text-xs text-white placeholder:text-gray-500"
             />
           </form>
 
-          {/* Search icon — mobile only, toggles search bar below header */}
+          {/* Mobile Search Toggle */}
           <button
             onClick={() => setMobileSearchOpen((prev) => !prev)}
             aria-label="Search"
-            className="md:hidden"
+            className="p-2 text-gray-300 hover:text-white md:hidden transition-colors"
           >
-            <Search size={22} className="text-black" />
+            <Search size={20} />
           </button>
 
-          {/* Shopping Bag Icon — always visible, mobile priority action */}
-          <button
-            onClick={() => navigate('/cart')}
-            aria-label="Shopping cart"
-            className="relative"
-          >
-            <ShoppingBag size={22} className="sm:hidden text-black" />
-            <ShoppingBag size={24} className="hidden sm:block text-black" />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-full min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] flex items-center justify-center px-1">
-                {cartCount}
-              </span>
-            )}
-          </button>
-
-          {/* Wishlist heart icon — desktop only, lives in mobile menu on small screens */}
-          <button
-            onClick={() => navigate('/wishlist')}
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
             aria-label="Wishlist"
-            className="relative hidden md:block"
+            className="relative p-2 text-gray-300 hover:text-white transition-colors"
           >
-            <Heart size={24} className="text-black" />
+            <Heart size={20} />
             {wishlistCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <span className="absolute top-1 -right-1 bg-white text-black text-[10px] font-bold rounded-full min-w-[17px] h-[17px] flex items-center justify-center px-1 shadow-md">
                 {wishlistCount}
               </span>
             )}
-          </button>
+          </Link>
 
-          {/* Profile Icon + Action Panel — desktop only, lives in mobile menu on small screens */}
+          {/* Shopping Bag */}
+          <Link
+            to="/cart"
+            aria-label="Shopping bag"
+            className="relative p-2 text-gray-300 hover:text-white transition-colors"
+          >
+            <ShoppingBag size={20} />
+            {cartCount > 0 && (
+              <span className="absolute top-1 -right-1 bg-white text-black text-[10px] font-bold rounded-full min-w-[17px] h-[17px] flex items-center justify-center px-1 shadow-md">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          {/* User Profile */}
           <div className="relative hidden md:block" ref={profileRef}>
             <button
               onClick={() => setProfileOpen((prev) => !prev)}
               aria-label="Account"
+              className="flex items-center gap-2 p-2 text-gray-300 hover:text-white transition-colors"
             >
-              <User size={24} className="text-black" />
+              <User size={20} />
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-[#CFC4C5] shadow-sm p-3 flex flex-col gap-2 z-50">
-
+              <div className="absolute right-0 mt-3 w-56 bg-[#101318] border border-white/20 shadow-2xl p-3 rounded-xl flex flex-col gap-2 z-50 backdrop-blur-xl">
                 {user ? (
                   <>
-                    {/* User Name */}
-                    <p className="truncate font-['Inter'] text-xs font-semibold text-[#1A1C1C] px-1">
-                      {user.firstName} {user.lastName}
-                    </p>
+                    <div className="px-3 py-2 border-b border-white/10">
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+                        Client
+                      </p>
+                      <p className="truncate text-sm font-medium text-white">
+                        {user.firstName} {user.lastName}
+                      </p>
+                    </div>
 
-                    {/* My Account — hidden for admins */}
                     {user.role !== 'admin' && (
-                      <button
-                        onClick={handleMyAccount}
-                        className="w-full text-left font-['Inter'] text-xs font-semibold text-black px-2 py-2.5 hover:bg-[#F3F3F4] transition-colors"
+                      <Link
+                        to="/myaccount"
+                        onClick={() => setProfileOpen(false)}
+                        className="w-full text-left text-xs text-gray-300 px-3 py-2 hover:bg-white/10 hover:text-white rounded transition-colors"
                       >
-                        My Account
-                      </button>
+                        Client Dashboard
+                      </Link>
                     )}
 
-                    {/* Logout */}
                     <button
                       onClick={handleLogout}
-                      className={ACTION_BUTTON_CLASS}
+                      className="w-full mt-1 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-lg transition-all"
                     >
-                      Logout
+                      Sign Out
                     </button>
                   </>
                 ) : (
-                  /* Login */
-                  <button
-                    onClick={() => {
-                      setProfileOpen(false);
-                      navigate('/login');
-                    }}
-                    className={ACTION_BUTTON_CLASS}
-                  >
-                    Login
-                  </button>
+                  <div className="p-2 flex flex-col gap-2">
+                    <p className="text-xs text-gray-400 text-center">
+                      Experience bespoke horology privileges.
+                    </p>
+                    <Link
+                      to="/login"
+                      onClick={() => setProfileOpen(false)}
+                      className="w-full text-center bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-all"
+                    >
+                      Client Login
+                    </Link>
+                  </div>
                 )}
-
               </div>
             )}
           </div>
 
-          {/* Hamburger — mobile only */}
+          {/* Mobile Hamburger */}
           <button
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            className="md:hidden"
+            aria-label="Toggle menu"
+            className="p-2 text-gray-300 hover:text-white lg:hidden transition-colors"
           >
-            {mobileMenuOpen ? (
-              <X size={22} className="text-black" />
-            ) : (
-              <Menu size={22} className="text-black" />
-            )}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile search bar — toggled by the search icon */}
+      {/* Mobile Search Dropdown */}
       {mobileSearchOpen && (
-        <div className="md:hidden border-t border-[#C4C7C7]/20 px-4 py-3">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex items-center w-full bg-[#F3F3F4] px-4 py-2.5"
-          >
-            <Search size={18} className="text-[#5D5E63] shrink-0" />
+        <div className="md:hidden border-t border-white/10 bg-[#0B0D11] px-4 py-3">
+          <form onSubmit={handleSearchSubmit} className="flex items-center w-full bg-[#161920] border border-white/20 rounded-lg px-3 py-2">
+            <Search size={16} className="text-gray-400 shrink-0" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search heritage..."
+              placeholder="Search timepieces..."
               autoFocus
-              className="bg-transparent outline-none w-full ml-2 font-['Inter'] text-sm placeholder:text-[#C6C6CB]"
+              className="bg-transparent outline-none w-full ml-2 text-xs text-white placeholder:text-gray-500"
             />
           </form>
         </div>
       )}
 
-      {/* Mobile nav menu — toggled by the hamburger. Holds nav links, Wishlist, and Account/Login. */}
+      {/* Mobile Nav Menu */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-[#C4C7C7]/20 px-4 py-3 flex flex-col">
+        <nav className="lg:hidden border-t border-white/10 bg-[#0B0D11]/98 backdrop-blur-2xl px-6 py-6 flex flex-col gap-4 shadow-2xl">
           {NAV_LINKS.map((link) => (
-            <button
+            <Link
               key={link.label}
-              onClick={() => handleNavClick(link.to)}
-              className="text-left font-['Inter'] text-sm font-semibold text-[#1A1C1C] py-3 border-b border-[#C4C7C7]/10 hover:text-black transition-colors"
+              to={link.to}
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-left text-sm uppercase tracking-[0.15em] text-gray-300 hover:text-white py-2 border-b border-white/5 transition-colors"
             >
               {link.label}
-            </button>
+            </Link>
           ))}
 
-          {/* Wishlist */}
-          <button
-            onClick={handleMobileWishlist}
-            className="flex items-center justify-between text-left font-['Inter'] text-sm font-semibold text-[#1A1C1C] py-3 border-b border-[#C4C7C7]/10 hover:text-black transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <Heart size={16} />
-              Wishlist
-            </span>
-            {wishlistCount > 0 && (
-              <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                {wishlistCount}
-              </span>
-            )}
-          </button>
-
-          {/* Account / Login */}
           {user ? (
-            <>
-              <p className="font-['Inter'] text-xs font-semibold text-[#5D5E63] pt-3 pb-1">
-                {user.firstName} {user.lastName}
-              </p>
-
-              {user.role !== 'admin' && (
-                <button
-                  onClick={handleMyAccount}
-                  className="text-left font-['Inter'] text-sm font-semibold text-[#1A1C1C] py-3 border-b border-[#C4C7C7]/10 hover:text-black transition-colors"
-                >
-                  My Account
-                </button>
-              )}
-
+            <div className="pt-3 flex flex-col gap-3">
+              <div className="text-xs text-gray-400">
+                Signed in as <span className="text-white font-medium">{user.firstName}</span>
+              </div>
               <button
                 onClick={handleLogout}
-                className={`${ACTION_BUTTON_CLASS} mt-3`}
+                className="w-full bg-white text-black text-xs font-bold uppercase tracking-wider py-3 rounded-lg"
               >
-                Logout
+                Sign Out
               </button>
-            </>
+            </div>
           ) : (
-            <button
-              onClick={handleMobileLogin}
-              className={`${ACTION_BUTTON_CLASS} mt-3`}
+            <Link
+              to="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center mt-2 bg-white text-black text-xs font-bold uppercase tracking-wider py-3 rounded-lg"
             >
-              Login
-            </button>
+              Client Login
+            </Link>
           )}
         </nav>
       )}
