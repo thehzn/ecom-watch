@@ -7,7 +7,7 @@ import CTASection from '../components/about/CTASection';
 
 export default function About() {
   return (
-    <article className="w-full bg-white min-h-screen flex flex-col">
+    <article className="w-full bg-[#08090C] text-white min-h-screen flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-white selection:text-black">
       <HeroSection />
       <HeritageSection />
       <ArtSection />
