@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-
+import { ArrowLeft, User, Mail, ArrowRight, Sparkles } from 'lucide-react';
 import { updateUser } from '../redux/authSlice';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
@@ -27,21 +27,6 @@ const validationSchema = Yup.object({
     .email('Please enter a valid email address'),
 });
 
-const inputClasses =
-  'peer w-full border-0 border-b border-[rgba(116,120,120,0.4)] bg-transparent pt-4 pb-2 text-[16px] font-normal text-black outline-none transition-colors duration-300 placeholder-transparent focus:border-black';
-
-const labelClasses =
-  'absolute left-0 top-4 text-[16px] text-[#9A9C9C] transition-all duration-300 peer-focus:top-[-8px] peer-focus:text-[12px] peer-focus:uppercase peer-focus:tracking-[0.05em] peer-focus:text-[#5D5E63] peer-[:not(:placeholder-shown)]:top-[-8px] peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.05em] peer-[:not(:placeholder-shown)]:text-[#5D5E63]';
-
-function FieldError({ children }) {
-  if (!children) return null;
-  return (
-    <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {children}
-    </p>
-  );
-}
-
 export default function EditProfile() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -52,9 +37,6 @@ export default function EditProfile() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const formik = useFormik({
-    // enableReinitialize so the form fills with the current user once the
-    // redux state is available (it's already in memory on this route, but
-    // this keeps the form correct if that ever changes).
     enableReinitialize: true,
     initialValues: {
       firstName: user.firstName || '',
@@ -66,7 +48,7 @@ export default function EditProfile() {
       setFormError('');
       setSuccessMessage('');
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/apiuser/user/updateprofile`, {
+        const res = await fetch(`${(import.meta.env.VITE_API_URL || 'http://localhost:3000')}/apiuser/user/updateprofile`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -89,10 +71,8 @@ export default function EditProfile() {
           return;
         }
 
-        // Sync the new details into redux + localStorage so the rest of the
-        // app (My Account header, navbar, etc.) reflects the change right away.
         dispatch(updateUser(data.user));
-        setSuccessMessage('Profile updated successfully.');
+        setSuccessMessage('Client dossier updated successfully.');
         setTimeout(() => navigate('/myaccount'), 1200);
       } catch {
         setFormError('Unable to reach the server. Please try again.');
@@ -103,113 +83,140 @@ export default function EditProfile() {
   });
 
   return (
-    <div className="w-full flex justify-center bg-[#F9F9F9] px-5 py-16">
-      <div className="w-full max-w-[448px]">
-        <h1
-          className="mb-2 text-black"
-          style={{ fontFamily: "'Libre Caslon Text', serif", fontSize: '32px', fontWeight: 400, lineHeight: '40px' }}
+    <div className="min-h-screen w-full bg-[#08090C] text-white flex flex-col justify-between font-['Plus_Jakarta_Sans'] selection:bg-white selection:text-black relative overflow-hidden">
+      
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle,_rgba(255,255,255,0.06)_0%,_transparent_70%)] pointer-events-none" />
+
+      {/* Header */}
+      <header className="w-full border-b border-white/10 bg-[#08090C]/80 backdrop-blur-xl px-6 py-5 sm:px-12 flex items-center justify-between z-20">
+        <Link to="/" className="flex flex-col group">
+          <span className="text-xl sm:text-2xl font-bold tracking-[0.25em] text-white">CHRONOS</span>
+          <span className="text-[8px] tracking-[0.35em] text-gray-400 uppercase font-semibold">Haute Horlogerie</span>
+        </Link>
+        <Link
+          to="/myaccount"
+          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-gray-300 hover:text-white transition-colors"
         >
-          Edit Profile
-        </h1>
-        <p className="mb-10" style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#5D5E63' }}>
-          Update your name and email address.
-        </p>
+          <ArrowLeft size={14} />
+          <span>Return to Dashboard</span>
+        </Link>
+      </header>
 
-        {successMessage ? (
-          <p className="text-sm text-black" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {successMessage}
-          </p>
-        ) : (
-          <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-8">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-              <div className="relative">
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  placeholder="First Name"
-                  autoComplete="given-name"
-                  value={formik.values.firstName}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-                <label htmlFor="firstName" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  First Name
-                </label>
-                {formik.touched.firstName && <FieldError>{formik.errors.firstName}</FieldError>}
+      {/* Main Form */}
+      <main className="relative flex-1 flex items-center justify-center px-6 py-12 z-10">
+        <div className="w-full max-w-[460px] bg-[#0E1015]/90 border border-white/15 backdrop-blur-2xl rounded-3xl p-8 sm:p-12 shadow-2xl">
+          
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/15 text-[10px] uppercase tracking-[0.25em] text-gray-300 mb-4">
+              <Sparkles size={11} />
+              Client Dossier
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-white">
+              Edit Profile
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400 mt-2 font-normal">
+              Update your personal credentials and communication email.
+            </p>
+          </div>
+
+          {successMessage ? (
+            <div className="p-4 bg-white/10 border border-white/20 rounded-2xl text-center text-sm font-medium text-white">
+              {successMessage}
+            </div>
+          ) : (
+            <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    placeholder="Jean"
+                    value={formik.values.firstName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3 outline-none transition-colors"
+                  />
+                  {formik.touched.firstName && formik.errors.firstName && (
+                    <p className="text-red-400 text-xs mt-1">{formik.errors.firstName}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    placeholder="Dufour"
+                    value={formik.values.lastName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3 outline-none transition-colors"
+                  />
+                  {formik.touched.lastName && formik.errors.lastName && (
+                    <p className="text-red-400 text-xs mt-1">{formik.errors.lastName}</p>
+                  )}
+                </div>
               </div>
 
-              <div className="relative">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Client Email Address
+                </label>
                 <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  placeholder="Last Name"
-                  autoComplete="family-name"
-                  value={formik.values.lastName}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="client@chronos.com"
+                  value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3 outline-none transition-colors"
                 />
-                <label htmlFor="lastName" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Last Name
-                </label>
-                {formik.touched.lastName && <FieldError>{formik.errors.lastName}</FieldError>}
+                {formik.touched.email && formik.errors.email && (
+                  <p className="text-red-400 text-xs mt-1">{formik.errors.email}</p>
+                )}
               </div>
-            </div>
 
-            <div className="relative">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Email Address"
-                autoComplete="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={inputClasses}
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              />
-              <label htmlFor="email" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                Email Address
-              </label>
-              {formik.touched.email && <FieldError>{formik.errors.email}</FieldError>}
-            </div>
+              {formError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-300 text-center">
+                  {formError}
+                </div>
+              )}
 
-            {formError && <FieldError>{formError}</FieldError>}
+              <button
+                type="submit"
+                disabled={formik.isSubmitting}
+                className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full shadow-lg transition-all disabled:opacity-60"
+              >
+                <span>{formik.isSubmitting ? 'Saving Changes…' : 'Save Changes'}</span>
+                <ArrowRight size={15} />
+              </button>
 
-            <button
-              type="submit"
-              disabled={formik.isSubmitting}
-              className="w-full bg-black text-white transition-colors duration-300 hover:bg-[#333333] active:scale-[0.98] disabled:opacity-70"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                padding: '20px',
-              }}
-            >
-              {formik.isSubmitting ? 'Saving…' : 'Save Changes'}
-            </button>
+              <div className="text-center mt-2">
+                <Link
+                  to="/myaccount"
+                  className="text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
+                >
+                  Cancel and return
+                </Link>
+              </div>
+            </form>
+          )}
 
-            <Link
-              to="/myaccount"
-              className="text-center"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: 600, color: '#5D5E63' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#000000')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#5D5E63')}
-            >
-              Cancel and return to My Account
-            </Link>
-          </form>
-        )}
-      </div>
+        </div>
+      </main>
+
+      <footer className="w-full border-t border-white/5 py-4 px-6 text-center text-[10px] text-gray-500 tracking-widest uppercase">
+        256-Bit Encrypted Atelier Access • Geneva Standard
+      </footer>
     </div>
   );
 }

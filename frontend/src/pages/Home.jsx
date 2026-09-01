@@ -16,25 +16,24 @@ import {
 import { useApi } from '../hooks/useApi';
 import { addToWishlistLocal } from '../redux/wishlistSlice';
 
-// Asset Imports
 import classicWatch from '../assets/classic-watch.jpg';
 import sportWatch from '../assets/sport-watch.jpg';
 import heritageWatch from '../assets/heritage-watch.jpg';
 import limitedWatch from '../assets/limited-watch.jpg';
-import heroWatchImg from '../assets/luxury_watch_hero.png';
+import heroWatchImg from '../assets/luxury_titanium_watch.jpg';
 
 const COLLECTIONS = [
   {
     tag: 'TITANIUM & PLATINUM',
     title: 'Heritage Classic',
-    desc: 'The purest architectural balance of Grade 5 titanium, sunray dials, and hand-beveled mechanics.',
+    desc: 'The purest architectural balance of Grade 5 titanium, skeleton dials, and hand-beveled mechanics.',
     to: '/categories?category=Heritage',
     image: heritageWatch,
   },
   {
     tag: 'CHRONOGRAPH DYNAMICS',
     title: 'Cosmograph & Sport',
-    desc: 'Forged carbon and ceramic tachymeter bezels built to endure high-performance motorsport and aviation.',
+    desc: 'Forged titanium and ceramic tachymeter bezels built to endure high-performance motorsport and aviation.',
     to: '/categories?category=Contemporary',
     image: sportWatch,
   },
@@ -57,10 +56,10 @@ const COLLECTIONS = [
 const FALLBACK_TRENDING = [
   {
     _id: 'stealth-1',
-    modelName: 'Chronos Sub-Ocean Titanium 41mm',
+    modelName: 'Aura Tourbillon Chrono 42mm',
     brand: 'Chronos',
-    price: 15400,
-    caseMaterial: 'Grade 5 Titanium & Ceramic',
+    price: 18500,
+    caseMaterial: 'Grade 5 Titanium & Fluted Bezel',
     glassType: 'Anti-Reflective Sapphire',
     category: 'Contemporary',
     badge: 'New 2026 Model',
@@ -143,42 +142,34 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#08090C] text-white selection:bg-white selection:text-black font-['Plus_Jakarta_Sans']">
       
-      {/* ---------------- 1. CINEMATIC STEALTH TITANIUM HERO SECTION ---------------- */}
+      {/* 1. CINEMATIC TITANIUM TOURBILLON HERO SECTION */}
       <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0B0D12] via-[#08090C] to-[#0B0D12] px-6 sm:px-12 py-16 border-b border-white/10">
         
-        {/* Radial Titanium Spotlight */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[700px] sm:h-[1000px] bg-[radial-gradient(circle,_rgba(255,255,255,0.07)_0%,_rgba(8,9,12,0)_70%)] pointer-events-none animate-stealth-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[700px] sm:h-[1000px] bg-[radial-gradient(circle,_rgba(255,255,255,0.08)_0%,_rgba(8,9,12,0)_70%)] pointer-events-none animate-stealth-pulse" />
         
-        {/* Sweeping Light Reflection */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="w-[35%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent blur-2xl animate-titanium-sweep" />
         </div>
 
         <div className="relative max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-10">
           
-          {/* Left Text Column */}
           <div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left">
-            
-            {/* Pill Tag */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
               <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gray-200">
-                Grade 5 Titanium • 2026 Collection
+                Calibre 9820 • Flying Tourbillon Chrono
               </span>
             </div>
 
-            {/* Main Headline */}
             <h1 className="text-4xl sm:text-6xl xl:text-7xl font-bold leading-[1.05] tracking-tight text-white">
-              ENGINEERED <br />
-              <span className="platinum-gradient-text font-light">PERFECTION</span>
+              AEROSPACE TITANIUM <br />
+              <span className="platinum-gradient-text font-light">OPEN-WORKED TOURBILLON</span>
             </h1>
 
-            {/* Description */}
             <p className="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed max-w-lg font-normal">
-              A benchmark of high-precision Swiss horology. Machined from solid aerospace titanium and platinum, crafted to outlast the generations that wear it.
+              Machined from solid Grade 5 aerospace titanium with an open-worked flying tourbillon, fluted bezel, and luminescent markers. Engineered in Geneva to withstand 300 meters of hydrostatic pressure.
             </p>
 
-            {/* Action Buttons */}
             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
               <Link
                 to="/shop"
@@ -196,66 +187,59 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Technical Highlights Bar */}
             <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-3 gap-6 text-left w-full max-w-lg">
               <div>
                 <p className="text-lg sm:text-xl font-bold text-white">72 H</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Power Reserve</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Twin Power Reserve</p>
               </div>
               <div>
                 <p className="text-lg sm:text-xl font-bold text-white">300 M</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Water Sealed</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Triplock Hermetic</p>
               </div>
               <div>
-                <p className="text-lg sm:text-xl font-bold text-white">CAL. 9820</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Manufacture Engine</p>
+                <p className="text-lg sm:text-xl font-bold text-white">GRADE 5</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Aerospace Titanium</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 relative flex items-center justify-center">
+            <div className="absolute w-[380px] sm:w-[500px] h-[380px] sm:h-[500px] rounded-full border border-white/10 pointer-events-none" />
+            <div className="absolute w-[320px] sm:w-[440px] h-[320px] sm:h-[440px] rounded-full border border-dashed border-white/20 pointer-events-none" />
+
+            <div className="relative z-10 animate-stealth-float p-4">
+              <div className="relative w-[300px] sm:w-[420px] xl:w-[470px] aspect-square rounded-3xl overflow-hidden bg-[#0A0B0E] border border-white/20 shadow-2xl">
+                <img
+                  src={heroWatchImg}
+                  alt="Chronos Stealth Titanium Chronograph"
+                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  loading="eager"
+                />
               </div>
             </div>
 
-          </div>
-
-          {/* Right Floating Timepiece Video Showcase */}
-          <div className="lg:col-span-6 relative flex items-center justify-center">
-            
-            {/* Precision Rings */}
-            <div className="absolute w-[360px] sm:w-[480px] h-[360px] sm:h-[480px] rounded-full border border-white/10 pointer-events-none" />
-            <div className="absolute w-[300px] sm:w-[420px] h-[300px] sm:h-[420px] rounded-full border border-dashed border-white/20 pointer-events-none" />
-
-            {/* Floating Watch */}
-            <div className="relative z-10 animate-stealth-float">
-              <img
-                src={heroWatchImg}
-                alt="Chronos Stealth Titanium Masterpiece"
-                className="w-[300px] sm:w-[420px] xl:w-[480px] object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.95)]"
-              />
+            <div className="absolute left-0 sm:left-2 top-8 bg-[#0F1116]/95 backdrop-blur-xl border border-white/25 px-4 py-3 rounded-2xl shadow-2xl z-20 hidden sm:block">
+              <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">CASE ARCHITECTURE</p>
+              <p className="text-xs font-semibold text-white mt-0.5">Grade 5 Titanium & Fluted Bezel</p>
             </div>
 
-            {/* Floating Titanium Spec Badges */}
-            <div className="absolute left-0 sm:left-4 top-10 bg-[#0F1116]/90 backdrop-blur-xl border border-white/20 px-4 py-3 rounded-xl shadow-2xl z-20 hidden sm:block">
-              <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">CASE ALLOY</p>
-              <p className="text-xs font-semibold text-white mt-0.5">Grade 5 Titanium & Platinum</p>
+            <div className="absolute right-0 sm:right-2 bottom-8 bg-[#0F1116]/95 backdrop-blur-xl border border-white/25 px-4 py-3 rounded-2xl shadow-2xl z-20 hidden sm:block">
+              <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">ESCAPEMENT</p>
+              <p className="text-xs font-semibold text-white mt-0.5">Flying Tourbillon • -2/+2 sec/day</p>
             </div>
 
-            <div className="absolute right-0 sm:right-4 bottom-8 bg-[#0F1116]/90 backdrop-blur-xl border border-white/20 px-4 py-3 rounded-xl shadow-2xl z-20 hidden sm:block">
-              <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">ACCURACY</p>
-              <p className="text-xs font-semibold text-white mt-0.5">-2/+2 sec/day Superlative</p>
-            </div>
-
-            {/* Simulation Tag */}
-            <div className="absolute -bottom-6 sm:bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 text-[10px] text-gray-300">
+            <div className="absolute -bottom-6 sm:bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 text-[10px] text-gray-300">
               <Play size={10} className="fill-white text-white" />
-              <span>Cinematic 3D Simulation</span>
+              <span>Geneva Manufacture Masterpiece</span>
             </div>
-
           </div>
 
         </div>
       </section>
 
-      {/* ---------------- 2. SUPERLATIVE STANDARDS STRIP ---------------- */}
+      {/* 2. SUPERLATIVE STANDARDS STRIP */}
       <section className="w-full bg-[#0C0E12] border-b border-white/10 py-8 px-6 sm:px-12">
         <div className="max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center sm:text-left">
-          
           <div className="flex flex-col sm:flex-row items-center gap-3.5">
             <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0">
               <Award size={18} />
@@ -295,13 +279,11 @@ export default function Home() {
               <p className="text-[11px] text-gray-400 mt-0.5">Manufacture Standard</p>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* ---------------- 3. FEATURED TIMEPIECES (TRENDING SECTION) ---------------- */}
+      {/* 3. TRENDING SECTION */}
       <section className="w-full py-20 sm:py-28 px-6 sm:px-12 max-w-[1600px] mx-auto">
-        
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
           <div>
             <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.25em] block mb-2">
@@ -321,7 +303,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Timepiece Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {trendingProducts.map((product) => {
             const isWishlisted = wishlistItems.some((w) => w._id === product._id);
@@ -331,7 +312,6 @@ export default function Home() {
                 onClick={() => navigate(`/product/${product._id}`)}
                 className="group relative bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col justify-between hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(255,255,255,0.06)]"
               >
-                {/* Watch Showcase Image Box */}
                 <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#141720] p-8 flex items-center justify-center">
                   <img
                     src={product.mainImage}
@@ -339,12 +319,10 @@ export default function Home() {
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                   />
 
-                  {/* Badge */}
                   <span className="absolute top-4 left-4 bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
                     {product.badge || 'New 2026'}
                   </span>
 
-                  {/* Wishlist Button */}
                   <button
                     onClick={(e) => handleWishlist(e, product)}
                     aria-label="Save to Wishlist"
@@ -353,7 +331,6 @@ export default function Home() {
                     <Heart size={15} className={isWishlisted ? 'fill-white text-white' : ''} />
                   </button>
 
-                  {/* Configure Bar */}
                   <div className="absolute bottom-3 inset-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                     <span className="w-full block bg-white text-black text-[11px] font-bold uppercase tracking-wider py-2.5 rounded-lg text-center shadow-lg">
                       Configure Model
@@ -361,7 +338,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Details */}
                 <div className="p-5 flex flex-col gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
                     {product.category || 'Oyster Perpetual'}
@@ -388,13 +364,11 @@ export default function Home() {
             );
           })}
         </div>
-
       </section>
 
-      {/* ---------------- 4. PILLAR COLLECTIONS ---------------- */}
+      {/* 4. PILLAR COLLECTIONS */}
       <section className="w-full py-20 bg-[#060709] border-t border-white/10">
         <div className="max-w-[1600px] mx-auto px-6 sm:px-12">
-          
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">
               The Configurations
@@ -442,16 +416,13 @@ export default function Home() {
               </Link>
             ))}
           </div>
-
         </div>
       </section>
 
-      {/* ---------------- 5. MANUFACTURE CRAFTSMANSHIP SPOTLIGHT ---------------- */}
+      {/* 5. CRAFTSMANSHIP SPOTLIGHT */}
       <section className="w-full py-24 px-6 sm:px-12 max-w-[1600px] mx-auto">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0F1116] to-[#08090C] border border-white/15 p-8 sm:p-16 shadow-2xl">
-          
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
             <div className="lg:col-span-6 flex flex-col">
               <span className="text-xs font-bold uppercase tracking-[0.25em] text-gray-400">
                 Inside the Manufacture
@@ -513,9 +484,7 @@ export default function Home() {
                 />
               </div>
             </div>
-
           </div>
-
         </div>
       </section>
 
