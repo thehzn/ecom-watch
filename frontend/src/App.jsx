@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
 import Home from './pages/Home';
@@ -11,7 +10,6 @@ import AdminProfile from './pages/admin/AdminProfile';
 import UnauthorizedPage from './pages/errors/UnauthorizedPage';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ServerErrorPage from './pages/errors/ServerErrorPage';
-import Navbar from './components/Navbar';
 import Shop from './pages/Shop';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -27,7 +25,6 @@ import Customers from './pages/admin/Customers';
 import Categories from './pages/Categories';
 import Wishlist from './pages/Wishlist';
 import Cart from './pages/Cart';
-
 import FAQ from './pages/FAQ';
 import Checkout from './pages/Checkout';
 import OrderConfirmed from './pages/OrderConfirmed';
@@ -40,45 +37,32 @@ import Enquiry from './pages/Enquiry';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
 
- 
-
 function App() {
   return (
     <>
       <Routes>
-
         {/* site routes — shared Navbar/Footer via UserLayout */}
         <Route element={<UserLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
-
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path='/faq' element={<FAQ />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path='/enquiry' element={<Enquiry/>}/>
-
-          
-           <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/order-confirmed" element={<OrderConfirmed/>} />
-             <Route path="/myaccount" element={<MyAccount />} />
-             <Route path="/my-orders" element={<MyOrders />} />
-             <Route path="/security" element={<Security />} />
-             <Route path="/edit-profile" element={<EditProfile />} />
-
- 
-
+          <Route path="/enquiry" element={<Enquiry />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-confirmed" element={<OrderConfirmed />} />
+          <Route path="/myaccount" element={<MyAccount />} />
+          <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
 
-        {/* auth routes — each page ships its own header, not the site UserLayout */}
+        {/* auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -87,8 +71,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/reset-request" element={<AdminForgotPassword />} />
 
-        {/* admin routes */}
-
+        {/* admin protected routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
@@ -100,7 +83,6 @@ function App() {
             <Route path="order/:id" element={<OrderDetail />} />
             <Route path="users" element={<Customers />} />
             <Route path="notifications" element={<AdminNotifications />} />
-
           </Route>
         </Route>
 
@@ -110,7 +92,7 @@ function App() {
         <Route path="/server-error" element={<ServerErrorPage />} />
       </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

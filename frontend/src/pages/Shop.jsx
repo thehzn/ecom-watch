@@ -111,7 +111,6 @@ export default function Shop() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [material, setMaterial] = useState('All Materials');
   
-  // Initialize and auto-sync 'productFor' based on search keyword
   const [productFor, setProductFor] = useState(() => {
     if (!search) return 'Men';
     const s = search.toLowerCase().trim();
@@ -125,7 +124,6 @@ export default function Shop() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState('');
 
-  // When search query changes from Navbar, auto-adapt the 'productFor' filter
   useEffect(() => {
     if (search) {
       const s = search.toLowerCase().trim();
@@ -205,7 +203,6 @@ export default function Shop() {
   return (
     <div className="min-h-screen w-full bg-[#08090C] text-white font-['Plus_Jakarta_Sans']">
       
-      {/* Collection Hero */}
       <section className="w-full bg-[#0B0D12] border-b border-white/10 px-5 py-14 sm:py-20 text-center relative overflow-hidden">
         <div className="relative mx-auto flex max-w-3xl flex-col items-center">
           <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-3">
@@ -222,13 +219,12 @@ export default function Shop() {
         </div>
       </section>
 
-      {/* Search context banner */}
       {search && (
         <section className="mx-auto flex max-w-[1600px] flex-col gap-2 border-b border-white/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <Search size={16} className="text-gray-400" />
             <p className="text-sm text-gray-300">
-              Search results for <span className="font-bold text-white">"{search}"</span>
+              Search results for <span className="font-bold text-white">"${search}"</span>
             </p>
           </div>
           <button
@@ -241,11 +237,8 @@ export default function Shop() {
         </section>
       )}
 
-      {/* Filter bar */}
       <section className="mx-auto flex max-w-[1600px] flex-col gap-4 border-b border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between bg-[#08090C]/90 backdrop-blur-md sticky top-[68px] z-30">
         <div className="flex flex-wrap items-center gap-6 sm:gap-8">
-          
-          {/* Material Filter */}
           <div className="flex flex-col">
             <label htmlFor="material" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
               Material
@@ -264,7 +257,6 @@ export default function Shop() {
             </select>
           </div>
 
-          {/* Gender / Edition Filter */}
           <div className="flex flex-col">
             <label htmlFor="for" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
               For
@@ -289,7 +281,6 @@ export default function Shop() {
         </p>
       </section>
 
-      {/* Product grid */}
       <section className="mx-auto max-w-[1600px] px-6 py-12 sm:py-16">
         {loading && (
           <div className="py-24 text-center">
@@ -312,7 +303,7 @@ export default function Shop() {
             <button
               onClick={() => {
                 setMaterial('All Materials');
-                setProductFor('All');
+                setProductFor('Men');
                 clearSearch();
               }}
               className="mt-4 text-white underline text-xs uppercase tracking-wider font-bold"
@@ -331,7 +322,6 @@ export default function Shop() {
         )}
       </section>
 
-      {/* Load more + pagination */}
       {!loading && !fetchError && totalPages > 1 && (
         <section className="flex flex-col items-center gap-6 border-t border-white/10 px-5 py-16">
           {page < totalPages && (
