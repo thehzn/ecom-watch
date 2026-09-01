@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/admin/Sidebar';
@@ -7,14 +9,14 @@ export default function AdminLayout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-sidebar-bg">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="lg:ml-[260px]">
+      <div className="lg:ml-[260px] min-h-screen bg-sidebar-bg">
         <AdminNavbar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="p-6 lg:p-10">
+        <div className="">
           <Outlet />
-        </main>
+        </div>
       </div>
     </div>
   );
