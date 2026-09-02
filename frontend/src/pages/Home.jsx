@@ -16,40 +16,40 @@ import {
 import { useApi } from '../hooks/useApi';
 import { addToWishlistLocal } from '../redux/wishlistSlice';
 
-import classicWatch from '../assets/classic-watch.jpg';
-import sportWatch from '../assets/sport-watch.jpg';
-import heritageWatch from '../assets/heritage-watch.jpg';
-import limitedWatch from '../assets/limited-watch.jpg';
+import categoryLuxuryWatch from '../assets/category_luxury_watch.jpg';
+import categoryHeritageWatch from '../assets/category_heritage_watch.jpg';
+import categorySportWatch from '../assets/category_sport_watch.jpg';
+import categoryContemporaryWatch from '../assets/category_contemporary_watch.jpg';
 import heroWatchImg from '../assets/luxury_titanium_watch.jpg';
 
 const COLLECTIONS = [
   {
-    tag: 'TITANIUM & PLATINUM',
+    tag: 'PRECIOUS METALS & PLATINUM',
+    title: 'Luxury Haute Horlogerie',
+    desc: 'Precious 950 platinum, 18K solid gold, and skeletonized sapphire dials hand-finished to perfection.',
+    to: '/categories?category=Luxury#luxury',
+    image: categoryLuxuryWatch,
+  },
+  {
+    tag: 'VINTAGE SWISS ARCHIVES',
     title: 'Heritage Classic',
-    desc: 'The purest architectural balance of Grade 5 titanium, skeleton dials, and hand-beveled mechanics.',
-    to: '/categories?category=Heritage',
-    image: heritageWatch,
+    desc: 'Vintage Swiss enamel dials, blued steel Breguet hands, and historic manufacture calibres reissued.',
+    to: '/categories?category=Heritage#heritage',
+    image: categoryHeritageWatch,
   },
   {
-    tag: 'PRECIOUS METALS',
-    title: '950 Platinum & Royal Gold',
-    desc: 'Manufactured in solid platinum and brushed Oystersteel with diamond-polished hands.',
-    to: '/categories?category=Luxury%20Watch',
-    image: classicWatch,
-  },
-  {
-    tag: 'GRAND COMPLICATIONS',
-    title: 'Perpetual Tourbillon',
-    desc: 'Multi-axis tourbillons, perpetual calendars, and mechanical storytelling at its most intricate.',
-    to: '/categories?category=Complications',
-    image: limitedWatch,
-  },
-  {
-    tag: 'HIGH-PERFORMANCE DYNAMICS',
+    tag: 'MOTORSPORT & HIGH PERFORMANCE',
     title: 'Sport & Chronograph',
-    desc: 'Forged titanium and ceramic tachymeter bezels built to endure high-performance motorsport, aviation, and extreme depths.',
-    to: '/categories?category=Contemporary',
-    image: sportWatch,
+    desc: 'Forged carbon, matte titanium, ceramic tachymeter bezels, and racing chronographs.',
+    to: '/categories?category=Sport#sport',
+    image: categorySportWatch,
+  },
+  {
+    tag: 'AVANT-GARDE ARCHITECTURE',
+    title: 'Contemporary Architectural',
+    desc: 'Open-worked geometric flying tourbillons and minimalist titanium monobloc architecture.',
+    to: '/categories?category=Contemporary#contemporary',
+    image: categoryContemporaryWatch,
   },
 ];
 
@@ -63,7 +63,7 @@ const FALLBACK_TRENDING = [
     glassType: 'Anti-Reflective Sapphire',
     category: 'Contemporary',
     badge: 'New 2026 Model',
-    mainImage: sportWatch,
+    mainImage: categoryContemporaryWatch,
   },
   {
     _id: 'stealth-2',
@@ -72,9 +72,9 @@ const FALLBACK_TRENDING = [
     price: 43800,
     caseMaterial: '950 Solid Platinum',
     glassType: 'Double Domed Sapphire',
-    category: 'Luxury Watch',
+    category: 'Luxury',
     badge: 'Masterpiece',
-    mainImage: classicWatch,
+    mainImage: categoryLuxuryWatch,
   },
   {
     _id: 'stealth-3',
@@ -85,18 +85,18 @@ const FALLBACK_TRENDING = [
     glassType: 'Beveled Sapphire',
     category: 'Heritage',
     badge: 'Collector Choice',
-    mainImage: heritageWatch,
+    mainImage: categoryHeritageWatch,
   },
   {
     _id: 'stealth-4',
-    modelName: 'Perpetual Celestial Tourbillon',
+    modelName: 'Forged Carbon Sport Chrono',
     brand: 'Chronos',
-    price: 72000,
-    caseMaterial: 'Titanium & White Gold',
+    price: 24500,
+    caseMaterial: 'Forged Carbon & Titanium',
     glassType: 'Curved Sapphire',
-    category: 'Complications',
+    category: 'Sport',
     badge: 'Limited 1/50',
-    mainImage: limitedWatch,
+    mainImage: categorySportWatch,
   },
 ];
 
@@ -353,7 +353,7 @@ export default function Home() {
 
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
                     <span className="text-base font-bold text-white">
-                      ₹{Number(product.price).toLocaleString()}
+                      ${Number(product.price).toLocaleString()}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-gray-300 font-bold group-hover:text-white transition-colors">
                       Details <ArrowUpRight size={14} />
@@ -366,7 +366,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. PILLAR COLLECTIONS */}
+      {/* 4. THE 4 CORE COLLECTIONS: Luxury, Heritage, Sport, Contemporary */}
       <section className="w-full py-20 bg-[#060709] border-t border-white/10">
         <div className="max-w-[1600px] mx-auto px-6 sm:px-12">
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -478,7 +478,7 @@ export default function Home() {
             <div className="lg:col-span-6 relative flex items-center justify-center">
               <div className="relative w-full aspect-square max-w-lg rounded-2xl overflow-hidden border border-white/15 shadow-2xl">
                 <img
-                  src={heritageWatch}
+                  src={categoryHeritageWatch}
                   alt="Manufacture Watch Movement"
                   className="w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
                 />
