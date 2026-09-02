@@ -18,7 +18,8 @@ import {
   ChevronRight, 
   Award,
   Clock,
-  UserCheck
+  UserCheck,
+  MessageSquare
 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { setAddresses, removeAddressLocal } from "../redux/addressSlice";
@@ -27,7 +28,7 @@ import { logout } from "../redux/authSlice";
 const QUICK_ACCESS_CARDS = [
   { 
     key: "orders", 
-    title: "Timepiece Acquisitions", 
+    title: "My Orders", 
     subtitle: "Track ordered complications & private courier delivery",
     icon: ShoppingBag, 
     route: "/my-orders" 
@@ -47,11 +48,11 @@ const QUICK_ACCESS_CARDS = [
     route: "/security" 
   },
   { 
-    key: "concierge", 
-    title: "Geneva Concierge", 
-    subtitle: "Bespoke watchmaker appointments & salon viewings",
-    icon: Compass, 
-    route: "/contact" 
+    key: "enquiry", 
+    title: "Enquiry", 
+    subtitle: "Submit personal inquiries & bespoke service requests",
+    icon: MessageSquare, 
+    route: "/enquiry" 
   },
 ];
 
