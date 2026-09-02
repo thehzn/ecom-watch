@@ -39,6 +39,7 @@ import EditProfile from './pages/EditProfile';
 import Enquiry from './pages/Enquiry';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
+import AdminEnquiries from './pages/admin/Adminenquiries';
 
  
 
@@ -100,6 +101,7 @@ function App() {
             <Route path="order/:id" element={<OrderDetail />} />
             <Route path="users" element={<Customers />} />
             <Route path="notifications" element={<AdminNotifications />} />
+            <Route path="enquiries" element={<AdminEnquiries />} />
 
           </Route>
         </Route>
