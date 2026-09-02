@@ -65,51 +65,61 @@ export const addProduct = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ status: false, message: error.message });
   }
-};
+}
+
 
 export const getAllProducts = async (req, res) => {
   try {
     const { category, productFor, caseMaterial, search } = req.query;
-    const filter = {};
 
-    if (category && category !== 'All') {
-      const catLower = category.toLowerCase().trim();
-      if (catLower === 'luxury' || catLower === 'luxury watch') {
-        filter.category = { $regex: /luxury/i };
-      } else if (catLower === 'sport') {
-        filter.category = { $regex: /sport|contemporary/i };
-      } else if (catLower === 'heritage') {
-        filter.category = { $regex: /heritage/i };
-      } else if (catLower === 'contemporary') {
-        filter.category = { $regex: /contemporary|sport/i };
-      } else {
-        filter.category = { $regex: new RegExp(category, 'i') };
+    const filter = {};
+    if (category && category !== "All") {
+      const catLower = category.trim().toLowerCase();
+
+      if (catLower === "luxury" || catLower === "luxury watch") {
+        filter.category = "Luxury Watch";
+      } 
+      else if (catLower === "sports" || catLower === "sport") {
+        filter.category = "Sports";
+      } 
+      else if (catLower === "heritage") {
+        filter.category = "Heritage";
+      } 
+      else if (catLower === "contemporary") {
+        filter.category = "Contemporary";
       }
     }
-
-    if (productFor && productFor !== 'All') {
-      filter.productFor = productFor;
+    if (productFor && productFor !== "All") {
+      filter.productFor = productFor.trim();
     }
-
-    if (caseMaterial && caseMaterial !== 'All Materials') {
-      filter.caseMaterial = caseMaterial;
+    if (caseMaterial && caseMaterial !== "All Materials") {
+      filter.caseMaterial = caseMaterial.trim();
     }
-
-    if (search) {
+    if (search && search.trim()) {
+      const keyword = search.trim();
       filter.$or = [
-        { modelName: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } },
-        { caseMaterial: { $regex: search, $options: 'i' } },
+        { modelName: { $regex: keyword, $options: "i" } },
+        { brand: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+        { caseMaterial: { $regex: keyword, $options: "i" } },
+        { productFor: { $regex: keyword, $options: "i" } },
+        { modelNumber: { $regex: keyword, $options: "i" } },
+        { sku: { $regex: keyword, $options: "i" } },
+        { glassType: { $regex: keyword, $options: "i" } },
+        { strapBracelet: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
       ];
     }
+    const products = await Product.find(filter).sort({ _id: -1 });
+    return res.status(200).json({status: true,message: "Products fetched successfully",products});
 
-    const products = await Product.find(filter).sort({ createdAt: -1 });
-    return res.status(200).json({ status: true, message: "Products fetched successfully", products });
   } catch (error) {
-    return res.status(500).json({ status: false, message: error.message });
+    console.error("getAllProducts error:", error);
+
+    return res.status(500).json({status: false,message: error.message});
   }
-};
+}
+
 
 export const getSingleProduct = async (req, res) => {
   try {
@@ -149,26 +159,34 @@ export const deleteProduct = async (req, res) => {
   }
 }
 
-
 export const searchProducts = async (req, res) => {
   try {
     const { search } = req.query;
-
-    if (!search) {
+    if (!search || !search.trim()) {
       return res.status(400).json({status: false,message: "Search query is required"});
     }
 
+    const keyword = search.trim();
     const products = await Product.find({
       $or: [
-        { modelName: { $regex: search, $options: "i" } },
-        { brand: { $regex: search, $options: "i" } },
-        { category: { $regex: search, $options: "i" } },
-        { caseMaterial: { $regex: search, $options: "i" } },
+        { modelName: { $regex: keyword, $options: "i" } },
+        { brand: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+        { productFor: { $regex: keyword, $options: "i" } },
+        { caseMaterial: { $regex: keyword, $options: "i" } },
+        { modelNumber: { $regex: keyword, $options: "i" } },
+        { sku: { $regex: keyword, $options: "i" } },
+        { glassType: { $regex: keyword, $options: "i" } },
+        { strapBracelet: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
       ],
-    });
+    }).sort({ _id: -1 });
 
-    return res.status(200).json({status: true,message: "Products found successfully", products});
+    return res.status(200).json({status: true,message: "Products found successfully",products});
+
   } catch (error) {
+    console.error("searchProducts error:", error);
+
     return res.status(500).json({status: false,message: error.message});
   }
 }
