@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../redux/authSlice';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000');
 
 export function useApi() {
   const token = useSelector((state) => state.auth.token);
@@ -90,6 +90,7 @@ export function useApi() {
       }),
     [request]
   );
+  
 
   const put = useCallback(
     (url, body) =>

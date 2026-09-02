@@ -1,5 +1,3 @@
-
-
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const navItems = [
@@ -31,17 +29,17 @@ export default function Sidebar({ isOpen, onClose }) {
         />
       )}
 
-      <aside
-        className={`
-          fixed top-0 left-0 h-screen w-[260px] bg-sidebar-bg
-          flex flex-col py-6 px-4 border-r border-sidebar-border
-          z-50 overflow-y-auto
-          transition-transform duration-300 ease-in-out
-          shadow-2xl lg:shadow-none
-          lg:translate-x-0
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
-      >
+    <aside
+    className={`
+    fixed top-0 left-0 h-screen w-[260px] bg-black
+    flex flex-col py-6 px-4 border-r border-sidebar-border
+    z-50 overflow-y-auto
+    transition-transform duration-300 ease-in-out
+    shadow-2xl lg:shadow-none
+    lg:translate-x-0
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+  `}
+ >
         {/* Brand heading */}
         <div className="flex flex-col mb-12 px-2">
           <h1 className="font-caslon text-2xl font-normal leading-8 tracking-[-0.02em] uppercase text-brand-black text-left">
