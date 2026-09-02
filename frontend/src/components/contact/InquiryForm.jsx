@@ -142,10 +142,7 @@
 //   );
 // }
 import React, { useState } from 'react';
-<<<<<<< HEAD
-=======
 import { useSelector } from 'react-redux';
->>>>>>> main
 import { useApi } from '../../hooks/useApi';
 
 export default function InquiryForm() {
@@ -162,7 +159,7 @@ export default function InquiryForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const { post } = useApi();
+  
   const token = useSelector((state) => state.auth.token);
 
   const handleChange = (e) => {
@@ -180,19 +177,6 @@ export default function InquiryForm() {
     setSubmitting(true);
 
     try {
-<<<<<<< HEAD
-      // Backend expects a single `name` field, so the two inputs are combined here.
-      await post('/enquiry/userenquiry', {
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message
-      });
-
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-=======
       const data = {
         subject: formData.nature,
         message: formData.message
@@ -212,23 +196,10 @@ export default function InquiryForm() {
       setTimeout(() => {
         setSubmitted(false);
 
->>>>>>> main
         setFormData({
           firstName: '',
           lastName: '',
           email: '',
-<<<<<<< HEAD
-          subject: 'Product Inquiry',
-          message: ''
-        });
-      }, 4000);
-    } catch (err) {
-      setSubmitError(
-        err?.response?.data?.message || "We couldn't send your inquiry. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
-=======
           nature: 'Product Inquiry',
           message: ''
         });
@@ -237,7 +208,6 @@ export default function InquiryForm() {
 
     } catch (error) {
       console.error('Inquiry submission failed:', error);
->>>>>>> main
     }
   };
 
@@ -321,14 +291,10 @@ export default function InquiryForm() {
 
         {/* Nature */}
         <div className="w-full relative">
-<<<<<<< HEAD
-          <label htmlFor="subject" className="sr-only">Nature of Inquiry</label>
-=======
           <label htmlFor="nature" className="sr-only">
             Nature of Inquiry
           </label>
 
->>>>>>> main
           <select
             id="subject"
             name="subject"
@@ -365,16 +331,10 @@ export default function InquiryForm() {
         <div className="pt-4 self-start">
           <button
             type="submit"
-<<<<<<< HEAD
-            disabled={submitting}
-            className="flex items-center justify-center bg-black text-white hover:opacity-90 disabled:opacity-50 px-[48px] py-[20px] font-inter text-[12px] font-semibold tracking-[0.1em] uppercase transition-opacity duration-300 cursor-pointer" >
-            {submitting ? 'Sending…' : 'Submit Inquiry'}
-=======
             className="flex items-center justify-center bg-black text-white hover:opacity-90 px-[48px] py-[20px] font-inter text-[12px] font-semibold tracking-[0.1em] uppercase transition-opacity duration-300 cursor-pointer"
           >
             Submit Inquiry
 
->>>>>>> main
             <span className="material-symbols-outlined text-base ml-2">
               arrow_forward
             </span>
