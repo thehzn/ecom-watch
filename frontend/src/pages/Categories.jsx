@@ -100,6 +100,7 @@ function ProductCard({ product }) {
         {details && (
           <p className="text-xs text-gray-400 line-clamp-1">{details}</p>
         )}
+
         <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
           <p className="text-sm font-bold text-white">
             ${Number(product.price).toLocaleString()}

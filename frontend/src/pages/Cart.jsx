@@ -446,7 +446,7 @@ export default function Cart() {
                 )}
                 <div className="pt-4 border-t border-white/10 flex justify-between text-lg font-bold text-white">
                   <span>Total</span>
-                  <span>${Number(total || subtotal || 0).toLocaleString()}</span>
+                  <span>₹{Number(total || subtotal || 0).toLocaleString()}</span>
                 </div>
               </div>
 
