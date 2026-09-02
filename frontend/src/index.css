@@ -1,8 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+/* Consolidated Google Fonts request */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
+/* Framework Imports */
 @import "tailwindcss";
 
-@theme {
+/* @theme {
   --color-obsidian-950: #050608;
   --color-obsidian-900: #090A0E;
   --color-graphite-850: #0F1116;
@@ -17,6 +21,33 @@
   --color-platinum-muted: #8E95A5;
 
   --font-stealth: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+} */
+ @theme {
+  --color-obsidian-950: #050608;
+  --color-obsidian-900: #090A0E;
+  --color-graphite-850: #0F1116;
+  --color-graphite-800: #151820;
+  --color-graphite-700: #1F2430;
+  --color-graphite-600: #2B3242;
+
+  --color-platinum-white: #FFFFFF;
+  --color-platinum-100: #F8F9FA;
+  --color-platinum-200: #E2E8F0;
+  --color-platinum-300: #CBD5E1;
+  --color-platinum-muted: #8E95A5;
+
+  --font-stealth: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Admin sidebar tokens — dark theme, matching graphite/obsidian palette */
+  --color-sidebar-bg: #0F1116;       /* solid dark bg, was previously undefined/transparent */
+  --color-sidebar-border: #1F2430;   /* graphite-700, subtle divider on dark bg */
+  --color-nav-text: #8E95A5;         /* platinum-muted, readable on dark */
+  --color-nav-hover: #151820;        /* graphite-800, slightly lighter hover state */
+  --color-brand-black: #FFFFFF;      /* active/emphasis text — needs to be light on dark bg */
+  --color-subtitle-gray: #8E95A5;
+
+  --font-caslon: "Libre Caslon Text", serif;
+  --font-worksans: "Work Sans", "Plus Jakarta Sans", sans-serif;
 }
 
 @keyframes titaniumSweep {

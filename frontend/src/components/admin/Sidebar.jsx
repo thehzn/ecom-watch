@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> main
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const navItems = [
@@ -5,6 +10,8 @@ const navItems = [
   { label: 'Product List', icon: 'inventory_2', path: '/admin/products' },
   { label: 'Order Details', icon: 'receipt', path: '/admin/orders' },
   { label: 'Customer Details', icon: 'group', path: '/admin/users' },
+  { label: 'Enquiries', icon: 'mail', path: '/admin/enquiries' },
+
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
