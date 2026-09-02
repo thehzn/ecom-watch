@@ -2,37 +2,62 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-
-import watchImage from '../../assets/admin-watch.avif';
+import {Eye,EyeOff,ArrowRight,ChevronDown,} from 'lucide-react';
+import { useApi } from '../../hooks/useApi';
+import watchImage from '../../assets/luxury_titanium_watch.jpg';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
 const MOBILE_REGEX = /^[0-9]{10}$/;
+
 const PASSWORD_ERROR =
-  'Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.';
+  'Must be 8+ characters with uppercase, lowercase, number & symbol.';
+
+const COUNTRY_CODES = [
+  { code: '+91', flag: '🇮🇳' },
+  { code: '+1', flag: '🇺🇸' },
+  { code: '+44', flag: '🇬🇧' },
+  { code: '+61', flag: '🇦🇺' },
+  { code: '+971', flag: '🇦🇪' },
+  { code: '+966', flag: '🇸🇦' },
+  { code: '+974', flag: '🇶🇦' },
+  { code: '+65', flag: '🇸🇬' },
+  { code: '+60', flag: '🇲🇾' },
+  { code: '+49', flag: '🇩🇪' },
+  { code: '+33', flag: '🇫🇷' },
+  { code: '+41', flag: '🇨🇭' },
+];
 
 const validationSchema = Yup.object({
   firstName: Yup.string()
     .trim()
     .required('First name is required')
-    .matches(NAME_REGEX, 'Only letters are allowed')
-    .min(2, 'Must be at least 2 characters')
-    .max(50, 'Must be at most 50 characters'),
+    .matches(NAME_REGEX, 'Only letters allowed')
+    .min(2, 'Min 2 characters')
+    .max(50, 'Max 50 characters'),
+
   lastName: Yup.string()
     .trim()
     .required('Last name is required')
-    .matches(NAME_REGEX, 'Only letters are allowed')
-    .min(2, 'Must be at least 2 characters')
-    .max(50, 'Must be at most 50 characters'),
+    .matches(NAME_REGEX, 'Only letters allowed')
+    .min(2, 'Min 2 characters')
+    .max(50, 'Max 50 characters'),
+
   email: Yup.string()
-    .transform((value) => (value ? value.trim().toLowerCase() : value))
+    .transform((value) =>
+      value ? value.trim().toLowerCase() : value
+    )
     .required('Email address is required')
-    .email('Please enter a valid email address'),
-  countryCode: Yup.string().trim().required('Required'),
+    .email('Enter a valid email'),
+
+  countryCode: Yup.string()
+    .trim()
+    .required('Country code is required'),
+
   mobileNumber: Yup.string()
     .trim()
     .required('Mobile number is required')
-    .matches(MOBILE_REGEX, 'Enter a valid 10-digit mobile number'),
+    .matches(MOBILE_REGEX, 'Enter valid 10-digit number'),
+
   password: Yup.string()
     .required('Password is required')
     .min(8, PASSWORD_ERROR)
@@ -40,31 +65,21 @@ const validationSchema = Yup.object({
     .matches(/[A-Z]/, PASSWORD_ERROR)
     .matches(/\d/, PASSWORD_ERROR)
     .matches(/[^A-Za-z0-9\s]/, PASSWORD_ERROR),
+
   confirmPassword: Yup.string()
-    .required('Please confirm your password')
+    .required('Confirm password')
     .oneOf([Yup.ref('password')], 'Passwords do not match'),
 });
 
-const inputClasses =
-  'peer w-full border-0 border-b border-[rgba(116,120,120,0.4)] bg-transparent pt-4 pb-2 text-[16px] font-normal text-black outline-none transition-colors duration-300 placeholder-transparent focus:border-black';
-
-const labelClasses =
-  'absolute left-0 top-4 text-[16px] text-[#9A9C9C] transition-all duration-300 peer-focus:top-[-8px] peer-focus:text-[12px] peer-focus:uppercase peer-focus:tracking-[0.05em] peer-focus:text-[#5D5E63] peer-[:not(:placeholder-shown)]:top-[-8px] peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.05em] peer-[:not(:placeholder-shown)]:text-[#5D5E63]';
-
-function FieldError({ children }) {
-  if (!children) return null;
-  return (
-    <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {children}
-    </p>
-  );
-}
-
 export default function Register() {
   const navigate = useNavigate();
+
+  const { post } = useApi();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formError, setFormError] = useState('');
+  const [countryOpen, setCountryOpen] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -76,310 +91,574 @@ export default function Register() {
       password: '',
       confirmPassword: '',
     },
-    validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
-      setFormError('');
-      try {
-       const res = await fetch(`${import.meta.env.VITE_API_URL}/apiauth/user/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName: values.firstName.trim(),
-            lastName: values.lastName.trim(),
-            email: values.email.trim().toLowerCase(),
-            countryCode: values.countryCode.trim(),
-            mobileNumber: values.mobileNumber.trim(),
-            password: values.password,
-            confirmPassword: values.confirmPassword,
-          }),
-        });
-        const data = await res.json().catch(() => null);
 
-        if (!res.ok) {
-          if (res.status === 409) {
-            setFieldError('email', 'An account with this email already exists');
-          } else {
-            setFormError((data && data.message) || 'Something went wrong. Please try again.');
-          }
-          return;
-        }
+    validationSchema,
+
+    onSubmit: async (
+      values,
+      { setSubmitting, setFieldError }
+    ) => {
+      setFormError('');
+
+      try {
+        await post('/apiauth/user/register', {
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+          email: values.email.trim().toLowerCase(),
+          countryCode: values.countryCode.trim(),
+          mobileNumber: values.mobileNumber.trim(),
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+        });
 
         navigate('/login');
-      } catch {
-        setFormError('Unable to reach the server. Please try again.');
+      } catch (error) {
+        const message =
+          error?.message ||
+          'Something went wrong. Please try again.';
+
+        const lowerMessage = message.toLowerCase();
+
+        if (
+          lowerMessage.includes('already exists') ||
+          lowerMessage.includes('email already') ||
+          lowerMessage.includes('user already') ||
+          lowerMessage.includes('already registered')
+        ) {
+          setFieldError(
+            'email',
+            'A client account with this email already exists'
+          );
+        } else {
+          setFormError(message);
+        }
       } finally {
         setSubmitting(false);
       }
     },
   });
 
+  const selectedCountry = COUNTRY_CODES.find(
+    (item) => item.code === formik.values.countryCode
+  );
+
   return (
-    <main className="flex min-h-screen w-full flex-col lg:flex-row" style={{ backgroundColor: '#F9F9F9' }}>
-      {/* Left Column - Brand Showcase (desktop only) */}
-      <div className="relative hidden min-h-screen w-1/2 flex-col justify-center overflow-hidden bg-black lg:flex">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{ backgroundImage: `url(${watchImage})` }}
+    <main className="min-h-screen w-full flex bg-white text-black font-['Plus_Jakarta_Sans']">
+
+      {/* =====================================================
+          LEFT IMAGE SECTION
+      ====================================================== */}
+      <section className="relative hidden lg:flex w-1/2 min-h-screen bg-black overflow-hidden">
+
+        <img
+          src={watchImage}
+          alt="Chronos Watch"
+          className="absolute inset-0 w-full h-full object-cover opacity-70"
         />
-        <div className="absolute inset-0 bg-black" style={{ mixBlendMode: 'overlay' }} />
 
-        <span
-          className="absolute left-12 top-12 z-10 uppercase text-white"
-          style={{
-            fontFamily: "'Libre Caslon Text', serif",
-            fontSize: '24px',
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-          }}
+        {/* Image overlay */}
+        <div className="absolute inset-0 bg-black/45" />
+
+        {/* Brand */}
+        <Link
+          to="/"
+          className="absolute top-10 left-12 z-10"
         >
-          Chronos
-        </span>
+          <div className="text-white text-3xl font-semibold tracking-[0.25em]">
+            CHRONOS
+          </div>
 
-        <div className="relative z-10 max-w-[480px] px-16">
-          <h1
-            className="text-white"
-            style={{
-              fontFamily: "'Libre Caslon Text', serif",
-              fontSize: '40px',
-              fontWeight: 400,
-              lineHeight: '48px',
-            }}
-          >
-            The Art of Time.
-          </h1>
-          <p
-            className="mt-6"
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '18px',
-              fontWeight: 400,
-              lineHeight: '28px',
-              color: 'rgba(255,255,255,0.8)',
-            }}
-          >
-            Join the Maison Chronos. Gain exclusive access to our limited collections, heritage
-            archives, and bespoke horological services.
+          <div className="text-white/60 text-[9px] uppercase tracking-[0.3em] mt-1">
+            Haute Horlogerie
+          </div>
+        </Link>
+
+        {/* Bottom text */}
+        <div className="absolute bottom-12 left-12 z-10">
+
+          <p className="text-white text-sm tracking-wide">
+            Timeless design. Precise craftsmanship.
           </p>
+
+          <div className="w-12 h-px bg-white mt-4" />
+
         </div>
-      </div>
 
-      {/* Right Column - Registration Form */}
-      <div
-        className="flex w-full flex-1 items-center justify-center px-5 py-16 lg:w-1/2 lg:px-16"
-        style={{ backgroundColor: '#F9F9F9' }}
-      >
-        <div className="w-full max-w-[448px]">
-          <h2
-            className="mb-2 text-black"
-            style={{
-              fontFamily: "'Libre Caslon Text', serif",
-              fontSize: '32px',
-              fontWeight: 400,
-              lineHeight: '40px',
-            }}
-          >
-            Create Account
-          </h2>
-          <p
-            className="mb-10"
-            style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#5D5E63' }}
-          >
-            Enter your details to begin your journey.
-          </p>
+      </section>
 
-          <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-8">
-            {/* First / Last Name */}
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-              <div className="relative">
+      {/* =====================================================
+          RIGHT REGISTER SECTION
+      ====================================================== */}
+      <section className="flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
+
+        <div className="w-full max-w-[480px]">
+
+          {/* MOBILE LOGO */}
+          <Link
+            to="/"
+            className="lg:hidden block mb-10"
+          >
+            <span className="text-2xl font-semibold tracking-[0.25em]">
+              CHRONOS
+            </span>
+          </Link>
+
+          {/* HEADER */}
+          <div className="mb-8">
+
+            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-3">
+              Registration
+            </p>
+
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Create Account
+            </h1>
+
+            <p className="text-sm text-black/50 mt-2">
+              Create your Chronos client account.
+            </p>
+
+          </div>
+
+          {/* =================================================
+              FORM
+          ================================================== */}
+          <form
+            onSubmit={formik.handleSubmit}
+            noValidate
+            className="flex flex-col gap-5"
+          >
+
+            {/* =================================================
+                FIRST NAME + LAST NAME
+            ================================================== */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              {/* FIRST NAME */}
+              <div>
+
+                <label
+                  htmlFor="firstName"
+                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+                >
+                  First Name
+                </label>
+
                 <input
                   id="firstName"
                   name="firstName"
                   type="text"
-                  placeholder="First Name"
+                  placeholder="First name"
                   autoComplete="given-name"
                   value={formik.values.firstName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
                 />
-                <label htmlFor="firstName" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  First Name
-                </label>
-                {formik.touched.firstName && <FieldError>{formik.errors.firstName}</FieldError>}
+
+                {formik.touched.firstName &&
+                  formik.errors.firstName && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {formik.errors.firstName}
+                    </p>
+                  )}
+
               </div>
 
-              <div className="relative">
+              {/* LAST NAME */}
+              <div>
+
+                <label
+                  htmlFor="lastName"
+                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+                >
+                  Last Name
+                </label>
+
                 <input
                   id="lastName"
                   name="lastName"
                   type="text"
-                  placeholder="Last Name"
+                  placeholder="Last name"
                   autoComplete="family-name"
                   value={formik.values.lastName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
                 />
-                <label htmlFor="lastName" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Last Name
-                </label>
-                {formik.touched.lastName && <FieldError>{formik.errors.lastName}</FieldError>}
+
+                {formik.touched.lastName &&
+                  formik.errors.lastName && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {formik.errors.lastName}
+                    </p>
+                  )}
+
               </div>
+
             </div>
 
-            {/* Email */}
-            <div className="relative">
+            {/* =================================================
+                EMAIL
+            ================================================== */}
+            <div>
+
+              <label
+                htmlFor="email"
+                className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+              >
+                Email Address
+              </label>
+
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Email Address"
+                placeholder="your@email.com"
                 autoComplete="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={inputClasses}
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
               />
-              <label htmlFor="email" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                Email Address
-              </label>
-              {formik.touched.email && <FieldError>{formik.errors.email}</FieldError>}
+
+              {formik.touched.email &&
+                formik.errors.email && (
+                  <p className="mt-1.5 text-xs text-red-600">
+                    {formik.errors.email}
+                  </p>
+                )}
+
             </div>
 
-            {/* Country Code / Mobile Number */}
-            <div className="grid grid-cols-[88px_1fr] gap-4">
+            {/* =================================================
+                COUNTRY CODE + MOBILE
+            ================================================== */}
+            <div className="grid grid-cols-[105px_1fr] gap-3">
+
+              {/* COUNTRY CODE */}
               <div className="relative">
-                <input
-                  id="countryCode"
-                  name="countryCode"
-                  type="text"
-                  placeholder="+91"
-                  autoComplete="tel-country-code"
-                  value={formik.values.countryCode}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-                <label htmlFor="countryCode" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+
+                <label
+                  htmlFor="countryCode"
+                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+                >
                   Code
                 </label>
-                {formik.touched.countryCode && <FieldError>{formik.errors.countryCode}</FieldError>}
+
+                {/* SELECTED COUNTRY */}
+                <button
+                  type="button"
+                  id="countryCode"
+                  aria-haspopup="listbox"
+                  aria-expanded={countryOpen}
+                  onClick={() =>
+                    setCountryOpen((open) => !open)
+                  }
+                  className="w-full h-[52px] bg-white border border-black/20 hover:border-black focus:border-black text-black text-sm px-3 outline-none flex items-center justify-between transition-colors"
+                >
+
+                  <span className="flex items-center gap-2">
+
+                    <span className="text-lg leading-none">
+                      {selectedCountry?.flag}
+                    </span>
+
+                    <span className="font-medium">
+                      {selectedCountry?.code}
+                    </span>
+
+                  </span>
+
+                  <ChevronDown
+                    size={15}
+                    className={`transition-transform duration-200 ${
+                      countryOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+
+                </button>
+
+                {/* CUSTOM COUNTRY DROPDOWN */}
+                {countryOpen && (
+                  <div
+                    className="absolute left-0 right-0 top-full mt-1 bg-white border border-black/20 shadow-xl z-50 max-h-60 overflow-y-auto"
+                    role="listbox"
+                  >
+
+                    {COUNTRY_CODES.map((item) => {
+
+                      const isSelected =
+                        formik.values.countryCode === item.code;
+
+                      return (
+                        <button
+                          key={item.code}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          onClick={() => {
+                            formik.setFieldValue(
+                              'countryCode',
+                              item.code
+                            );
+
+                            formik.setFieldTouched(
+                              'countryCode',
+                              true
+                            );
+
+                            setCountryOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-3 text-sm text-left transition-colors ${
+                            isSelected
+                              ? 'bg-black text-white'
+                              : 'bg-white text-black hover:bg-black hover:text-white'
+                          }`}
+                        >
+
+                          <span className="text-lg leading-none">
+                            {item.flag}
+                          </span>
+
+                          <span className="font-medium">
+                            {item.code}
+                          </span>
+
+                        </button>
+                      );
+
+                    })}
+
+                  </div>
+                )}
+
+                {formik.touched.countryCode &&
+                  formik.errors.countryCode && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {formik.errors.countryCode}
+                    </p>
+                  )}
+
               </div>
 
-              <div className="relative">
+              {/* MOBILE NUMBER */}
+              <div>
+
+                <label
+                  htmlFor="mobileNumber"
+                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+                >
+                  Mobile Number
+                </label>
+
                 <input
                   id="mobileNumber"
                   name="mobileNumber"
                   type="tel"
                   inputMode="numeric"
-                  placeholder="Mobile Number"
-                  autoComplete="tel-national"
                   maxLength={10}
+                  placeholder="9876543210"
+                  autoComplete="tel-national"
                   value={formik.values.mobileNumber}
-                  onChange={formik.handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(
+                      /\D/g,
+                      ''
+                    );
+
+                    formik.setFieldValue(
+                      'mobileNumber',
+                      value
+                    );
+                  }}
                   onBlur={formik.handleBlur}
-                  className={inputClasses}
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
                 />
-                <label htmlFor="mobileNumber" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Mobile Number
-                </label>
-                {formik.touched.mobileNumber && <FieldError>{formik.errors.mobileNumber}</FieldError>}
+
+                {formik.touched.mobileNumber &&
+                  formik.errors.mobileNumber && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {formik.errors.mobileNumber}
+                    </p>
+                  )}
+
               </div>
+
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                autoComplete="new-password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`${inputClasses} pr-10`}
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              />
-              <label htmlFor="password" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+            {/* =================================================
+                PASSWORD
+            ================================================== */}
+            <div>
+
+              <label
+                htmlFor="password"
+                className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+              >
                 Password
               </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-0 top-4 text-[#5D5E63] hover:text-black"
-                tabIndex={-1}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
-              </button>
-              {formik.touched.password && <FieldError>{formik.errors.password}</FieldError>}
+
+              <div className="relative">
+
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter password"
+                  autoComplete="new-password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((value) => !value)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
+                  aria-label={
+                    showPassword
+                      ? 'Hide password'
+                      : 'Show password'
+                  }
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff size={17} />
+                  ) : (
+                    <Eye size={17} />
+                  )}
+                </button>
+
+              </div>
+
+              {formik.touched.password &&
+                formik.errors.password && (
+                  <p className="mt-1.5 text-xs text-red-600">
+                    {formik.errors.password}
+                  </p>
+                )}
+
             </div>
 
-            {/* Confirm Password */}
-            <div className="relative">
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm Password"
-                autoComplete="new-password"
-                value={formik.values.confirmPassword}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`${inputClasses} pr-10`}
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              />
-              <label htmlFor="confirmPassword" className={labelClasses} style={{ fontFamily: 'Inter, sans-serif' }}>
+            {/* =================================================
+                CONFIRM PASSWORD
+            ================================================== */}
+            <div>
+
+              <label
+                htmlFor="confirmPassword"
+                className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+              >
                 Confirm Password
               </label>
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((s) => !s)}
-                className="absolute right-0 top-4 text-[#5D5E63] hover:text-black"
-                tabIndex={-1}
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
-              </button>
-              {formik.touched.confirmPassword && <FieldError>{formik.errors.confirmPassword}</FieldError>}
+
+              <div className="relative">
+
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={
+                    showConfirmPassword
+                      ? 'text'
+                      : 'password'
+                  }
+                  placeholder="Confirm password"
+                  autoComplete="new-password"
+                  value={formik.values.confirmPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(
+                      (value) => !value
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
+                  aria-label={
+                    showConfirmPassword
+                      ? 'Hide confirm password'
+                      : 'Show confirm password'
+                  }
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={17} />
+                  ) : (
+                    <Eye size={17} />
+                  )}
+                </button>
+
+              </div>
+
+              {formik.touched.confirmPassword &&
+                formik.errors.confirmPassword && (
+                  <p className="mt-1.5 text-xs text-red-600">
+                    {formik.errors.confirmPassword}
+                  </p>
+                )}
+
             </div>
 
-            {formError && <FieldError>{formError}</FieldError>}
+            {/* =================================================
+                SERVER ERROR
+            ================================================== */}
+            {formError && (
+              <div className="border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-600">
+                {formError}
+              </div>
+            )}
 
+            {/* =================================================
+                SUBMIT BUTTON
+            ================================================== */}
             <button
               type="submit"
               disabled={formik.isSubmitting}
-              className="w-full bg-black text-white transition-colors duration-300 hover:bg-[#333333] active:scale-[0.98] disabled:opacity-70"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                padding: '20px',
-              }}
+              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all"
             >
-              {formik.isSubmitting ? 'Creating Account…' : 'Create Account'}
+
+              <span>
+                {formik.isSubmitting
+                  ? 'Creating Account...'
+                  : 'Create Account'}
+              </span>
+
+              {!formik.isSubmitting && (
+                <ArrowRight size={15} />
+              )}
+
             </button>
 
-            <p
-              className="text-center"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#5D5E63' }}
-            >
-              Already a member?{' '}
-              <Link to="/login" className="font-semibold text-black underline-offset-2 hover:underline">
-                Login
+            {/* =================================================
+                LOGIN LINK
+            ================================================== */}
+            <p className="text-center text-xs text-black/50 pt-1">
+
+              Already have an account?{' '}
+
+              <Link
+                to="/login"
+                className="font-semibold text-black hover:underline"
+              >
+                Sign In
               </Link>
+
             </p>
+
           </form>
+
         </div>
-      </div>
+
+      </section>
+
     </main>
   );
 }

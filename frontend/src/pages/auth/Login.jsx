@@ -3,15 +3,19 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Globe } from 'lucide-react';
-
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { login } from '../../redux/authSlice';
+import { useApi } from '../../hooks/useApi';
+import loginWatchImage from '../../assets/classic-watch.jpg';
 
 const validationSchema = Yup.object({
   email: Yup.string()
-    .transform((value) => (value ? value.trim().toLowerCase() : value))
+    .transform((value) =>
+      value ? value.trim().toLowerCase() : value
+    )
     .required('Email address is required')
-    .email('Please enter a valid email address'),
+    .email('Enter a valid email'),
+
   password: Yup.string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters'),
@@ -20,35 +24,41 @@ const validationSchema = Yup.object({
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { post } = useApi();
+
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [langOpen, setLangOpen] = useState(false);
 
   const formik = useFormik({
-    initialValues: { email: '', password: '' },
+    initialValues: {
+      email: '',
+      password: '',
+    },
+
     validationSchema,
+
     onSubmit: async (values, { setSubmitting }) => {
       setAuthError('');
+
       try {
-       const res = await fetch(`${import.meta.env.VITE_API_URL}/apiauth/user/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: values.email.trim().toLowerCase(),
-            password: values.password,
-          }),
+        const data = await post('/apiauth/user/login', {
+          email: values.email.trim().toLowerCase(),
+          password: values.password,
         });
-        const data = await res.json().catch(() => null);
 
-        if (!res.ok) {
-          setAuthError((data && data.message) || 'Invalid email or password');
-          return;
-        }
+        dispatch(
+          login({
+            token: data.token,
+            user: data.user,
+          })
+        );
 
-        dispatch(login({ token: data.token, user: data.user }));
         navigate('/');
-      } catch {
-        setAuthError('Unable to reach the server. Please try again.');
+      } catch (error) {
+        setAuthError(
+          error.message || 'Invalid email or password'
+        );
       } finally {
         setSubmitting(false);
       }
@@ -56,216 +66,283 @@ export default function Login() {
   });
 
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: '#F9F9F9' }}>
-      {/* Sticky Header */}
-      <header
-        className="sticky top-0 z-50 w-full border-b"
-        style={{
-          backgroundColor: 'rgba(249,249,249,0.8)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderColor: 'rgba(196,199,199,0.2)',
-        }}
-      >
-        <div className="mx-auto flex max-w-[1536px] items-center justify-between px-6 py-5 sm:px-10">
+    <main className="min-h-screen w-full flex bg-white text-black font-['Plus_Jakarta_Sans']">
+
+      {/* =====================================================
+          LEFT LOGIN SECTION
+      ====================================================== */}
+      <section className="flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
+
+        <div className="w-full max-w-[460px]">
+
+          {/* MOBILE LOGO */}
           <Link
             to="/"
-            className="uppercase text-black"
-            style={{
-              fontFamily: "'Libre Caslon Text', serif",
-              fontSize: '24px',
-              fontWeight: 700,
-              letterSpacing: '0.2em',
-            }}
+            className="lg:hidden block mb-10"
           >
-            Chronos
+            <div className="text-2xl font-semibold tracking-[0.25em]">
+              CHRONOS
+            </div>
+
+            <div className="text-[8px] uppercase tracking-[0.3em] text-black/50 mt-1">
+              Haute Horlogerie
+            </div>
           </Link>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setLangOpen((o) => !o)}
-              className="flex items-center text-[#5D5E63] transition-colors hover:text-black"
-              aria-label="Select language"
-              aria-expanded={langOpen}
-            >
-              <Globe size={20} strokeWidth={1.5} />
-            </button>
+          {/* HEADER */}
+          <div className="mb-8">
 
-            {langOpen && (
-              <div
-                className="absolute right-0 top-8 w-32 border bg-white py-2 shadow-sm"
-                style={{ borderColor: 'rgba(196,199,199,0.3)' }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLangOpen(false)}
-                  className="block w-full px-4 py-2 text-left text-[14px] text-black hover:bg-[#F9F9F9]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  English
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Login Section */}
-      <main className="relative flex min-h-[calc(100vh-73px)] w-full items-center justify-center overflow-hidden px-5 py-16">
-        {/* Decorative blurred gradient circles */}
-        <div
-          className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full opacity-60 blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(0,0,0,0.06), transparent 70%)' }}
-        />
-        <div
-          className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full opacity-60 blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%)' }}
-        />
-
-        <div className="relative z-10 w-full max-w-[480px]">
-          {/* Authentication Card */}
-          <div
-            className="w-full p-8"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.4)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid rgba(196,199,199,0.1)',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-            }}
-          >
-            <h1
-              className="text-center text-black"
-              style={{
-                fontFamily: "'Libre Caslon Text', serif",
-                fontSize: '40px',
-                fontWeight: 400,
-                lineHeight: '48px',
-              }}
-            >
-              Welcome Back
-            </h1>
-            <p
-              className="mb-8 mt-2 text-center"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#5D5E63' }}
-            >
-              Re-enter the world of timeless precision.
+            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-3">
+              Client Access
             </p>
 
-            <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-6">
-              {/* Email */}
-              <div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full border-0 border-b bg-transparent text-[16px] text-black outline-none transition-colors duration-300 placeholder:text-[#9A9C9C] focus:border-black"
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: '#747878',
-                    padding: '12px 0px',
-                  }}
-                />
-                {formik.touched.email && formik.errors.email && (
-                  <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Welcome Back
+            </h1>
+
+            <p className="text-sm text-black/50 mt-2">
+              Sign in to access your Chronos client account.
+            </p>
+
+          </div>
+
+          {/* =================================================
+              LOGIN FORM
+          ================================================== */}
+          <form
+            onSubmit={formik.handleSubmit}
+            noValidate
+            className="flex flex-col gap-5"
+          >
+
+            {/* EMAIL */}
+            <div>
+
+              <label
+                htmlFor="email"
+                className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+              >
+                Email Address
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="your@email.com"
+                autoComplete="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full bg-white border ${
+                  formik.touched.email && formik.errors.email
+                    ? 'border-red-400'
+                    : 'border-black/20'
+                } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
+              />
+
+              {formik.touched.email &&
+                formik.errors.email && (
+                  <p className="mt-1.5 text-xs text-red-600">
                     {formik.errors.email}
                   </p>
                 )}
+
+            </div>
+
+            {/* PASSWORD */}
+            <div>
+
+              <div className="flex items-center justify-between mb-2">
+
+                <label
+                  htmlFor="password"
+                  className="block text-[10px] font-semibold uppercase tracking-wider"
+                >
+                  Password
+                </label>
+
+                <Link
+                  to="/forgot-password"
+                  className="text-[10px] uppercase tracking-wider text-black/100 hover:text-black transition-colors"
+                >
+                  Forgot Password?
+                </Link>
+
               </div>
 
-              {/* Password */}
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="text-[12px] uppercase tracking-[0.05em] text-[#5D5E63]"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Password
-                  </label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-[#5D5E63] hover:text-black"
-                    style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px' }}
-                  >
-                    Forgot Password?
-                  </Link>
-                </div>
-                <div className="relative flex items-center">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className="w-full border-0 border-b bg-transparent pr-8 text-[16px] text-black outline-none transition-colors duration-300 placeholder:text-[#9A9C9C] focus:border-black"
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      borderColor: '#747878',
-                      padding: '12px 0px',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-0 text-[#5D5E63] hover:text-black"
-                    tabIndex={-1}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
-                  </button>
-                </div>
-                {formik.touched.password && formik.errors.password && (
-                  <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <div className="relative">
+
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter password"
+                  autoComplete="current-password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`w-full bg-white border ${
+                    formik.touched.password &&
+                    formik.errors.password
+                      ? 'border-red-400'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((value) => !value)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
+                  tabIndex={-1}
+                  aria-label={
+                    showPassword
+                      ? 'Hide password'
+                      : 'Show password'
+                  }
+                >
+                  {showPassword ? (
+                    <EyeOff size={17} />
+                  ) : (
+                    <Eye size={17} />
+                  )}
+                </button>
+
+              </div>
+
+              {formik.touched.password &&
+                formik.errors.password && (
+                  <p className="mt-1.5 text-xs text-red-600">
                     {formik.errors.password}
                   </p>
                 )}
-              </div>
 
-              {authError && (
-                <p className="text-[12px] text-red-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {authError}
-                </p>
+            </div>
+
+            {/* SERVER ERROR */}
+            {authError && (
+              <div className="border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-600">
+                {authError}
+              </div>
+            )}
+
+            {/* LOGIN BUTTON */}
+            <button
+              type="submit"
+              disabled={formik.isSubmitting}
+              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all"
+            >
+
+              <span>
+                {formik.isSubmitting
+                  ? 'Signing In...'
+                  : 'Sign In'}
+              </span>
+
+              {!formik.isSubmitting && (
+                <ArrowRight size={15} />
               )}
 
-              <button
-                type="submit"
-                disabled={formik.isSubmitting}
-                className="w-full bg-black text-white transition-colors duration-300 hover:bg-[#333333] active:scale-[0.98] disabled:opacity-70"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  padding: '16px',
-                }}
-              >
-                {formik.isSubmitting ? 'Signing In…' : 'Sign In'}
-              </button>
+            </button>
 
-              <p
-                className="text-center"
-                style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#5D5E63' }}
+            {/* REGISTER */}
+            <p className="text-center text-xs text-black/50 pt-1">
+
+              Don't have a Chronos account?{' '}
+
+              <Link
+                to="/register"
+                className="font-semibold text-black hover:underline"
               >
-                Don't have an account?{' '}
-                <Link to="/register" className="font-semibold text-black hover:underline">
-                  Create Account
-                </Link>
-              </p>
-            </form>
-          </div>
+                Create Account
+              </Link>
+
+            </p>
+
+          </form>
+
         </div>
-      </main>
-    </div>
+
+      </section>
+
+
+      {/* =====================================================
+          RIGHT WATCH IMAGE SECTION
+      ====================================================== */}
+      <section className="relative hidden lg:flex w-1/2 min-h-screen bg-black overflow-hidden">
+
+        {/* WATCH IMAGE */}
+        <img
+          src={loginWatchImage}
+          alt="Luxury Chronos Watch"
+          className="absolute inset-0 w-full h-full object-cover object-[65%_center]"
+        />
+
+        {/* DARK OVERLAY */}
+        <div className="absolute inset-0 bg-black/45" />
+
+        {/* GRADIENT */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/10 via-transparent to-black/50" />
+
+        {/* BRAND */}
+        <Link
+          to="/"
+          className="absolute top-10 right-12 z-10 text-right"
+        >
+
+          <div className="text-white text-3xl font-semibold tracking-[0.25em]">
+            CHRONOS
+          </div>
+
+          <div className="text-white/60 text-[9px] uppercase tracking-[0.3em] mt-1">
+            Haute Horlogerie
+          </div>
+
+        </Link>
+
+        {/* IMAGE CONTENT */}
+        <div className="absolute left-12 bottom-14 z-10 max-w-[400px]">
+
+          <div className="flex items-center gap-4 mb-5">
+
+            <div className="w-10 h-px bg-white/70" />
+
+            <span className="text-white/70 text-[10px] uppercase tracking-[0.3em]">
+              Private Collection
+            </span>
+
+          </div>
+
+          <h2 className="text-white text-4xl xl:text-5xl font-light tracking-tight leading-[1.05]">
+            Timeless
+            <br />
+            Precision.
+          </h2>
+
+          <p className="text-white/60 text-sm leading-relaxed mt-5 max-w-[330px]">
+            Discover exceptional timepieces crafted with
+            precision, heritage and timeless elegance.
+          </p>
+
+        </div>
+
+        {/* BOTTOM DETAILS */}
+        <div className="absolute bottom-10 left-12 right-12 z-10 flex items-center justify-between">
+
+          <span className="text-white/45 text-[9px] uppercase tracking-[0.25em]">
+            Est. 1985
+          </span>
+
+          <span className="text-white/45 text-[9px] uppercase tracking-[0.25em]">
+            Geneva • Switzerland
+          </span>
+
+        </div>
+
+      </section>
+
+    </main>
   );
 }

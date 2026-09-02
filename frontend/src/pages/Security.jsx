@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff, Check, Shield, ArrowLeft, ArrowRight, KeyRound } from 'lucide-react';
 
-// Same policy the backend enforces on register/reset — kept in sync so the
-// client never accepts something the server would reject.
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 const validationSchema = Yup.object({
@@ -21,14 +19,13 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref('newPassword')], 'Passwords do not match'),
 });
 
-// Two at-a-glance rules shown in the requirements card, checked live as the
-// user types — the full policy above is still what actually gates submit.
 const LIVE_RULES = [
   { key: 'length', label: 'Minimum 8 characters', test: (v) => v.length >= 8 },
+  { key: 'upper', label: '1 uppercase & 1 lowercase letter', test: (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) },
   {
     key: 'numberOrSymbol',
-    label: 'Includes numbers or symbols',
-    test: (v) => /\d/.test(v) || /[^A-Za-z0-9]/.test(v),
+    label: '1 number & 1 special symbol',
+    test: (v) => /\d/.test(v) && /[^A-Za-z0-9]/.test(v),
   },
 ];
 
@@ -47,7 +44,7 @@ export default function Security() {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       setApiError('');
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/apiuser/user/updateprofile`, {
+        const res = await fetch(`${(import.meta.env.VITE_API_URL || 'http://localhost:3000')}/apiuser/user/updateprofile`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -63,7 +60,7 @@ export default function Security() {
         }
 
         resetForm();
-        setSuccessMessage('Password updated successfully.');
+        setSuccessMessage('Password updated successfully. Please log in with your new key.');
         setTimeout(() => navigate('/login'), 1500);
       } catch {
         setApiError('Unable to reach the server. Please try again.');
@@ -74,142 +71,150 @@ export default function Security() {
   });
 
   return (
-    <div className="w-full flex justify-center bg-[#F9F9F9] px-5 py-16">
-      <div className="w-full max-w-[448px] flex flex-col items-center gap-8">
-        <h1
-          className="text-center text-black text-[32px] font-normal"
-          style={{ fontFamily: 'var(--font-caslon)', lineHeight: '40px' }}
+    <div className="min-h-screen w-full bg-[#08090C] text-white flex flex-col justify-between font-['Plus_Jakarta_Sans'] selection:bg-white selection:text-black relative overflow-hidden">
+      
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle,_rgba(255,255,255,0.06)_0%,_transparent_70%)] pointer-events-none" />
+
+      <header className="w-full border-b border-white/10 bg-[#08090C]/80 backdrop-blur-xl px-6 py-5 sm:px-12 flex items-center justify-between z-20">
+        <Link to="/" className="flex flex-col group">
+          <span className="text-xl sm:text-2xl font-bold tracking-[0.25em] text-white">CHRONOS</span>
+          <span className="text-[8px] tracking-[0.35em] text-gray-400 uppercase font-semibold">Haute Horlogerie</span>
+        </Link>
+        <Link
+          to="/myaccount"
+          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-gray-300 hover:text-white transition-colors"
         >
-          Security &amp; Access
-        </h1>
+          <ArrowLeft size={14} />
+          <span>Return to Dashboard</span>
+        </Link>
+      </header>
 
-        {successMessage ? (
-          <p className="text-sm text-black text-center" style={{ fontFamily: 'var(--font-inter)' }}>
-            {successMessage}
-          </p>
-        ) : (
-          <form onSubmit={formik.handleSubmit} noValidate className="w-full flex flex-col gap-5">
-            {/* New Password */}
-            <div>
-              <div className="relative flex items-center">
-                <input
-                  id="newPassword"
-                  name="newPassword"
-                  type={showNew ? 'text' : 'password'}
-                  placeholder="New Password"
-                  autoComplete="new-password"
-                  value={formik.values.newPassword}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full border-0 border-b bg-transparent pr-8 text-[16px] text-black outline-none transition-colors duration-300 placeholder:text-[#9A9C9C] focus:border-black"
-                  style={{ fontFamily: 'var(--font-inter)', borderColor: '#C4C7C7', padding: '12px 0px' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNew((s) => !s)}
-                  className="absolute right-0 text-[#5D5E63] hover:text-black"
-                  tabIndex={-1}
-                  aria-label={showNew ? 'Hide password' : 'Show password'}
-                >
-                  {showNew ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
-                </button>
+      <main className="relative flex-1 flex items-center justify-center px-6 py-12 z-10">
+        <div className="w-full max-w-[460px] bg-[#0E1015]/90 border border-white/15 backdrop-blur-2xl rounded-3xl p-8 sm:p-12 shadow-2xl">
+          
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white mx-auto mb-4">
+              <KeyRound size={22} />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-white">
+              Security &amp; Keys
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400 mt-2">
+              Update your master password to protect your client portfolio.
+            </p>
+          </div>
+
+          {successMessage ? (
+            <div className="p-4 bg-white/10 border border-white/20 rounded-2xl text-center text-sm font-medium text-white">
+              {successMessage}
+            </div>
+          ) : (
+            <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-4">
+              
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  New Security Password
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type={showNew ? 'text' : 'password'}
+                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    value={formik.values.newPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3.5 pr-11 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNew((s) => !s)}
+                    className="absolute right-3.5 text-gray-400 hover:text-white"
+                    tabIndex={-1}
+                  >
+                    {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
+                {formik.touched.newPassword && formik.errors.newPassword && (
+                  <p className="text-red-400 text-xs mt-1">{formik.errors.newPassword}</p>
+                )}
               </div>
-              {formik.touched.newPassword && formik.errors.newPassword && (
-                <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'var(--font-inter)' }}>
-                  {formik.errors.newPassword}
-                </p>
-              )}
-            </div>
 
-            {/* Confirm New Password */}
-            <div>
-              <div className="relative flex items-center">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirm ? 'text' : 'password'}
-                  placeholder="Confirm New Password"
-                  autoComplete="new-password"
-                  value={formik.values.confirmPassword}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full border-0 border-b bg-transparent pr-8 text-[16px] text-black outline-none transition-colors duration-300 placeholder:text-[#9A9C9C] focus:border-black"
-                  style={{ fontFamily: 'var(--font-inter)', borderColor: '#C4C7C7', padding: '12px 0px' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm((s) => !s)}
-                  className="absolute right-0 text-[#5D5E63] hover:text-black"
-                  tabIndex={-1}
-                  aria-label={showConfirm ? 'Hide password' : 'Show password'}
-                >
-                  {showConfirm ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
-                </button>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Confirm New Password
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirm ? 'text' : 'password'}
+                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    value={formik.values.confirmPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3.5 pr-11 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((s) => !s)}
+                    className="absolute right-3.5 text-gray-400 hover:text-white"
+                    tabIndex={-1}
+                  >
+                    {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
+                {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                  <p className="text-red-400 text-xs mt-1">{formik.errors.confirmPassword}</p>
+                )}
               </div>
-              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                <p className="mt-1 text-[12px] text-red-600" style={{ fontFamily: 'var(--font-inter)' }}>
-                  {formik.errors.confirmPassword}
-                </p>
+
+              <div className="bg-[#141720] border border-white/10 rounded-2xl p-4 flex flex-col gap-2 mt-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Security Standard:</span>
+                {LIVE_RULES.map((rule) => {
+                  const met = rule.test(formik.values.newPassword);
+                  return (
+                    <div key={rule.key} className="flex items-center gap-2.5">
+                      <span
+                        className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                          met ? 'bg-white text-black' : 'border border-white/30 text-transparent'
+                        }`}
+                      >
+                        {met && <Check size={10} strokeWidth={3} />}
+                      </span>
+                      <span className={`text-xs ${met ? 'text-white font-medium' : 'text-gray-400'}`}>
+                        {rule.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {apiError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-300 text-center">
+                  {apiError}
+                </div>
               )}
-            </div>
 
-            {/* Requirements card */}
-            <div className="bg-[#F0F0F0] rounded-md p-4 flex flex-col gap-2">
-              {LIVE_RULES.map((rule) => {
-                const met = rule.test(formik.values.newPassword);
-                return (
-                  <div key={rule.key} className="flex items-center gap-2">
-                    <span
-                      className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                        met ? 'bg-black' : 'border border-[#C4C7C7]'
-                      }`}
-                    >
-                      {met && <Check size={11} color="#FFFFFF" strokeWidth={3} />}
-                    </span>
-                    <span
-                      className={met ? 'text-black' : 'text-[#5D5E63]'}
-                      style={{ fontFamily: 'var(--font-inter)', fontSize: '13px' }}
-                    >
-                      {rule.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+              <button
+                type="submit"
+                disabled={formik.isSubmitting}
+                className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full shadow-lg transition-all disabled:opacity-60"
+              >
+                <span>{formik.isSubmitting ? 'Updating Key…' : 'Update Password'}</span>
+                <ArrowRight size={15} />
+              </button>
+            </form>
+          )}
 
-            {apiError && (
-              <p className="text-[12px] text-red-600" style={{ fontFamily: 'var(--font-inter)' }}>
-                {apiError}
-              </p>
-            )}
+        </div>
+      </main>
 
-            <button
-              type="submit"
-              disabled={formik.isSubmitting}
-              className="w-full bg-black text-white transition-colors duration-300 hover:bg-[#2F3131] active:scale-[0.98] disabled:opacity-70"
-              style={{
-                fontFamily: 'var(--font-inter)',
-                fontSize: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                padding: '20px 0',
-              }}
-            >
-              {formik.isSubmitting ? 'Updating…' : 'Update Password'}
-            </button>
-          </form>
-        )}
-
-        <button
-          type="button"
-          onClick={() => navigate('/login')}
-          className="text-[#5D5E63] underline hover:text-black transition-colors duration-200"
-          style={{ fontFamily: 'var(--font-inter)', fontSize: '12px', fontWeight: 600 }}
-        >
-          Cancel and return to sign in
-        </button>
-      </div>
+      <footer className="w-full border-t border-white/5 py-4 px-6 text-center text-[10px] text-gray-500 tracking-widest uppercase">
+        256-Bit Encrypted Atelier Access • Geneva Standard
+      </footer>
     </div>
   );
 }

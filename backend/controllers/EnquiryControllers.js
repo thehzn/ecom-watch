@@ -32,11 +32,12 @@ export const createEnquiry = async (req, res) => {
 
     const enquiry = await Enquiry.create(enquiryData);
 
-    await Notification.create({
+    const notification = await Notification.create({
       type: "enquiry",
       message: `${enquiry.name} submitted a new enquiry`,
       user: userId || undefined
     })
+    console.log("ENQUIRY NOTIFICATION CREATED:", notification);
 
     return res.status(201).json({status: true,message: "Enquiry submitted successfully",enquiry});
   } catch (error) {

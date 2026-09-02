@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { ShoppingBag, ChevronLeft, ChevronRight, Package, Clock, ShieldCheck, ArrowRight, ArrowLeft } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
 
-// Matches the real orderStatus enum: Pending / Shipped / Cancelled / Delivered.
 const STATUS_STYLES = {
-  Delivered: "bg-[#F3F4F6] text-[#5D5E63]",
-  Shipped: "bg-black text-white",
-  Pending: "bg-[#FFF4E5] text-[#8A5A00]",
-  Cancelled: "bg-[#FDEDED] text-[#B42318]",
+  Delivered: "bg-white/10 text-white border border-white/20",
+  Shipped: "bg-white text-black font-bold",
+  Pending: "bg-amber-500/10 text-amber-300 border border-amber-500/20",
+  Cancelled: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
 
 export default function MyOrders() {
@@ -30,14 +30,10 @@ export default function MyOrders() {
     setLoading(true);
     setError("");
     try {
-      // Real route (note the typo, this is intentional and matches the
-      // backend): /apiorders/myordes. No page/limit support server-side —
-      // it returns every order for the user at once, so pagination here
-      // is handled client-side, same approach as Categories.jsx.
       const res = await get("/apiorders/myordes");
       setAllOrders(res?.orders || []);
     } catch {
-      setError("Could not load your orders. Please try again.");
+      setError("Could not load your acquisitions right now.");
     } finally {
       setLoading(false);
     }
@@ -45,11 +41,8 @@ export default function MyOrders() {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reset to page 1 if the current page becomes empty (e.g. after a refetch
-  // with fewer orders than before).
   useEffect(() => {
     if (page > totalPages) setPage(1);
   }, [page, totalPages]);
@@ -58,198 +51,194 @@ export default function MyOrders() {
     setCancellingId(orderId);
     setError("");
     try {
-      // Real endpoint: DELETE /apiorders/cancelMyOrder/:id (customer-facing,
-      // added by Najisha). NOTE: her controller currently reads/writes
-      // order.status, but the schema's real field is orderStatus — the
-      // cancel may report success without actually persisting. Refetching
-      // from the server below (rather than trusting an optimistic update)
-      // means the UI always reflects DB truth, bug or not — worth testing
-      // by cancelling an order and checking it stays Cancelled after a
-      // page refresh.
-      await del(`/apiorders/cancelMyOrder/${orderId}`);
-      await fetchOrders();
+      await del(`/apiorders/cancelorder/${orderId}`);
+      fetchOrders();
     } catch {
-      setError("Could not cancel that order. Please try again.");
+      setError("Could not cancel this order. Please contact Concierge.");
     } finally {
       setCancellingId(null);
     }
   };
 
-  const rangeStart = totalOrders === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(page * PAGE_SIZE, totalOrders);
-
   return (
-    <main className="max-w-[1280px] mx-auto px-4 md:px-12 py-10 bg-white font-['Inter'] text-black">
-      <div className="flex flex-col">
-        {/* Breadcrumb */}
-        <nav className="text-xs text-[#5D5E63] mb-6">
-          <button onClick={() => navigate("/myaccount")} className="hover:text-black transition-colors">
-            My Account
-          </button>
-          <span className="mx-2">/</span>
-          <span className="text-black">My Orders</span>
-        </nav>
-
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="font-['Libre_Caslon_Text'] text-[48px] font-normal text-black">
-            My Orders
+    <div className="min-h-screen w-full bg-[#08090C] text-white font-['Plus_Jakarta_Sans'] selection:bg-white selection:text-black">
+      
+      {/* Header Banner */}
+      <section className="w-full bg-[#0B0D12] border-b border-white/10 px-6 py-14 sm:py-16 text-center relative overflow-hidden">
+        <div className="max-w-3xl mx-auto flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300 mb-3">
+            <Package size={12} />
+            Client Portfolio
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+            Timepiece Acquisitions
           </h1>
-          <p className="font-['Inter'] text-base text-[#5D5E63] max-w-[672px] leading-[28px] mt-3">
-            Track, manage, and review every order you've placed with Chronos —
-            from dispatch through to delivery.
+          <p className="text-sm text-gray-400 mt-2">
+            Track your bespoke orders, certified deliveries, and acquisition records.
           </p>
         </div>
+      </section>
 
-        {/* Order History */}
-        <section>
-          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      <main className="max-w-[1200px] mx-auto px-6 sm:px-12 py-12">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between mb-8">
+          <Link
+            to="/myaccount"
+            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft size={14} />
+            <span>Return to Client Dossier</span>
+          </Link>
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Total Orders: {totalOrders}
+          </span>
+        </div>
 
-          <div className="w-full overflow-x-auto">
-            <table className="w-full border-collapse border-b border-[#E2E2E2]">
-              <thead>
-                <tr className="border-b border-[#E2E2E2]">
-                  {["Order", "Quantity", "Date", "Status", "Total", "Action"].map(
-                    (col) => (
-                    <th
-                      key={col}
-                      className="text-left py-4 text-[11px] uppercase tracking-[0.15em] font-semibold text-[#5D5E63] whitespace-nowrap"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-sm text-[#5D5E63]">
-                      Loading your orders...
-                    </td>
-                  </tr>
-                ) : orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-sm text-[#5D5E63]">
-                      You haven't placed any orders yet.
-                    </td>
-                  </tr>
-                ) : (
-                  orders.map((order) => {
-                    const items = order.items || [];
-                    const firstItem = items[0];
-                    const extraItemCount = items.length - 1;
-                    const totalUnits = items.reduce((sum, it) => sum + (it.quantity || 0), 0);
-                    const reference = order._id ? `#${order._id.slice(-8).toUpperCase()}` : "—";
-                    const placedOn = order.createdAt
-                      ? new Date(order.createdAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
-                      : "—";
+        {loading && (
+          <div className="py-24 text-center">
+            <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm text-gray-400">Retrieving acquisition ledger…</p>
+          </div>
+        )}
 
-                    return (
-                      <tr
-                        key={order._id}
-                        className="border-b border-[#E2E2E2] hover:bg-[#F9F9F9] transition-colors duration-300"
-                      >
-                        <td className="py-8 pr-4">
+        {!loading && error && (
+          <p className="py-16 text-center text-sm text-red-400">{error}</p>
+        )}
+
+        {!loading && !error && orders.length === 0 && (
+          <div className="bg-[#0E1015] border border-white/10 rounded-3xl p-16 text-center max-w-lg mx-auto">
+            <ShoppingBag size={40} className="text-gray-500 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-white">No Acquisitions Yet</h3>
+            <p className="text-sm text-gray-400 mt-2 mb-6">
+              You have not placed any timepiece orders yet. Explore our handcrafted collection.
+            </p>
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 bg-white text-black text-xs font-bold uppercase tracking-wider px-8 py-3.5 rounded-full hover:bg-gray-200 transition-all"
+            >
+              <span>Explore Timepieces</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        )}
+
+        {!loading && !error && orders.length > 0 && (
+          <div className="flex flex-col gap-6">
+            {orders.map((order) => {
+              const status = order.orderStatus || "Pending";
+              const statusClass = STATUS_STYLES[status] || STATUS_STYLES.Pending;
+              const items = order.items || [];
+              const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recent';
+
+              return (
+                <div
+                  key={order._id}
+                  className="bg-[#0E1015] border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col gap-6 hover:border-white/25 transition-all shadow-xl"
+                >
+                  {/* Order Top Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs">
+                      <div>
+                        <span className="text-gray-500 uppercase tracking-wider text-[10px] block">Order Identifier</span>
+                        <span className="text-white font-mono font-medium">#{order._id.slice(-8).toUpperCase()}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 uppercase tracking-wider text-[10px] block">Acquisition Date</span>
+                        <span className="text-gray-300 font-medium">{dateStr}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 uppercase tracking-wider text-[10px] block">Total Amount</span>
+                        <span className="text-white font-bold text-sm">\${Number(order.totalAmount || 0).toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold ${statusClass}`}>
+                      {status}
+                    </span>
+                  </div>
+
+                  {/* Order Items */}
+                  <div className="flex flex-col gap-4">
+                    {items.map((item, idx) => {
+                      const prod = item.productId || {};
+                      return (
+                        <div key={idx} className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-4">
-                            <img
-                              src={firstItem?.product?.mainImage}
-                              alt={firstItem?.product?.modelName}
-                              className="w-20 h-20 object-cover bg-[#E2E2E2]"
-                            />
+                            <div className="w-16 h-16 rounded-xl bg-[#141720] border border-white/10 p-2 shrink-0 flex items-center justify-center">
+                              <img
+                                src={prod.mainImage || "/default-watch.jpg"}
+                                alt={prod.modelName || "Timepiece"}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
                             <div>
-                              <p className="text-sm font-bold">{reference}</p>
-                              <p className="text-xs text-[#5D5E63] mt-1">
-                                {firstItem?.product?.modelName}
-                                {extraItemCount > 0 && ` +${extraItemCount} more item${extraItemCount > 1 ? "s" : ""}`}
+                              <h4 className="text-sm font-bold text-white line-clamp-1">
+                                {prod.modelName || "Haute Horlogerie Timepiece"}
+                              </h4>
+                              <p className="text-xs text-gray-400">
+                                Qty: {item.quantity} • \${Number(item.price || prod.price || 0).toLocaleString()} each
                               </p>
                             </div>
                           </div>
-                        </td>
-                        <td className="py-8 pr-4 text-sm text-[#5D5E63] whitespace-nowrap">
-                          {totalUnits} {totalUnits === 1 ? "Unit" : "Units"}
-                        </td>
-                        <td className="py-8 pr-4 text-sm text-[#5D5E63] whitespace-nowrap">
-                          {placedOn}
-                        </td>
-                        <td className="py-8 pr-4">
-                          <span
-                            className={`inline-block px-3 py-1 text-[10px] uppercase font-bold tracking-[0.15em] ${
-                              STATUS_STYLES[order.orderStatus] || "bg-[#F3F4F6] text-[#5D5E63]"
-                            }`}
-                          >
-                            {order.orderStatus}
+
+                          <span className="text-sm font-bold text-white">
+                            \${Number((item.price || prod.price || 0) * item.quantity).toLocaleString()}
                           </span>
-                        </td>
-                        <td className="py-8 text-sm font-bold text-black tracking-tight whitespace-nowrap">
-                          ${Number(order.total).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                          })}
-                        </td>
-                        <td className="py-8">
-                          {order.orderStatus === "Pending" ? (
-                            <button
-                              onClick={() => handleCancel(order._id)}
-                              disabled={cancellingId === order._id}
-                              className="border border-black bg-transparent px-6 py-2 text-[10px] uppercase font-bold tracking-[0.15em] hover:bg-black hover:text-white transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                              {cancellingId === order._id ? "Cancelling..." : "Cancel Order"}
-                            </button>
-                          ) : null}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Actions Bar */}
+                  <div className="pt-4 border-t border-white/5 flex items-center justify-between text-xs">
+                    <span className="text-gray-500 text-[11px] flex items-center gap-1.5">
+                      <ShieldCheck size={14} className="text-gray-400" />
+                      Insured Swiss Delivery &amp; Certificate of Authenticity
+                    </span>
+
+                    {status === "Pending" && (
+                      <button
+                        onClick={() => handleCancel(order._id)}
+                        disabled={cancellingId === order._id}
+                        className="text-red-400 hover:text-red-300 font-bold uppercase tracking-wider text-[11px] transition-colors disabled:opacity-50"
+                      >
+                        {cancellingId === order._id ? "Cancelling…" : "Cancel Order"}
+                      </button>
+                    )}
+                  </div>
+
+                </div>
+              );
+            })}
           </div>
+        )}
 
-          {/* Pagination */}
-          {totalOrders > 0 && (
-            <div className="flex justify-between items-center mt-12">
-              <p className="text-[11px] text-[#5D5E63]">
-                Showing {rangeStart}–{rangeEnd} of {totalOrders} orders
-              </p>
+        {/* Pagination */}
+        {!loading && !error && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-12 pt-6 border-t border-white/10">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:border-white transition-colors disabled:opacity-30"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="text-xs uppercase tracking-wider font-semibold text-gray-400">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:border-white transition-colors disabled:opacity-30"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="text-[#5D5E63] hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2"
-                  aria-label="Previous page"
-                >
-                  ←
-                </button>
+      </main>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setPage(n)}
-                    className={`w-8 h-8 text-sm transition-colors ${
-                      n === page ? "bg-black text-white" : "text-[#5D5E63] hover:text-black"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="text-[#5D5E63] hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2"
-                  aria-label="Next page"
-                >
-                  →
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
-      </div>
-    </main>
+    </div>
   );
 }
