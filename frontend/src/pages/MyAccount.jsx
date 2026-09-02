@@ -408,13 +408,6 @@ export default function MyAccount() {
                 <Edit3 size={14} />
                 <span>Edit Dossier</span>
               </button>
-              <button
-                onClick={() => navigate("/security")}
-                className="inline-flex items-center gap-2 border border-white/20 hover:border-white text-white text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-full transition-colors"
-              >
-                <Shield size={14} />
-                <span>Security</span>
-              </button>
             </div>
 
           </div>

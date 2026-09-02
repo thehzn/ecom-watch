@@ -75,20 +75,6 @@ export default function Security() {
       
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle,_rgba(255,255,255,0.06)_0%,_transparent_70%)] pointer-events-none" />
 
-      <header className="w-full border-b border-white/10 bg-[#08090C]/80 backdrop-blur-xl px-6 py-5 sm:px-12 flex items-center justify-between z-20">
-        <Link to="/" className="flex flex-col group">
-          <span className="text-xl sm:text-2xl font-bold tracking-[0.25em] text-white">CHRONOS</span>
-          <span className="text-[8px] tracking-[0.35em] text-gray-400 uppercase font-semibold">Haute Horlogerie</span>
-        </Link>
-        <Link
-          to="/myaccount"
-          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-gray-300 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={14} />
-          <span>Return to Dashboard</span>
-        </Link>
-      </header>
-
       <main className="relative flex-1 flex items-center justify-center px-6 py-12 z-10">
         <div className="w-full max-w-[460px] bg-[#0E1015]/90 border border-white/15 backdrop-blur-2xl rounded-3xl p-8 sm:p-12 shadow-2xl">
           
@@ -206,15 +192,16 @@ export default function Security() {
                 <span>{formik.isSubmitting ? 'Updating Key…' : 'Update Password'}</span>
                 <ArrowRight size={15} />
               </button>
+             <Link
+              to="/myaccount"
+              className="inline-flex items-center justify-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-gray-300 hover:text-white transition-colors w-full">
+              <span>Return to Dashboard</span>
+              </Link>
             </form>
           )}
 
         </div>
       </main>
-
-      <footer className="w-full border-t border-white/5 py-4 px-6 text-center text-[10px] text-gray-500 tracking-widest uppercase">
-        256-Bit Encrypted Atelier Access • Geneva Standard
-      </footer>
     </div>
   );
 }
