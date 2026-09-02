@@ -68,7 +68,7 @@ function ProductCard({ product }) {
           <p className="mt-1 text-xs text-gray-400">{details}</p>
         )}
         <p className="mt-3 text-base font-bold text-white">
-          ${Number(product.price).toLocaleString()}
+          ₹{Number(product.price).toLocaleString()}
         </p>
       </div>
     </Link>

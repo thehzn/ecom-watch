@@ -89,7 +89,7 @@ function ProductCard({ product }) {
 
         <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
           <p className="text-base font-bold text-white">
-            ${Number(product.price).toLocaleString()}
+            ₹{Number(product.price).toLocaleString()}
           </p>
           <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
             In Stock
