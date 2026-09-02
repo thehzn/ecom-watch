@@ -37,8 +37,6 @@ export const createEnquiry = async (req, res) => {
       message: `${enquiry.name} submitted a new enquiry`,
       user: userId || undefined
     })
-    console.log("ENQUIRY NOTIFICATION CREATED:", notification);
-
     return res.status(201).json({status: true,message: "Enquiry submitted successfully",enquiry});
   } catch (error) {
     return res.status(500).json({status: false,message: error.message});
