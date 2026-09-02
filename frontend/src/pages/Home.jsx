@@ -31,11 +31,11 @@ const COLLECTIONS = [
     image: heritageWatch,
   },
   {
-    tag: 'CHRONOGRAPH DYNAMICS',
-    title: 'Cosmograph & Sport',
-    desc: 'Forged titanium and ceramic tachymeter bezels built to endure high-performance motorsport and aviation.',
-    to: '/categories?category=Contemporary',
-    image: sportWatch,
+    tag: 'PRECIOUS METALS',
+    title: '950 Platinum & Royal Gold',
+    desc: 'Manufactured in solid platinum and brushed Oystersteel with diamond-polished hands.',
+    to: '/categories?category=Luxury%20Watch',
+    image: classicWatch,
   },
   {
     tag: 'GRAND COMPLICATIONS',
@@ -45,11 +45,11 @@ const COLLECTIONS = [
     image: limitedWatch,
   },
   {
-    tag: 'PRECIOUS METALS',
-    title: '950 Platinum & Royal Steel',
-    desc: 'Manufactured in solid platinum and brushed Oystersteel with diamond-polished hands.',
-    to: '/categories?category=Luxury%20Watch',
-    image: classicWatch,
+    tag: 'HIGH-PERFORMANCE DYNAMICS',
+    title: 'Sport & Chronograph',
+    desc: 'Forged titanium and ceramic tachymeter bezels built to endure high-performance motorsport, aviation, and extreme depths.',
+    to: '/categories?category=Contemporary',
+    image: sportWatch,
   },
 ];
 
