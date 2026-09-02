@@ -67,9 +67,20 @@ function ProductCard({ product }) {
         {details && (
           <p className="mt-1 text-xs text-gray-400">{details}</p>
         )}
+<<<<<<< Updated upstream
         <p className="mt-3 text-base font-bold text-white">
           ₹{Number(product.price).toLocaleString()}
         </p>
+=======
+        <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
+          <p className="text-sm font-bold text-white">
+            ₹{Number(product.price).toLocaleString()}
+          </p>
+          <span className="text-[10px] uppercase tracking-wider text-gray-300 font-bold group-hover:text-white">
+            Configure &rarr;
+          </span>
+        </div>
+>>>>>>> Stashed changes
       </div>
     </Link>
   );
