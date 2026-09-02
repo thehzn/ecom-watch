@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useApi } from '../../hooks/useApi';
 
 export default function InquiryForm() {
   const { post } = useApi();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,8 +15,6 @@ export default function InquiryForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-
-  const token = useSelector((state) => state.auth.token);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,14 +32,12 @@ export default function InquiryForm() {
 
     try {
       const data = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
         subject: formData.subject,
         message: formData.message
       };
-
-      if (!token) {
-        data.name = `${formData.firstName} ${formData.lastName}`;
-        data.email = formData.email;
-      }
 
       const result = await post('/enquiry/userenquiry', data);
 
@@ -61,10 +56,13 @@ export default function InquiryForm() {
           message: ''
         });
       }, 4000);
+
     } catch (err) {
       console.error('Inquiry submission failed:', err);
+
       setSubmitError(
-        err?.message || 'Something went wrong while sending your inquiry. Please try again.'
+        err?.message ||
+        'Something went wrong while sending your inquiry. Please try again.'
       );
     } finally {
       setSubmitting(false);
@@ -73,6 +71,7 @@ export default function InquiryForm() {
 
   return (
     <section className="w-full" aria-labelledby="inquiry-form-title">
+
       <h2
         id="inquiry-form-title"
         className="font-caslon text-2xl font-normal text-black mb-6"
@@ -105,7 +104,7 @@ export default function InquiryForm() {
             type="text"
             id="firstName"
             name="firstName"
-            required={!token}
+            required
             value={formData.firstName}
             onChange={handleChange}
             placeholder="First Name"
@@ -123,7 +122,7 @@ export default function InquiryForm() {
             type="text"
             id="lastName"
             name="lastName"
-            required={!token}
+            required
             value={formData.lastName}
             onChange={handleChange}
             placeholder="Last Name"
@@ -141,7 +140,7 @@ export default function InquiryForm() {
             type="email"
             id="email"
             name="email"
-            required={!token}
+            required
             value={formData.email}
             onChange={handleChange}
             placeholder="Email Address"
@@ -160,6 +159,7 @@ export default function InquiryForm() {
             name="subject"
             value={formData.subject}
             onChange={handleChange}
+            required
             className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-[#5D5E63] appearance-none pr-8 cursor-pointer transition-colors duration-300"
           >
             <option value="Product Inquiry">Product Inquiry</option>
@@ -167,6 +167,7 @@ export default function InquiryForm() {
             <option value="Concierge Service">Concierge Service</option>
             <option value="General Inquiry">General Inquiry</option>
           </select>
+
           <span className="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-[#5D5E63] pointer-events-none text-2xl">
             expand_more
           </span>

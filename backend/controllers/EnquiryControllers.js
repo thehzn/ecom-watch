@@ -1,45 +1,39 @@
 import Enquiry from "../models/EnquiryModel.js";
-import Notification from "../models/NotificationModel.js";
-import User from "../models/UserModel.js";
-
 
 export const createEnquiry = async (req, res) => {
   try {
-    const { name, email, subject, message } = req.body;
+    const { firstName, lastName, email, subject, message } = req.body;
+
     const userId = req.user?.id;
-    if (!subject || !message || (!userId && (!name || !email))) {
-    return res.status(400).json({status: false,message: "Subject and message are required"});
+    if (!firstName || !lastName || !email || !subject || !message) {
+      return res.status(400).json({
+        status: false,
+        message: "All fields are required"
+      });
     }
 
-    let enquiryData = {
-      name,
+    const enquiryData = {
+      name: `${firstName} ${lastName}`,
       email,
       subject,
       message
     };
-
     if (userId) {
-      const user = await User.findById(userId);
-
-      if (!user) {
-        return res.status(404).json({status: false,message: "User not found"});
-      }
-
       enquiryData.user = userId;
-      enquiryData.name = `${user.firstName} ${user.lastName}`;
-      enquiryData.email = user.email;
     }
 
     const enquiry = await Enquiry.create(enquiryData);
+    return res.status(201).json({
+      status: true,
+      message: "Enquiry submitted successfully",
+      enquiry
+    });
 
-    const notification = await Notification.create({
-      type: "enquiry",
-      message: `${enquiry.name} submitted a new enquiry`,
-      user: userId || undefined
-    })
-    return res.status(201).json({status: true,message: "Enquiry submitted successfully",enquiry});
   } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({
+      status: false,
+      message: error.message
+    });
   }
 }
 
