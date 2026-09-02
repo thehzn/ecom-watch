@@ -725,7 +725,7 @@ export default function ProductDetails() {
 
             <div className="mt-4 flex items-baseline gap-4">
               <span className="text-3xl font-bold text-white">
-                ${Number(product.price).toLocaleString()}
+                ₹{Number(product.price).toLocaleString()}
               </span>
               <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
                 In Stock & Verified

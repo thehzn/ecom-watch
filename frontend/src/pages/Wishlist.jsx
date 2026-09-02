@@ -387,7 +387,7 @@ console.log(response.products);
                   {product.modelName}
                 </h3>
                 <p className="text-base font-bold text-white">
-                  ${Number(product.price).toLocaleString()}
+                  ₹{Number(product.price).toLocaleString()}
                 </p>
 
                 <div className="mt-4 flex gap-2">
