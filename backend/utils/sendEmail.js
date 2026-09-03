@@ -163,7 +163,8 @@ export const sendOTP = async (req, res) => {
     console.log(`  OTP CODE: >>> ${userOTP} <<<`);
     console.log(`  VALID FOR 5 MINUTES`);
     console.log(`========================================\n`);
-
+console.log("EMAIL configured:", !!process.env.email);
+console.log("OTP Password configured:", !!process.env.OTP_Password);
 if (process.env.email && process.env.OTP_Password) {
   try {
     const transporter = nodemailer.createTransport({
