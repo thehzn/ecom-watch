@@ -62,10 +62,9 @@
 //   }
 // };import User from "../models/UserModel.js";
 
-
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import User from "../models/UserModel.js"
+import User from "../models/UserModel.js";
 
 dotenv.config();
 
@@ -83,12 +82,23 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    // Check Render environment variables
-    console.log("EMAIL configured:", !!process.env.email);
-    console.log("OTP Password configured:", !!process.env.OTP_Password);
+    // Check Brevo environment variables
+    console.log(
+      "BREVO SMTP configured:",
+      !!process.env.BREVO_SMTP_USER
+    );
 
-    if (!process.env.email || !process.env.OTP_Password) {
-      console.error("Email credentials are missing");
+    console.log(
+      "BREVO SMTP key configured:",
+      !!process.env.BREVO_SMTP_KEY
+    );
+
+    if (
+      !process.env.BREVO_SMTP_USER ||
+      !process.env.BREVO_SMTP_KEY ||
+      !process.env.BREVO_SENDER_EMAIL
+    ) {
+      console.error("Brevo email credentials are missing");
 
       return res.status(500).json({
         status: false,
@@ -111,38 +121,47 @@ export const sendOTP = async (req, res) => {
     }
 
     const userOTP = generateOTP();
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.email,
-    pass: process.env.OTP_Password,
-  },
-});
+    const otpExpiresAt = new Date(
+      Date.now() + 5 * 60 * 1000
+    );
+
+    // Brevo SMTP transporter
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_KEY,
+      },
+    });
+
     try {
       await transporter.sendMail({
-        from: process.env.email,
+        from: process.env.BREVO_SENDER_EMAIL,
         to: cleanEmail,
         subject: "Chronos Haute Horlogerie - Security OTP Verification",
         html: `
           <h2>Your Authentication OTP:
             <strong>${userOTP}</strong>
           </h2>
+
           <p>This code is valid for 5 minutes.</p>
-          <p>If you didn't request this, you can safely ignore this email.</p>
+
+          <p>
+            If you didn't request this, you can safely ignore this email.
+          </p>
         `,
       });
 
       console.log("✅ User OTP email sent successfully");
     } catch (mailErr) {
-      console.error("========== SMTP ERROR ==========");
+      console.error("========== BREVO SMTP ERROR ==========");
       console.error("Message:", mailErr.message);
       console.error("Code:", mailErr.code);
       console.error("Command:", mailErr.command);
-      console.error("=================================");
+      console.error("======================================");
 
       return res.status(502).json({
         status: false,
@@ -169,7 +188,6 @@ const transporter = nodemailer.createTransport({
       status: true,
       message: "OTP sent successfully",
     });
-
   } catch (error) {
     console.error("sendOTP Error:", error);
 
