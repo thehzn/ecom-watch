@@ -61,10 +61,9 @@
 //     return res.status(500).json({ status: false, message: error.message });
 //   }
 // };import User from "../models/UserModel.js";
-
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import User from "../models/UserModel.js";
+import brevo from "@getbrevo/brevo";
 
 dotenv.config();
 
@@ -82,23 +81,11 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    // Check Brevo environment variables
-    console.log(
-      "BREVO SMTP configured:",
-      !!process.env.BREVO_SMTP_USER
-    );
-
-    console.log(
-      "BREVO SMTP key configured:",
-      !!process.env.BREVO_SMTP_KEY
-    );
-
     if (
-      !process.env.BREVO_SMTP_USER ||
-      !process.env.BREVO_SMTP_KEY ||
+      !process.env.BREVO_API_KEY ||
       !process.env.BREVO_SENDER_EMAIL
     ) {
-      console.error("Brevo email credentials are missing");
+      console.error("Brevo API configuration is missing");
 
       return res.status(500).json({
         status: false,
@@ -126,42 +113,53 @@ export const sendOTP = async (req, res) => {
       Date.now() + 5 * 60 * 1000
     );
 
-    // Brevo SMTP transporter
-    const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_KEY,
+    // Brevo API
+    const apiInstance = new brevo.TransactionalEmailsApi();
+
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+    sendSmtpEmail.sender = {
+      email: process.env.BREVO_SENDER_EMAIL,
+      name: "Chronos Haute Horlogerie",
+    };
+
+    sendSmtpEmail.to = [
+      {
+        email: cleanEmail,
       },
-    });
+    ];
+
+    sendSmtpEmail.subject =
+      "Chronos Haute Horlogerie - Security OTP Verification";
+
+    sendSmtpEmail.htmlContent = `
+      <h2>Your Authentication OTP:
+        <strong>${userOTP}</strong>
+      </h2>
+
+      <p>This code is valid for 5 minutes.</p>
+
+      <p>
+        If you didn't request this, you can safely ignore this email.
+      </p>
+    `;
 
     try {
-      await transporter.sendMail({
-        from: process.env.BREVO_SENDER_EMAIL,
-        to: cleanEmail,
-        subject: "Chronos Haute Horlogerie - Security OTP Verification",
-        html: `
-          <h2>Your Authentication OTP:
-            <strong>${userOTP}</strong>
-          </h2>
-
-          <p>This code is valid for 5 minutes.</p>
-
-          <p>
-            If you didn't request this, you can safely ignore this email.
-          </p>
-        `,
-      });
+      const result = await apiInstance.sendTransacEmail(
+        sendSmtpEmail
+      );
 
       console.log("✅ User OTP email sent successfully");
+      console.log("Brevo response:", result);
     } catch (mailErr) {
-      console.error("========== BREVO SMTP ERROR ==========");
+      console.error("========== BREVO API ERROR ==========");
       console.error("Message:", mailErr.message);
-      console.error("Code:", mailErr.code);
-      console.error("Command:", mailErr.command);
-      console.error("======================================");
+      console.error("=====================================");
 
       return res.status(502).json({
         status: false,
@@ -180,14 +178,11 @@ export const sendOTP = async (req, res) => {
       }
     );
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`OTP for ${cleanEmail}: ${userOTP}`);
-    }
-
     return res.status(200).json({
       status: true,
       message: "OTP sent successfully",
     });
+
   } catch (error) {
     console.error("sendOTP Error:", error);
 
