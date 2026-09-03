@@ -39,4 +39,5 @@ coverage/
 *.seed
 *.pid.lock
 
-uploads/
+uploads/*
+!uploads/.gitkeep
