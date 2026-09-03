@@ -36,14 +36,15 @@ export const sendOTP = async (req, res) => {
 
     if (process.env.email && process.env.OTP_Password) {
       try {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.email,
-            pass: process.env.OTP_Password,
-          },
-        });
-
+     const transporter = nodemailer.createTransport({
+     host: "smtp.gmail.com",
+     port: 587,
+     secure: false,
+    auth: {
+    user: process.env.email,
+    pass: process.env.OTP_Password,
+  },
+});
         await transporter.sendMail({
           from: process.env.email,
           to: cleanEmail,
