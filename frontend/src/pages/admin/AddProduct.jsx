@@ -1,3 +1,5 @@
+
+
 // import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import { useSelector } from 'react-redux';
@@ -25,7 +27,7 @@
 //   return (
 //     <label
 //       className={`relative flex flex-col items-center justify-center gap-2 border border-dashed border-[#CFC4C5] bg-[#F3F3F1] cursor-pointer transition-colors duration-300 hover:bg-[#ECECEA] ${
-//         tall ? 'h-[320px]' : 'h-[130px]'
+//         tall ? 'h-[220px] sm:h-[280px] lg:h-[320px]' : 'h-[110px] sm:h-[130px]'
 //       }`}
 //     >
 //       <input
@@ -39,9 +41,9 @@
 //       ) : (
 //         <>
 //           <span className="text-[#5E5E5E] text-2xl leading-none">↑</span>
-//           <span className={`text-[#1A1C1C] ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
+//           <span className={`text-[#1A1C1C] text-center px-2 ${tall ? 'text-sm' : 'text-[10px]'}`}>{label}</span>
 //           {tall && (
-//             <span className="text-[10px] text-[#5E5E5E]">Supports PNG and JPG up to 10MB</span>
+//             <span className="text-[10px] text-[#5E5E5E] text-center px-4">Supports PNG and JPG up to 10MB</span>
 //           )}
 //         </>
 //       )}
@@ -128,15 +130,15 @@
 //   };
 
 //   return (
-//     <main className="min-h-screen flex flex-col items-center py-24 px-6 bg-[#F9F9F9]">
+//     <main className="min-h-screen flex flex-col items-center py-10 px-4 sm:py-16 sm:px-6 lg:py-24 bg-[#F9F9F9]">
 //       <div className="w-full max-w-[800px] mx-auto">
 //         {/* Page Header */}
-//         <header className="mb-20 text-center">
+//         <header className="mb-12 sm:mb-16 lg:mb-20 text-center">
 //           <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5E5E5E] mb-4">
 //             Product Registration
 //           </p>
 //           <h1
-//             className="text-[32px] leading-10 font-normal uppercase tracking-wide text-black mb-4"
+//             className="text-[24px] leading-8 sm:text-[28px] sm:leading-9 lg:text-[32px] lg:leading-10 font-normal uppercase tracking-wide text-black mb-4"
 //             style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //           >
 //             Add New Piece
@@ -146,20 +148,20 @@
 //           </p>
 //         </header>
 
-//         <form onSubmit={handleSubmit} className="flex flex-col gap-24">
+//         <form onSubmit={handleSubmit} className="flex flex-col gap-14 sm:gap-20 lg:gap-24">
 //           {/* Section 01 — General Information */}
 //           <section>
-//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
 //               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">01</span>
 //               <h2
-//                 className="text-xl text-black"
+//                 className="text-lg sm:text-xl text-black"
 //                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //               >
 //                 General Information
 //               </h2>
 //             </div>
 
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
 //               <div>
 //                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Name *</label>
 //                 <input
@@ -213,17 +215,17 @@
 
 //           {/* Section 02 — Classification */}
 //           <section>
-//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
 //               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">02</span>
 //               <h2
-//                 className="text-xl text-black"
+//                 className="text-lg sm:text-xl text-black"
 //                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //               >
 //                 Classification
 //               </h2>
 //             </div>
 
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
 //               <div>
 //                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Category</label>
 //                 <select
@@ -239,7 +241,7 @@
 //               </div>
 //               <div>
 //                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Product For</label>
-//                 <div className="flex items-center gap-6 h-10">
+//                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 min-h-10">
 //                   {PRODUCT_FOR_OPTIONS.map((option) => (
 //                     <label key={option} className="flex items-center gap-2 cursor-pointer">
 //                       <input
@@ -260,17 +262,17 @@
 
 //           {/* Section 03 — Inventory & Pricing */}
 //           <section>
-//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
 //               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">03</span>
 //               <h2
-//                 className="text-xl text-black"
+//                 className="text-lg sm:text-xl text-black"
 //                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //               >
 //                 Inventory &amp; Pricing
 //               </h2>
 //             </div>
 
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
 //               <div>
 //                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
 //                 <input
@@ -304,10 +306,10 @@
 
 //           {/* Section 04 — Content */}
 //           <section>
-//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
 //               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">04</span>
 //               <h2
-//                 className="text-xl text-black"
+//                 className="text-lg sm:text-xl text-black"
 //                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //               >
 //                 Content
@@ -330,17 +332,17 @@
 
 //           {/* Section 05 — Technical Specifications */}
 //           <section>
-//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-10">
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
 //               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">05</span>
 //               <h2
-//                 className="text-xl text-black"
+//                 className="text-lg sm:text-xl text-black"
 //                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //               >
 //                 Technical Specifications
 //               </h2>
 //             </div>
 
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 lg:gap-x-8 gap-y-8 lg:gap-y-10">
 //               <div>
 //                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Case Material</label>
 //                 <input
@@ -380,7 +382,7 @@
 //           {/* Media Assets */}
 //           <section>
 //             <h2
-//               className="text-xl text-black mb-6"
+//               className="text-lg sm:text-xl text-black mb-6"
 //               style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //             >
 //               Media Assets
@@ -406,11 +408,11 @@
 //           </section>
 
 //           {error && (
-//             <p className="text-sm text-[#A32D2D] text-center -mt-16">{error}</p>
+//             <p className="text-sm text-[#A32D2D] text-center -mt-10 sm:-mt-16 lg:-mt-20">{error}</p>
 //           )}
 
 //           {/* Buttons */}
-//           <footer className="pt-16 pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
+//           <footer className="pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
 //             <button
 //               type="submit"
 //               disabled={submitting}
@@ -439,6 +441,16 @@ import { useSelector } from 'react-redux';
 const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Sports'];
 const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
 const BASE_URL = import.meta.env.VITE_API_URL;
+
+// Shared class strings so every field is consistent and text is always visible
+const underlineInput =
+  "w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+const underlineInputStrong =
+  "w-full border-0 border-b border-[#1A1C1C] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+const boxInput =
+  "w-full border border-[#CFC4C5] bg-white py-2 px-3 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+const textareaClass =
+  "w-full border border-[#CFC4C5] bg-white p-3 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] resize-none focus:outline-none focus:border-black";
 
 const initialFormState = {
   modelName: '',
@@ -540,13 +552,13 @@ export default function AddProduct() {
         if (file) payload.append('images', file);
       });
       console.log('token:', token);
-     const res = await fetch(`${import.meta.env.VITE_API_URL}/apiproduct/addproduct`, {
-  method: 'POST',
-  headers: {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  },
-  body: payload,
-});
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apiproduct/addproduct`, {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: payload,
+      });
 
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -603,7 +615,7 @@ export default function AddProduct() {
                   onChange={handleChange}
                   placeholder="e.g. Meridian Chronograph"
                   required
-                  className="w-full border-0 border-b border-[#1A1C1C] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInputStrong}
                 />
               </div>
               <div>
@@ -615,7 +627,7 @@ export default function AddProduct() {
                   onChange={handleChange}
                   placeholder="e.g. CHR-2024-0142"
                   required
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
               <div>
@@ -627,7 +639,7 @@ export default function AddProduct() {
                   onChange={handleChange}
                   placeholder="e.g. Chronos"
                   required
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
               <div>
@@ -639,7 +651,7 @@ export default function AddProduct() {
                   onChange={handleChange}
                   placeholder="e.g. MC-450"
                   required
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
             </div>
@@ -664,7 +676,7 @@ export default function AddProduct() {
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  className="w-full border border-[#CFC4C5] bg-white py-2 px-3 text-sm focus:outline-none focus:border-black"
+                  className={boxInput}
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -716,7 +728,7 @@ export default function AddProduct() {
                   min="0"
                   step="0.01"
                   required
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
               <div>
@@ -730,7 +742,7 @@ export default function AddProduct() {
                   min="1"
                   step="1"
                   required
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
             </div>
@@ -757,7 +769,7 @@ export default function AddProduct() {
                 rows={4}
                 required
                 placeholder="Describe the heritage, craftsmanship, and character of this timepiece..."
-                className="w-full border border-[#CFC4C5] bg-white p-3 text-sm resize-none focus:outline-none focus:border-black"
+                className={textareaClass}
               />
             </div>
           </section>
@@ -783,7 +795,7 @@ export default function AddProduct() {
                   value={form.caseMaterial}
                   onChange={handleChange}
                   placeholder="18K Rose Gold"
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
               <div>
@@ -794,7 +806,7 @@ export default function AddProduct() {
                   value={form.glassType}
                   onChange={handleChange}
                   placeholder="Anti-Reflective Sapphire"
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
               <div>
@@ -805,7 +817,7 @@ export default function AddProduct() {
                   value={form.strapBracelet}
                   onChange={handleChange}
                   placeholder="Hand-stitched Alligator"
-                  className="w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm focus:outline-none focus:border-black"
+                  className={underlineInput}
                 />
               </div>
             </div>
