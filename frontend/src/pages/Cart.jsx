@@ -391,7 +391,7 @@ export default function Cart() {
                   </span>
                   <h3 className="text-xl font-bold text-white">{product.modelName}</h3>
                   <p className="text-sm font-bold text-white">
-                    ${Number(product.price).toLocaleString()}
+                    ₹{Number(product.price).toLocaleString()}
                   </p>
                 </div>
 
@@ -432,7 +432,7 @@ export default function Cart() {
               <div className="flex flex-col gap-3 text-sm">
                 <div className="flex justify-between text-gray-300">
                   <span>Subtotal</span>
-                  <span className="font-bold text-white">${Number(subtotal || 0).toLocaleString()}</span>
+                  <span className="font-bold text-white">₹{Number(subtotal || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>Insured Global Shipping</span>
@@ -441,7 +441,7 @@ export default function Cart() {
                 {tax > 0 && (
                   <div className="flex justify-between text-gray-300">
                     <span>Estimated Tax</span>
-                    <span className="text-white">${Number(tax).toLocaleString()}</span>
+                    <span className="text-white">₹{Number(tax).toLocaleString()}</span>
                   </div>
                 )}
                 <div className="pt-4 border-t border-white/10 flex justify-between text-lg font-bold text-white">

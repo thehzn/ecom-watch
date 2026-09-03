@@ -353,7 +353,7 @@ export default function Home() {
 
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
                     <span className="text-base font-bold text-white">
-                      ${Number(product.price).toLocaleString()}
+                     ₹{Number(product.price).toLocaleString()}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-gray-300 font-bold group-hover:text-white transition-colors">
                       Details <ArrowUpRight size={14} />
