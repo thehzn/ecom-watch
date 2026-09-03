@@ -32,8 +32,8 @@ const COLLECTIONS = [
     image: categoryHeritageWatch,
   },
   {
-    category: 'Sport',
-    id: 'sport',
+    category: 'Sports',
+    id: 'sports',
     label: 'Collection III',
     title: 'Sport & Chronograph',
     description:
