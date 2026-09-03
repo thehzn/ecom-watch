@@ -34,26 +34,27 @@ export const sendOTP = async (req, res) => {
     console.log(`  VALID FOR 5 MINUTES`);
     console.log(`========================================\n`);
 
-    if (process.env.email && process.env.OTP_Password) {
-      try {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.email,
-            pass: process.env.OTP_Password,
-          },
-        });
+if (process.env.email && process.env.OTP_Password) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.OTP_Password,
+      },
+    });
 
-        await transporter.sendMail({
-          from: process.env.email,
-          to: cleanEmail,
-          subject: "Chronos Haute Horlogerie - Security OTP Verification",
-          html: `<h2>Your Authentication OTP: <strong>${userOTP}</strong></h2> <p>This code is valid for 5 minutes.</p>`,
-        });
-      } catch (mailErr) {
-        console.warn("SMTP Mail Error: " + mailErr.message);
-      }
-    }
+    await transporter.sendMail({
+      from: process.env.email,
+      to: cleanEmail,
+      subject: "Chronos Haute Horlogerie - Security OTP Verification",
+      html: `<h2>Your Authentication OTP: <strong>${userOTP}</strong></h2>
+             <p>This code is valid for 5 minutes.</p>`,
+    });
+  } catch (mailErr) {
+    console.warn("SMTP Mail Error: " + mailErr.message);
+  }
+}
 
     return res.status(200).json({ status: true, message: "OTP sent successfully" });
   } catch (error) {
