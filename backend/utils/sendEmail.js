@@ -158,6 +158,33 @@ export const sendOTP = async (req, res) => {
         },
       }
     );
+    console.log(`\n========================================`);
+    console.log(`  CHRONOS SECURITY OTP FOR: ${cleanEmail}`);
+    console.log(`  OTP CODE: >>> ${userOTP} <<<`);
+    console.log(`  VALID FOR 5 MINUTES`);
+    console.log(`========================================\n`);
+
+if (process.env.email && process.env.OTP_Password) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.OTP_Password,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.email,
+      to: cleanEmail,
+      subject: "Chronos Haute Horlogerie - Security OTP Verification",
+      html: `<h2>Your Authentication OTP: <strong>${userOTP}</strong></h2>
+             <p>This code is valid for 5 minutes.</p>`,
+    });
+  } catch (mailErr) {
+    console.warn("SMTP Mail Error: " + mailErr.message);
+  }
+}
 
     // Never log the OTP itself in production — logs are often accessible
     // to teammates, log drains, or CI tools and this defeats the purpose of OTP.
