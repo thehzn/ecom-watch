@@ -61,9 +61,9 @@
 //     return res.status(500).json({ status: false, message: error.message });
 //   }
 // };import User from "../models/UserModel.js";
+
 import dotenv from "dotenv";
 import User from "../models/UserModel.js";
-import * as brevo from "@getbrevo/brevo";
 
 dotenv.config();
 
@@ -113,59 +113,58 @@ export const sendOTP = async (req, res) => {
       Date.now() + 5 * 60 * 1000
     );
 
-    // Brevo API
-    const apiInstance = new brevo.TransactionalEmailsApi();
+    // Send email using Brevo REST API
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "Chronos Haute Horlogerie",
+            email: process.env.BREVO_SENDER_EMAIL,
+          },
+          to: [
+            {
+              email: cleanEmail,
+            },
+          ],
+          subject:
+            "Chronos Haute Horlogerie - Security OTP Verification",
+          htmlContent: `
+            <h2>Your Authentication OTP:
+              <strong>${userOTP}</strong>
+            </h2>
 
-    apiInstance.setApiKey(
-      brevo.TransactionalEmailsApiApiKeys.apiKey,
-      process.env.BREVO_API_KEY
+            <p>This code is valid for 5 minutes.</p>
+
+            <p>
+              If you didn't request this, you can safely ignore this email.
+            </p>
+          `,
+        }),
+      }
     );
 
-    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    const data = await response.json();
 
-    sendSmtpEmail.sender = {
-      email: process.env.BREVO_SENDER_EMAIL,
-      name: "Chronos Haute Horlogerie",
-    };
-
-    sendSmtpEmail.to = [
-      {
-        email: cleanEmail,
-      },
-    ];
-
-    sendSmtpEmail.subject =
-      "Chronos Haute Horlogerie - Security OTP Verification";
-
-    sendSmtpEmail.htmlContent = `
-      <h2>Your Authentication OTP:
-        <strong>${userOTP}</strong>
-      </h2>
-
-      <p>This code is valid for 5 minutes.</p>
-
-      <p>
-        If you didn't request this, you can safely ignore this email.
-      </p>
-    `;
-
-    try {
-      const result = await apiInstance.sendTransacEmail(
-        sendSmtpEmail
-      );
-
-      console.log("✅ User OTP email sent successfully");
-      console.log("Brevo response:", result);
-    } catch (mailErr) {
+    if (!response.ok) {
       console.error("========== BREVO API ERROR ==========");
-      console.error("Message:", mailErr.message);
+      console.error(data);
       console.error("=====================================");
 
       return res.status(502).json({
         status: false,
-        message: "Failed to send OTP email. Please try again later.",
+        message: "Failed to send OTP email",
       });
     }
+
+    console.log("✅ User OTP email sent successfully");
+    console.log("Brevo message ID:", data.messageId);
 
     // Save OTP only after email is successfully sent
     await User.collection.updateOne(
