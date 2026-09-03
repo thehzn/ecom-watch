@@ -65,6 +65,7 @@
 
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import User from "../models/UserModel.js"
 
 dotenv.config();
 
