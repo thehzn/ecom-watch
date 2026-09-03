@@ -60,8 +60,9 @@
 //     console.error("sendOTP Error:", error);
 //     return res.status(500).json({ status: false, message: error.message });
 //   }
-// };
-import User from "../models/UserModel.js";
+// };import User from "../models/UserModel.js";
+
+
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
@@ -69,21 +70,6 @@ dotenv.config();
 
 const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
-
-// Build the transporter once (outside the handler) so it's reused across requests
-// instead of creating a fresh SMTP connection on every OTP send.
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for port 465
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
-  connectionTimeout: 10000, // 10s to establish connection
-  greetingTimeout: 10000,   // 10s to receive greeting after connect
-  socketTimeout: 15000,     // 15s of inactivity before giving up
-});
 
 export const sendOTP = async (req, res) => {
   try {
@@ -96,8 +82,13 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
-      console.error("Email credentials missing: EMAIL_USER / EMAIL_APP_PASSWORD not set");
+    // Check Render environment variables
+    console.log("EMAIL configured:", !!process.env.email);
+    console.log("OTP Password configured:", !!process.env.OTP_Password);
+
+    if (!process.env.email || !process.env.OTP_Password) {
+      console.error("Email credentials are missing");
+
       return res.status(500).json({
         status: false,
         message: "Email configuration is missing on server",
@@ -121,25 +112,34 @@ export const sendOTP = async (req, res) => {
     const userOTP = generateOTP();
     const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    // Send the email FIRST. Only persist the OTP if delivery actually succeeds —
-    // otherwise you end up with a valid OTP in the DB that the user never received.
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.OTP_Password,
+      },
+    });
+
     try {
       await transporter.sendMail({
-        from: `"Chronos Haute Horlogerie" <${process.env.EMAIL_USER}>`,
+        from: process.env.email,
         to: cleanEmail,
         subject: "Chronos Haute Horlogerie - Security OTP Verification",
         html: `
-          <h2>Your Authentication OTP: <strong>${userOTP}</strong></h2>
+          <h2>Your Authentication OTP:
+            <strong>${userOTP}</strong>
+          </h2>
           <p>This code is valid for 5 minutes.</p>
           <p>If you didn't request this, you can safely ignore this email.</p>
         `,
       });
+
+      console.log("✅ User OTP email sent successfully");
     } catch (mailErr) {
       console.error("========== SMTP ERROR ==========");
       console.error("Message:", mailErr.message);
       console.error("Code:", mailErr.code);
       console.error("Command:", mailErr.command);
-      console.error("Response:", mailErr.response);
       console.error("=================================");
 
       return res.status(502).json({
@@ -148,7 +148,7 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    // Only save the OTP once we know the email actually went out
+    // Save OTP only after email is successfully sent
     await User.collection.updateOne(
       { _id: user._id },
       {
@@ -158,47 +158,19 @@ export const sendOTP = async (req, res) => {
         },
       }
     );
-    console.log(`\n========================================`);
-    console.log(`  CHRONOS SECURITY OTP FOR: ${cleanEmail}`);
-    console.log(`  OTP CODE: >>> ${userOTP} <<<`);
-    console.log(`  VALID FOR 5 MINUTES`);
-    console.log(`========================================\n`);
-console.log("EMAIL configured:", !!process.env.email);
-console.log("OTP Password configured:", !!process.env.OTP_Password);
-if (process.env.email && process.env.OTP_Password) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.email,
-        pass: process.env.OTP_Password,
-      },
-    });
 
-    await transporter.sendMail({
-      from: process.env.email,
-      to: cleanEmail,
-      subject: "Chronos Haute Horlogerie - Security OTP Verification",
-      html: `<h2>Your Authentication OTP: <strong>${userOTP}</strong></h2>
-             <p>This code is valid for 5 minutes.</p>`,
-    });
-  } catch (mailErr) {
-    console.warn("SMTP Mail Error: " + mailErr.message);
-  }
-}
-
-    // Never log the OTP itself in production — logs are often accessible
-    // to teammates, log drains, or CI tools and this defeats the purpose of OTP.
     if (process.env.NODE_ENV !== "production") {
-      console.log(`[DEV ONLY] OTP for ${cleanEmail}: ${userOTP}`);
+      console.log(`OTP for ${cleanEmail}: ${userOTP}`);
     }
 
     return res.status(200).json({
       status: true,
       message: "OTP sent successfully",
     });
+
   } catch (error) {
     console.error("sendOTP Error:", error);
+
     return res.status(500).json({
       status: false,
       message: "Something went wrong. Please try again.",
