@@ -53,16 +53,16 @@ export const sendAdminOTP = async (req, res) => {
     }
 
     try {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.email,
-          pass: process.env.OTP_Password,
-        },
-      });
-
+     const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  family: 4,
+  auth: {
+    user: process.env.email,
+    pass: process.env.OTP_Password,
+  },
+});
       await transporter.sendMail({
         from: process.env.email,
         to: cleanEmail,
