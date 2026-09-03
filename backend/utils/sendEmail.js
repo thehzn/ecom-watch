@@ -113,14 +113,15 @@ export const sendOTP = async (req, res) => {
     const userOTP = generateOTP();
     const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.email,
-        pass: process.env.OTP_Password,
-      },
-    });
-
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.email,
+    pass: process.env.OTP_Password,
+  },
+});
     try {
       await transporter.sendMail({
         from: process.env.email,
