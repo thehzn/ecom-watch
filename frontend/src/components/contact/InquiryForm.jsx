@@ -8,8 +8,8 @@ export default function InquiryForm() {
     firstName: '',
     lastName: '',
     email: '',
-    subject: 'Product Inquiry',
-    message: ''
+    subject: 'General Inquiry',
+    message: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -21,22 +21,23 @@ export default function InquiryForm() {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setSubmitError('');
     setSubmitting(true);
 
     try {
       const data = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
         subject: formData.subject,
-        message: formData.message
+        message: formData.message.trim(),
       };
 
       const result = await post('/enquiry/userenquiry', data);
@@ -45,24 +46,23 @@ export default function InquiryForm() {
 
       setSubmitted(true);
 
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        subject: 'General Inquiry',
+        message: '',
+      });
+
       setTimeout(() => {
         setSubmitted(false);
-
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          subject: 'Product Inquiry',
-          message: ''
-        });
       }, 4000);
-
     } catch (err) {
       console.error('Inquiry submission failed:', err);
 
       setSubmitError(
         err?.message ||
-        'Something went wrong while sending your inquiry. Please try again.'
+          'Something went wrong while sending your inquiry. Please try again.'
       );
     } finally {
       setSubmitting(false);
@@ -70,69 +70,108 @@ export default function InquiryForm() {
   };
 
   return (
-    <section className="w-full" aria-labelledby="inquiry-form-title">
+    <section
+      className="w-full"
+      aria-labelledby="inquiry-form-title"
+    >
+      {/* Heading */}
+      <div className="mb-8">
+        <p className="font-inter text-[10px] uppercase tracking-[0.25em] text-[#555555] mb-2">
+          Concierge
+        </p>
 
-      <h2
-        id="inquiry-form-title"
-        className="font-caslon text-2xl font-normal text-black mb-6"
-      >
-        Send an Inquiry
-      </h2>
+        <h2
+          id="inquiry-form-title"
+          className="font-caslon text-3xl sm:text-4xl font-normal text-black tracking-tight"
+        >
+          Send an Inquiry
+        </h2>
+      </div>
 
+      {/* Success Message */}
       {submitted && (
-        <div className="mb-6 p-4 bg-neutral-100 text-neutral-800 text-sm font-inter text-center rounded-[2px] transition duration-300">
-          Thank you. Your inquiry has been received and our concierge will
-          connect with you shortly.
+        <div
+          className="mb-7 border border-black/10 bg-[#F7F7F5] px-5 py-4 text-center"
+          role="status"
+        >
+          <p className="font-inter text-[11px] font-semibold uppercase tracking-[0.12em] text-black">
+            Inquiry Received
+          </p>
+
+          <p className="mt-1 font-inter text-sm text-[#5D5E63]">
+            Thank you. Our concierge will connect with you shortly.
+          </p>
         </div>
       )}
 
+      {/* Error Message */}
       {submitError && (
-        <div className="mb-6 p-4 bg-[#FCEBEB] text-[#A32D2D] text-sm font-inter text-center rounded-[2px] transition duration-300">
-          {submitError}
+        <div
+          className="mb-7 border border-[#E5B8B8] bg-[#FCEBEB] px-5 py-4 text-center"
+          role="alert"
+        >
+          <p className="font-inter text-sm text-[#A32D2D]">
+            {submitError}
+          </p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col space-y-7"
+      >
+        {/* First Name + Last Name */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
 
-        {/* First Name */}
-        <div className="w-full">
-          <label htmlFor="firstName" className="sr-only">
-            First Name
-          </label>
+          {/* First Name */}
+          <div className="w-full">
+         <label
+          htmlFor="firstName"
+              className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2">         First Name
+         </label>
 
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            required
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="First Name"
-            className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-black placeholder-[#5D5E63] transition-colors duration-300"
-          />
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              required
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="First Name"
+              autoComplete="given-name"
+              className="w-full border-0 border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-3 font-inter text-sm text-black placeholder-[#999999] transition-colors duration-300"
+            />
+          </div>
+
+          {/* Last Name */}
+          <div className="w-full">
+            <label
+              htmlFor="lastName"
+              className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2"
+            >
+              Last Name
+            </label>
+
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              required
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Last Name"
+              autoComplete="family-name"
+              className="w-full border-0 border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-3 font-inter text-sm text-black placeholder-[#999999] transition-colors duration-300"
+            />
+          </div>
         </div>
 
-        {/* Last Name */}
+        {/* Email Address */}
         <div className="w-full">
-          <label htmlFor="lastName" className="sr-only">
-            Last Name
-          </label>
-
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            required
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Last Name"
-            className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-black placeholder-[#5D5E63] transition-colors duration-300"
-          />
-        </div>
-
-        {/* Email */}
-        <div className="w-full">
-          <label htmlFor="email" className="sr-only">
+          <label
+            htmlFor="email"
+            className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2"
+          >
             Email Address
           </label>
 
@@ -144,39 +183,18 @@ export default function InquiryForm() {
             value={formData.email}
             onChange={handleChange}
             placeholder="Email Address"
-            className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-black placeholder-[#5D5E63] transition-colors duration-300"
+            autoComplete="email"
+            className="w-full border-0 border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-3 font-inter text-sm text-black placeholder-[#999999] transition-colors duration-300"
           />
         </div>
 
-        {/* Subject */}
-        <div className="w-full relative">
-          <label htmlFor="subject" className="sr-only">
-            Nature of Inquiry
-          </label>
-
-          <select
-            id="subject"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-            className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-[#5D5E63] appearance-none pr-8 cursor-pointer transition-colors duration-300"
-          >
-            <option value="Product Inquiry">Product Inquiry</option>
-            <option value="Order Assistance">Order Assistance</option>
-            <option value="Concierge Service">Concierge Service</option>
-            <option value="General Inquiry">General Inquiry</option>
-          </select>
-
-          <span className="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-[#5D5E63] pointer-events-none text-2xl">
-            expand_more
-          </span>
-        </div>
-
-        {/* Message */}
+        {/* Your Enquiry Details */}
         <div className="w-full">
-          <label htmlFor="message" className="sr-only">
-            Your Message
+          <label
+            htmlFor="message"
+            className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2"
+          >
+            Your Enquiry Details
           </label>
 
           <textarea
@@ -185,27 +203,28 @@ export default function InquiryForm() {
             required
             value={formData.message}
             onChange={handleChange}
-            placeholder="Your Message"
-            rows="4"
-            className="w-full border-b border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent py-4 font-inter text-base text-[#5D5E63] placeholder-[#5D5E63] min-h-[120px] transition-colors duration-300 resize-y"
+            placeholder="Tell us how we can assist you..."
+            rows={5}
+            className="w-full border border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent px-4 py-4 font-inter text-sm text-black placeholder-[#999999] transition-colors duration-300 resize-y min-h-[140px]"
           />
         </div>
 
-        {/* Submit */}
-        <div className="pt-4 self-start">
+        {/* Submit Button */}
+        <div className="pt-2">
           <button
             type="submit"
             disabled={submitting}
-            className="flex items-center justify-center bg-black text-white hover:opacity-90 px-[48px] py-[20px] font-inter text-[12px] font-semibold tracking-[0.1em] uppercase transition-opacity duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group inline-flex items-center justify-center gap-3 bg-black text-white px-9 py-4 font-inter text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Sending...' : 'Submit Inquiry'}
+            <span>
+              {submitting ? 'Sending...' : 'Submit Inquiry'}
+            </span>
 
-            <span className="material-symbols-outlined text-base ml-2">
+            <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:translate-x-1">
               arrow_forward
             </span>
           </button>
         </div>
-
       </form>
     </section>
   );
