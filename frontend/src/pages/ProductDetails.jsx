@@ -813,7 +813,7 @@ export default function ProductDetails() {
                     <img src={rel.mainImage} alt={rel.modelName} className="h-full w-full object-contain group-hover:scale-105 transition-transform" />
                   </div>
                   <h4 className="text-base font-bold text-white group-hover:text-gray-200 transition-colors">{rel.modelName}</h4>
-                  <p className="text-sm font-bold text-white mt-1">${Number(rel.price).toLocaleString()}</p>
+                  <p className="text-sm font-bold text-white mt-1">₹{Number(rel.price).toLocaleString()}</p>
                 </Link>
               ))}
             </div>

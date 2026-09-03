@@ -407,7 +407,7 @@ export default function MyAccount() {
                 className="inline-flex items-center gap-2 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-full transition-all shadow-md"
               >
                 <Edit3 size={14} />
-                <span>Edit Dossier</span>
+                <span>Edit </span>
               </button>
             </div>
 
