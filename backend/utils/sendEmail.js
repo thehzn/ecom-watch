@@ -63,7 +63,7 @@
 // };import User from "../models/UserModel.js";
 import dotenv from "dotenv";
 import User from "../models/UserModel.js";
-import brevo from "@getbrevo/brevo";
+import * as brevo from "@getbrevo/brevo";
 
 dotenv.config();
 
