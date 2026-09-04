@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
+
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, countryCode, mobileNumber, password, confirmPassword } = req.body;
@@ -44,22 +45,75 @@ export const register = async (req, res) => {
     });
     return res.status(200).json({ status: true, message: "User Registered Successfully", user: userDetails });
   } catch (error) {
+      console.error("REGISTER ERROR:", error);
     return res.status(500).json({ status: false, message: error.message });
   }
-};
+}
+
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ status: false, message: "All fields must be filled" });
-    const currentUser = await User.findOne({ email: email.toLowerCase().trim() });
-    if (!currentUser) {
-      return res.status(400).json({ status: false, message: "Invalid User or Password" });
+    const { email, password, captchaToken } = req.body;
+
+    // RECAPTCHA CHECK
+    if (!captchaToken) {
+      return res.status(400).json({
+        status: false,
+        message: "Please complete the reCAPTCHA",
+      });
     }
-    if (currentUser.role !== "user") return res.status(404).json({ status: false, message: "Access Denied" });
-    const isMatch = await argon.verify(currentUser.password, password);
-    if (!isMatch) return res.status(400).json({ status: false, message: "Invalid Password" });
-    const userToken = jwt.sign({ id: currentUser._id, role: currentUser.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const captchaResponse = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: captchaToken,
+        }),
+      }
+    );
+
+    const captchaResult = await captchaResponse.json();
+
+    if (!captchaResult.success) {
+      return res.status(400).json({status: false,message: "reCAPTCHA verification failed. Please try again."});
+    }
+    if (!email || !password) {
+      return res.status(400).json({status: false,message: "All fields must be filled"});
+    }
+
+    const currentUser = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
+
+    if (!currentUser) {
+      return res.status(400).json({status: false,message: "Invalid User or Password"});
+    }
+
+    if (currentUser.role !== "user") {
+      return res.status(404).json({status: false,message: "Access Denied"});
+    }
+
+    const isMatch = await argon.verify(currentUser.password,password);
+
+    if (!isMatch) {
+      return res.status(400).json({status: false,message: "Invalid Password"});
+    }
+
+    const userToken = jwt.sign(
+      {
+        id: currentUser._id,
+        role: currentUser.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
     return res.status(200).json({
       status: true,
       message: "Successfully Loggedin",
@@ -74,9 +128,12 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ status: false, message: error.message });
+    console.error("LOGIN ERROR:", error);
+
+    return res.status(500).json({status: false,message: error.message});
   }
-};
+}
+
 
 export const verifyOtp = async (req, res) => {
   try {

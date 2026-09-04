@@ -10,6 +10,7 @@ export default function InquiryForm() {
     email: '',
     subject: 'General Inquiry',
     message: '',
+    privacyConsent: false,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -17,16 +18,24 @@ export default function InquiryForm() {
   const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ================= PRIVACY CONSENT =================
+    if (!formData.privacyConsent) {
+      setSubmitError(
+        'You must agree to the Privacy Policy before submitting.'
+      );
+      return;
+    }
 
     setSubmitError('');
     setSubmitting(true);
@@ -52,6 +61,7 @@ export default function InquiryForm() {
         email: '',
         subject: 'General Inquiry',
         message: '',
+        privacyConsent: false,
       });
 
       setTimeout(() => {
@@ -125,10 +135,12 @@ export default function InquiryForm() {
 
           {/* First Name */}
           <div className="w-full">
-         <label
-          htmlFor="firstName"
-              className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2">         First Name
-         </label>
+            <label
+              htmlFor="firstName"
+              className="block font-inter text-[11px] font-semibold uppercase tracking-[0.15em] text-[#222222] mb-2"
+            >
+              First Name
+            </label>
 
             <input
               type="text"
@@ -207,6 +219,33 @@ export default function InquiryForm() {
             rows={5}
             className="w-full border border-[#C4C7C7] hover:border-black focus:border-black focus:outline-none bg-transparent px-4 py-4 font-inter text-sm text-black placeholder-[#999999] transition-colors duration-300 resize-y min-h-[140px]"
           />
+        </div>
+
+        {/* ================= PRIVACY CONSENT ================= */}
+
+        <div className="pt-1">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="privacyConsent"
+              checked={formData.privacyConsent}
+              onChange={handleChange}
+              className="accent-black mt-1 shrink-0"
+            />
+
+            <span className="font-inter text-sm text-[#5D5E63] leading-6">
+              I agree to the{" "}
+              <a
+                href="/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-black underline hover:opacity-70"
+              >
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
         </div>
 
         {/* Submit Button */}
