@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import {Eye,EyeOff,ArrowRight,ChevronDown,} from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import watchImage from '../../assets/luxury_titanium_watch.jpg';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
 const MOBILE_REGEX = /^[0-9]{10}$/;
@@ -69,6 +70,9 @@ const validationSchema = Yup.object({
   confirmPassword: Yup.string()
     .required('Confirm password')
     .oneOf([Yup.ref('password')], 'Passwords do not match'),
+
+  privacyAccepted: Yup.boolean()
+    .oneOf([true], 'You must accept the Privacy Policy'),
 });
 
 export default function Register() {
@@ -81,6 +85,9 @@ export default function Register() {
   const [formError, setFormError] = useState('');
   const [countryOpen, setCountryOpen] = useState(false);
 
+  // GOOGLE RECAPTCHA
+  const [captchaToken, setCaptchaToken] = useState(null);
+
   const formik = useFormik({
     initialValues: {
       firstName: '',
@@ -90,6 +97,7 @@ export default function Register() {
       mobileNumber: '',
       password: '',
       confirmPassword: '',
+      privacyAccepted: false,
     },
 
     validationSchema,
@@ -100,6 +108,12 @@ export default function Register() {
     ) => {
       setFormError('');
 
+      // CHECK RECAPTCHA
+      if (!captchaToken) {
+        setFormError('Please complete the reCAPTCHA.');
+        return;
+      }
+
       try {
         await post('/apiauth/user/register', {
           firstName: values.firstName.trim(),
@@ -109,6 +123,9 @@ export default function Register() {
           mobileNumber: values.mobileNumber.trim(),
           password: values.password,
           confirmPassword: values.confirmPassword,
+
+          // CAPTCHA TOKEN
+          captchaToken,
         });
 
         navigate('/login');
@@ -615,6 +632,48 @@ export default function Register() {
                 {formError}
               </div>
             )}
+
+            {/* PRIVACY CONSENT */}
+            <div className="mt-2">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="privacyAccepted"
+                  checked={formik.values.privacyAccepted}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="mt-1 w-4 h-4 accent-black cursor-pointer"
+                />
+
+                <span className="text-xs text-black/60 leading-relaxed">
+                  I agree to the{" "}
+                  <Link
+                    to="/privacy-policy"
+                    className="text-black font-semibold hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>{" "}
+                  and consent to the collection and use of my personal information.
+                </span>
+              </label>
+
+              {formik.touched.privacyAccepted &&
+                formik.errors.privacyAccepted && (
+                  <p className="mt-1.5 text-xs text-red-600">
+                    {formik.errors.privacyAccepted}
+                  </p>
+                )}
+            </div>
+
+            {/* GOOGLE RECAPTCHA */}
+            <div className="mt-2">
+              <ReCAPTCHA
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+                onExpired={() => setCaptchaToken(null)}
+                onErrored={() => setCaptchaToken(null)}
+              />
+            </div>
 
             {/* =================================================
                 SUBMIT BUTTON

@@ -7,6 +7,7 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { login } from '../../redux/authSlice';
 import { useApi } from '../../hooks/useApi';
 import loginWatchImage from '../../assets/classic-watch.jpg';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -29,6 +30,7 @@ export default function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const formik = useFormik({
     initialValues: {
@@ -41,10 +43,18 @@ export default function Login() {
     onSubmit: async (values, { setSubmitting }) => {
       setAuthError('');
 
+      // RECAPTCHA CHECK
+      if (!captchaToken) {
+        setAuthError('Please complete the reCAPTCHA.');
+        setSubmitting(false);
+        return;
+      }
+
       try {
         const data = await post('/apiauth/user/login', {
           email: values.email.trim().toLowerCase(),
           password: values.password,
+          captchaToken,
         });
 
         dispatch(
@@ -59,6 +69,9 @@ export default function Login() {
         setAuthError(
           error.message || 'Invalid email or password'
         );
+
+        // Reset CAPTCHA after failed login
+        setCaptchaToken(null);
       } finally {
         setSubmitting(false);
       }
@@ -227,6 +240,16 @@ export default function Login() {
                 {authError}
               </div>
             )}
+
+            {/* GOOGLE RECAPTCHA */}
+            <div className="mt-2">
+              <ReCAPTCHA
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+                onExpired={() => setCaptchaToken(null)}
+                onErrored={() => setCaptchaToken(null)}
+              />
+            </div>
 
             {/* LOGIN BUTTON */}
             <button
