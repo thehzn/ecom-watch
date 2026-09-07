@@ -37,10 +37,12 @@ import EditProfile from './pages/EditProfile';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminEnquiries from './pages/admin/Adminenquiries';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <>
+      <ScrollToTop />
       <Routes>
         {/* site routes — shared Navbar/Footer via UserLayout */}
         <Route element={<UserLayout />}>
