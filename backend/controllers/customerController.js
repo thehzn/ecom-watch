@@ -1,35 +1,115 @@
 import User from "../models/UserModel.js";
 
 
-export const getAllCustomers = async ( req, res ) =>{
-    try {
-       const customers = await User.find({role:"user"}, "firstName lastName email").sort({ createdAt: -1 })
-       if(customers.length === 0){ 
-        return res.status(401).json({ status: false, message:"Users not found"}) 
-       }
-        return res.status(200).json({ status: true, message:"Users Details Fetched", customers}) 
-    } catch (error) {
-    return res.status(500).json({ status:false, message: error.message})        
+// export const getAllCustomers = async ( req, res ) =>{
+//     try {
+//        const customers = await User.find({role:"user"}, "firstName lastName email").sort({ createdAt: -1 })
+//        if(customers.length === 0){ 
+//         return res.status(401).json({ status: false, message:"Users not found"}) 
+//        }
+//         return res.status(200).json({ status: true, message:"Users Details Fetched", customers}) 
+//     } catch (error) {
+//     return res.status(500).json({ status:false, message: error.message})        
+//     }
+// }
+export const getAllCustomers = async (req, res) => {
+  try {
+    const customers = await User.aggregate([
+      { $match: { role: "user" } },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "newsletters",
+          localField: "_id",
+          foreignField: "user",
+          as: "subscription",
+        },
+      },
+      {
+        $addFields: {
+          isSubscribed: { $gt: [{ $size: "$subscription" }, 0] },
+        },
+      },
+      {
+        $project: {
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          isSubscribed: 1,
+        },
+      },
+    ]);
+
+    if (customers.length === 0) {
+      return res.status(401).json({ status: false, message: "Users not found" });
     }
-}
+    return res.status(200).json({ status: true, message: "Users Details Fetched", customers });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
 
 
+// export const searchCustomers = async (req, res) => {
+//   try {
+//     const { search } = req.query;
+//     const customers = await User.find({role: "user",
+//       $or: [
+//         { firstName: { $regex: search, $options: "i" } },
+//         { lastName: { $regex: search, $options: "i" } },
+//         { email: { $regex: search, $options: "i" } },
+//       ]}, "firstName lastName email").sort({ createdAt: -1 });
+
+//     return res.status(200).json({status: true,message: "Customers search successful",customers});
+
+//   } catch (error) {
+//     return res.status(500).json({status: false,message: error.message});
+//   }
+// }
 export const searchCustomers = async (req, res) => {
   try {
     const { search } = req.query;
-    const customers = await User.find({role: "user",
-      $or: [
-        { firstName: { $regex: search, $options: "i" } },
-        { lastName: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ]}, "firstName lastName email").sort({ createdAt: -1 });
 
-    return res.status(200).json({status: true,message: "Customers search successful",customers});
+    const customers = await User.aggregate([
+      {
+        $match: {
+          role: "user",
+          $or: [
+            { firstName: { $regex: search, $options: "i" } },
+            { lastName: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "newsletters",
+          localField: "_id",
+          foreignField: "user",
+          as: "subscription",
+        },
+      },
+      {
+        $addFields: {
+          isSubscribed: { $gt: [{ $size: "$subscription" }, 0] },
+        },
+      },
+      {
+        $project: {
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          isSubscribed: 1,
+        },
+      },
+    ]);
 
+    return res.status(200).json({ status: true, message: "Customers search successful", customers });
   } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({ status: false, message: error.message });
   }
-}
+};
 
 
 export const deleteCustomer = async (req, res) => {
