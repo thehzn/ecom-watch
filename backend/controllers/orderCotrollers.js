@@ -70,11 +70,22 @@ let discount = 0;
     // 7. Total
     const total = subtotal - discount + shipping + tax;
     // 8. Create Razorpay order
-    const razorpayOrder = await razorpay.orders.create({
-      amount: total * 100,
-      currency: "INR",
-      receipt: `receipt_${Date.now()}`,
-    });
+    // const razorpayOrder = await razorpay.orders.create({
+    //   amount: total * 100,
+    //   currency: "INR",
+    //   receipt: `receipt_${Date.now()}`,
+    // });
+     let razorpayOrder;
+    try {
+      razorpayOrder = await razorpay.orders.create({
+        amount: total * 100,
+        currency: "INR",
+        receipt: `receipt_${Date.now()}`,
+      });
+    } catch (rzpError) {
+      console.error("Razorpay order creation failed:", JSON.stringify(rzpError));
+      throw new Error(rzpError?.error?.description || "Could not create Razorpay order");
+    }
 
     // 9. Save order in MongoDB
     const order = await Order.create({

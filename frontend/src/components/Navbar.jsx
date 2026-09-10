@@ -74,7 +74,7 @@ export default function Navbar() {
     dispatch(clearWishlist());
     setProfileOpen(false);
     setMobileMenuOpen(false);
-    navigate('/login');
+    navigate('/');
   };
 
   return (
