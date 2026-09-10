@@ -49,7 +49,6 @@ export const addtoCart = async ( req, res ) =>{
     }
 }
 
-
 export const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -58,18 +57,29 @@ export const getCart = async (req, res) => {
       .populate("items.product");
 
     if (!cart) {
-      return res.status(404).json({status: false,message: "Cart is empty"});
+      return res.status(404).json({
+        status: false,
+        message: "Cart is empty",
+      });
+    }
+
+    // Remove cart items whose product no longer exists
+    const validItems = cart.items.filter((item) => item.product);
+
+    // If invalid products were found, update the cart
+    if (validItems.length !== cart.items.length) {
+      cart.items = validItems;
+      await cart.save();
     }
 
     let subtotal = 0;
 
     cart.items.forEach((item) => {
-      if (item.product) {
-        subtotal += item.product.price * item.quantity;
-      }
+      subtotal += item.product.price * item.quantity;
     });
 
-    const subscriber = await Newsletter.findOne({user: userId});
+    const subscriber = await Newsletter.findOne({ user: userId });
+
     let discount = 0;
 
     if (subscriber) {
@@ -78,12 +88,18 @@ export const getCart = async (req, res) => {
 
     const shipping = 0;
     const tax = 0;
-    const total =subtotal - discount + shipping + tax;
+    const total = subtotal - discount + shipping + tax;
 
     const itemCount = cart.items.reduce(
-      (total, item) => total + item.quantity,0);
+      (total, item) => total + item.quantity,
+      0
+    );
 
-    return res.status(200).json({status: true,message: "Cart fetched successfully",cart,itemCount,
+    return res.status(200).json({
+      status: true,
+      message: "Cart fetched successfully",
+      cart,
+      itemCount,
       orderSummary: {
         subtotal,
         discount,
@@ -92,11 +108,14 @@ export const getCart = async (req, res) => {
         total,
       },
     });
-
   } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
 }
+
 
 
 export const updateCart = async (req, res) => {
