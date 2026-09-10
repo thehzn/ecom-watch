@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import {Eye,EyeOff,ArrowRight,ChevronDown,} from 'lucide-react';
+import {Eye,EyeOff,ArrowRight,ChevronDown,ArrowLeft} from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import watchImage from '../../assets/luxury_titanium_watch.jpg';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -206,8 +206,19 @@ export default function Register() {
       {/* =====================================================
           RIGHT REGISTER SECTION
       ====================================================== */}
-      <section className="flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
-
+      <section className=" relative flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
+            {/* =================================================
+            BACK TO HOME LINK (Works on all screen sizes)
+        ================================================== */}
+        <div className="absolute top-6 left-6 sm:left-10 lg:left-16">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
+          >
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Return to Catalog</span>
+          </Link>
+        </div>
         <div className="w-full max-w-[480px]">
 
           {/* MOBILE LOGO */}

@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight ,ArrowLeft } from 'lucide-react';
 import { login } from '../../redux/authSlice';
 import { useApi } from '../../hooks/useApi';
 import loginWatchImage from '../../assets/classic-watch.jpg';
@@ -84,8 +84,19 @@ export default function Login() {
       {/* =====================================================
           LEFT LOGIN SECTION
       ====================================================== */}
-      <section className="flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
-
+      <section className="relative flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
+           {/* =================================================
+            BACK TO HOME LINK (Works on all screen sizes)
+        ================================================== */}
+        <div className="absolute top-6 left-6 sm:left-10 lg:left-16">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
+          >
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Return to Catalog</span>
+          </Link>
+        </div>
         <div className="w-full max-w-[460px]">
 
           {/* MOBILE LOGO */}

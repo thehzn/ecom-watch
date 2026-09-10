@@ -38,12 +38,16 @@ import SingleOrder from "./pages/SingleOrder"
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminEnquiries from './pages/admin/Adminenquiries';
+import ScrollToTop from './components/ScrollToTop';
+import AppInitializer from './AppInitializer';
 
 
 
 function App() {
   return (
     <>
+      <ScrollToTop />
+      <AppInitializer />
       <Routes>
         {/* site routes — shared Navbar/Footer via UserLayout */}
         <Route element={<UserLayout />}>

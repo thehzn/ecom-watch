@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -6,10 +7,16 @@ import { useApi } from '../../hooks/useApi';
 const PAGE_SIZE = 5;
 const LOW_STOCK_THRESHOLD = 4;
 
+const STOCK_FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'available', label: 'Available' },
+  { key: 'low', label: 'Low Stock' },
+];
+
 function getStockInfo(stock) {
-  if (stock <= 0) return { label: 'Reserved', bg: '#F3F3F4', color: '#5E5E5E' };
-  if (stock < LOW_STOCK_THRESHOLD) return { label: 'Low Stock', bg: '#FAEEDA', color: '#854F0B' };
-  return { label: 'Available', bg: '#EAF3DE', color: '#3B6D11' };
+  if (stock <= 0) return { key: 'reserved', label: 'Reserved', bg: '#F3F3F4', color: '#5E5E5E' };
+  if (stock < LOW_STOCK_THRESHOLD) return { key: 'low', label: 'Low Stock', bg: '#FAEEDA', color: '#854F0B' };
+  return { key: 'available', label: 'Available', bg: '#EAF3DE', color: '#3B6D11' };
 }
 
 function StockBadge({ stock }) {
@@ -30,6 +37,7 @@ export default function ProductList() {
 
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -47,20 +55,36 @@ export default function ProductList() {
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return products;
-    return products.filter((p) =>
-      [p.modelName, p.sku, p.brand, p.modelNumber, p.category, p.productFor]
-        .filter(Boolean)
-        .some((field) => field.toLowerCase().includes(query))
-    );
-  }, [products, search]);
+
+    return products.filter((p) => {
+      const matchesSearch =
+        !query ||
+        [p.modelName, p.sku, p.brand, p.modelNumber, p.category, p.productFor]
+          .filter(Boolean)
+          .some((field) => field.toLowerCase().includes(query));
+
+      const matchesStock = stockFilter === 'all' || getStockInfo(p.stock).key === stockFilter;
+
+      return matchesSearch && matchesStock;
+    });
+  }, [products, search, stockFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
+
+  // Keep page clamped whenever search/filter/deletion changes the result count
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
+
   const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
   );
+
+  const handleStockFilterChange = (key) => {
+    setStockFilter(key);
+    setPage(1);
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Remove this product from the catalogue?')) return;
@@ -69,6 +93,7 @@ export default function ProductList() {
       await del(`/apiproduct/deleteproduct/${id}`);
       setProducts((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
+
       // error already captured by useApi
     } finally {
       setDeletingId(null);
@@ -85,7 +110,7 @@ export default function ProductList() {
       <div className="w-full max-w-[1440px] mx-auto">
 
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-8 sm:mb-10 lg:mb-12">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-6">
           <div>
             <h1
               className="text-[26px] leading-9 sm:text-[32px] sm:leading-10 font-normal text-black mb-2"
@@ -203,7 +228,53 @@ export default function ProductList() {
 
                     {/* Product Details */}
                     <td className="px-4 xl:px-6 py-4 align-middle overflow-hidden">
-                      <p
+        {/* Stock Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 mb-8 sm:mb-10 lg:mb-12">
+          {STOCK_FILTERS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handleStockFilterChange(key)}
+              className={`text-[11px] uppercase tracking-wide px-4 py-2 rounded-full border transition-colors duration-200 ${
+                stockFilter === key
+                  ? 'bg-black text-white border-black'
+                  : 'bg-white text-[#5E5E5E] border-[#CFC4C5] hover:border-black hover:text-black'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Shared loading / error / empty states */}
+        {loading && (
+          <p className="py-12 text-center text-sm text-[#5E5E5E]">Loading products...</p>
+        )}
+
+        {!loading && error && (
+          <p className="py-12 text-center text-sm text-[#A32D2D]">{error}</p>
+        )}
+
+        {!loading && !error && paginatedProducts.length === 0 && (
+          <p className="py-12 text-center text-sm text-[#5E5E5E]">No products found.</p>
+        )}
+
+        {!loading && !error && paginatedProducts.length > 0 && (
+          <div className="bg-white border border-[#CFC4C5] overflow-hidden">
+
+            {/* Mobile card list (below sm breakpoint) */}
+            <div className="sm:hidden divide-y divide-[#CFC4C5]">
+              {paginatedProducts.map((p) => (
+                <div key={p._id} className="p-4 flex gap-3">
+                  <div className="w-16 h-16 border border-[#CFC4C5] overflow-hidden shrink-0">
+                    <img
+                      src={p.mainImage}
+                      alt={p.modelName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">                      <p
                         className="text-base text-black truncate"
                         style={{ fontFamily: "'Libre Caslon Text', serif" }}
                         title={p.modelName}
@@ -252,6 +323,7 @@ export default function ProductList() {
                     {/* Edit & Delete — centered to match header */}
                     <td className="px-4 xl:px-6 py-4 align-middle">
                       <div className="flex items-center justify-center gap-4">
+                      <div className="flex items-center gap-3 shrink-0">
                         <button
                           onClick={() => navigate(`/admin/edit/${p._id}`)}
                           className="text-[#5E5E5E] hover:text-black transition-colors duration-200"
@@ -268,12 +340,137 @@ export default function ProductList() {
                           <Trash2 size={16} />
                         </button>
                       </div>
-                    </td>
+                    </div>
+
+                    <p className="text-xs text-[#5E5E5E] mt-0.5 truncate">
+                      {p.sku} · {p.brand}
+                    </p>
+
+                    <div className="flex items-center justify-between mt-2">
+                      <p
+                        className="text-base text-black"
+                        style={{ fontFamily: "'Libre Caslon Text', serif" }}
+                      >
+                        ₹{Number(p.price).toLocaleString()}
+                      </p>
+                      <StockBadge stock={p.stock} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop/tablet table (sm and up) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse table-fixed">
+                <colgroup>
+                  <col className="w-[80px]" />
+                  <col className="w-[220px]" />
+                  <col className="w-[150px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[150px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[100px]" />
+                </colgroup>
+                <thead>
+                  <tr className="bg-[#EEEEEE] border-b border-[#CFC4C5]">
+                    {['Image', 'Product', 'SKU / Brand', 'Model No.', 'Category', 'Price', 'Stock', 'Actions'].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-5 text-[11px] font-normal uppercase tracking-[0.1em] text-[#1A1C1C] whitespace-nowrap"
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {paginatedProducts.map((p) => (
+                    <tr
+                      key={p._id}
+                      className="border-b border-[#CFC4C5] last:border-b-0 transition-colors duration-200 hover:bg-[#F3F3F4]"
+                    >
+                      {/* Image */}
+                      <td className="px-6 py-6">
+                        <div className="w-16 h-16 border border-[#CFC4C5] overflow-hidden">
+                          <img
+                            src={p.mainImage}
+                            alt={p.modelName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </td>
+
+                      {/* Product Details */}
+                      <td className="px-6 py-6 overflow-hidden">
+                        <p
+                          className="text-lg text-black truncate"
+                          style={{ fontFamily: "'Libre Caslon Text', serif" }}
+                          title={p.modelName}
+                        >
+                          {p.modelName}
+                        </p>
+                        <p className="text-xs text-[#5E5E5E] mt-1 truncate">{p.category}</p>
+                      </td>
+
+                      {/* SKU & Brand */}
+                      <td className="px-6 py-6 overflow-hidden">
+                        <p className="text-sm font-bold text-black truncate" title={p.sku}>{p.sku}</p>
+                        <p className="text-xs text-[#5E5E5E] mt-1 truncate">{p.brand}</p>
+                      </td>
+
+                      {/* Model Number */}
+                      <td className="px-6 py-6 overflow-hidden">
+                        <p className="text-sm text-[#1A1C1C] truncate" title={p.modelNumber}>{p.modelNumber}</p>
+                      </td>
+
+                      {/* Category Details */}
+                      <td className="px-6 py-6 overflow-hidden">
+                        <p className="text-sm text-[#1A1C1C] truncate">{p.category}</p>
+                        <p className="text-xs text-[#5E5E5E] mt-1 truncate">{p.productFor}</p>
+                      </td>
+
+                      {/* Price */}
+                      <td className="px-6 py-6 text-right">
+                        <p
+                          className="text-lg text-black whitespace-nowrap"
+                          style={{ fontFamily: "'Libre Caslon Text', serif" }}
+                        >
+                          ₹{Number(p.price).toLocaleString()}
+                        </p>
+                      </td>
+
+                      {/* Stock Status */}
+                      <td className="px-6 py-6">
+                        <StockBadge stock={p.stock} />
+                      </td>
+
+                      {/* Edit & Delete */}
+                      <td className="px-6 py-6">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => navigate(`/admin/edit/${p._id}`)}
+                            className="text-[#5E5E5E] hover:text-black transition-colors duration-200"
+                            aria-label="Edit product"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p._id)}
+                            disabled={deletingId === p._id}
+                            className="text-[#5E5E5E] hover:text-[#A32D2D] transition-colors duration-200 disabled:opacity-40"
+                            aria-label="Delete product"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
           {/* Desktop Pagination */}
           <Pagination
@@ -380,6 +577,57 @@ export default function ProductList() {
           )}
         </div>
 
+            {/* Pagination */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4 py-4 sm:px-6 bg-[#EEEEEE] border-t border-[#CFC4C5]">
+              <p className="text-sm text-[#5E5E5E]">
+                {filteredProducts.length === 0
+                  ? 'Showing 0 products'
+                  : `Showing ${(page - 1) * PAGE_SIZE + 1} to ${Math.min(
+                      page * PAGE_SIZE,
+                      filteredProducts.length
+                    )} of ${filteredProducts.length} products`}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="w-10 h-10 flex items-center justify-center border border-[#CFC4C5] bg-white hover:bg-[#F3F3F4] transition-colors duration-200 disabled:opacity-40"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {[...Array(totalPages)].map((_, i) => {
+                  const pageNum = i + 1;
+                  const isActive = pageNum === page;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-10 h-10 flex items-center justify-center border text-sm transition-colors duration-200 ${
+                        isActive
+                          ? 'bg-black text-white border-black'
+                          : 'bg-white text-[#1A1C1C] border-[#CFC4C5] hover:bg-[#F3F3F4]'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="w-10 h-10 flex items-center justify-center border border-[#CFC4C5] bg-white hover:bg-[#F3F3F4] transition-colors duration-200 disabled:opacity-40"
+                  aria-label="Next page"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

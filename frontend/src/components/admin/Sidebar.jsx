@@ -42,7 +42,11 @@ export default function Sidebar({ isOpen, onClose }) {
  >
         {/* Brand heading */}
         <div className="flex flex-col mb-12 px-2">
-          <h1 className="font-caslon text-2xl font-normal leading-8 tracking-[-0.02em] uppercase text-brand-black text-left">
+          <h1
+          onClick = {()=>{
+            console.log("clicked");
+            navigate("/admin/dashboard")}}
+           className="font-caslon text-2xl font-normal leading-8 tracking-[-0.02em] uppercase text-brand-black text-left">
             Chronos
           </h1>
           <span className="font-worksans text-[11px] font-semibold leading-4 tracking-[0.1em] uppercase text-subtitle-gray mt-1">

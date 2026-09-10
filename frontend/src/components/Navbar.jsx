@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search, ShoppingBag, User, Heart, Menu, X } from 'lucide-react';
 import { logout as logoutAction } from '../redux/authSlice';
+import { clearCart } from '../redux/cartSlice'; 
+import {clearWishlist} from '../redux/wishlistSlice';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -68,9 +70,11 @@ export default function Navbar() {
 
   const handleLogout = () => {
     dispatch(logoutAction());
+    dispatch(clearCart());
+    dispatch(clearWishlist());
     setProfileOpen(false);
     setMobileMenuOpen(false);
-    navigate('/login');
+    navigate('/');
   };
 
   return (
