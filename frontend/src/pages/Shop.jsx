@@ -1,9 +1,10 @@
+
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronLeft, ChevronRight, X, Heart, Search } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
-import { addToWishlistLocal } from '../redux/wishlistSlice';
+import { addToWishlistLocal, removeFromWishlist } from '../redux/wishlistSlice';
 
 const LIMIT = 12;
 
@@ -12,7 +13,7 @@ const MATERIAL_OPTIONS = ['All Materials','Stainless Steel','Titanium','Gold','R
 const FOR_OPTIONS = ['All', 'Men', 'Women', 'Children'];
 
 function ProductCard({ product }) {
-  const { post } = useApi();
+  const { post, del } = useApi();
   const dispatch = useDispatch();
 
   const details = [product.caseMaterial, product.glassType]
@@ -29,13 +30,18 @@ function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (saving || wishlisted) return;
+    if (saving) return;
 
     setSaving(true);
 
     try {
-      await post(`/apiwishlist/addwishlist/${product._id}`);
-      dispatch(addToWishlistLocal(product));
+      if (wishlisted) {
+        await del(`/apiwishlist/removefromlist/${product._id}`);
+        dispatch(removeFromWishlist(product._id));
+      } else {
+        await post(`/apiwishlist/addwishlist/${product._id}`);
+        dispatch(addToWishlistLocal(product));
+      }
     } catch {
       // silently ignore
     } finally {
@@ -57,7 +63,7 @@ function ProductCard({ product }) {
 
         <button
           onClick={handleWishlist}
-          disabled={saving || wishlisted}
+          disabled={saving}
           aria-label={
             wishlisted ? 'Added to wishlist' : 'Add to wishlist'
           }
