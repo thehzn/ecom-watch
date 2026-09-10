@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
@@ -48,6 +49,11 @@ export default function Cart() {
           total: 0,
         }
       );
+
+      const res = await get("/apicarts/getcartitems", { allowNotFound: true });
+      const validItems = (res?.cart?.items ?? []).filter((it)=>it.product);
+      setItems(validItems);
+      setOrderSummary(res?.orderSummary ?? { subtotal: 0, shipping: 0, tax: 0, total: 0 });
     } catch {
       setItems([]);
 

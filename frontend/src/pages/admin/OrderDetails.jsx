@@ -1,9 +1,17 @@
+
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 
 const PAGE_SIZE = 5;
+
+const FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'shipped', label: 'Shipped' },
+  { key: 'cancelled', label: 'Cancelled' },
+];
 
 const STATUS_STYLES = {
   Pending: { bg: '#FAEEDA', color: '#854F0B' },
@@ -40,8 +48,8 @@ export default function OrderDetails() {
 
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
-
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -54,23 +62,42 @@ export default function OrderDetails() {
 
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return orders;
+    
     return orders.filter((o) => {
+
       const productName = o.items?.[0]?.productName || o.items?.[0]?.product?.modelName;
       const sku = o.items?.[0]?.sku || o.items?.[0]?.product?.sku;
+
+      // 1. Status Filter check
+      if (filter !== 'all' && o.orderStatus?.toLowerCase() !== filter) {
+        return false;
+      }
+
+      // 2. Search Query check
+      if (!query) return true;
+
+      const productName = o.items?.[0]?.product?.modelName;
+      const sku = o.items?.[0]?.product?.sku;
+
       const name = o.user?.firstName
         ? `${o.user.firstName} ${o.user.lastName || ''}`
         : `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`;
       const address = `${o.shippingAddress?.address || ''} ${o.shippingAddress?.city || ''} ${o.shippingAddress?.state || ''} ${o.shippingAddress?.pincode || ''}`;
+      
       return [productName, sku, name, address, o.orderStatus]
         .filter(Boolean)
         .some((field) => field.toLowerCase().includes(query));
     });
-  }, [orders, search]);
+  }, [orders, search, filter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paginatedOrders = filteredOrders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const handleFilterChange = (key) => {
+    setFilter(key);
+    setPage(1);
+  };
 
   return (
     <main className="min-h-screen max-w-[1440px] mx-auto px-4 py-10 sm:px-6 sm:py-12 lg:px-10 lg:py-16 bg-[#F9F9F9] text-[#1A1C1C]" style={{ fontFamily: "'Work Sans', sans-serif" }}>
@@ -82,7 +109,11 @@ export default function OrderDetails() {
           </h1>
         </div>
 
+
         <div className="flex flex-col sm:flex-row justify-between gap-6 border-b border-[#CFC4C5] pb-6 sm:pb-8 mb-6 sm:mb-8">
+        {/* Toolbar & Filter Tabs */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#CFC4C5] pb-6 sm:pb-8 mb-6 sm:mb-8">
+          {/* Search */}
           <div className="relative w-full sm:w-[384px]">
             <Search size={20} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#5E5E5E]" />
             <input
@@ -93,6 +124,23 @@ export default function OrderDetails() {
               className="w-full pl-8 pr-4 py-2 border-0 border-b border-[#7E7576] bg-transparent uppercase text-[11px] placeholder:text-[#5E5E5E] focus:outline-none"
               style={{ fontFamily: "'Work Sans', sans-serif" }}
             />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
+            {FILTERS.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleFilterChange(key)}
+                className={`text-[11px] uppercase tracking-wide px-4 py-2 rounded-full border transition-colors duration-200 whitespace-nowrap ${
+                  filter === key
+                    ? 'bg-[#1A1C1C] text-white border-[#1A1C1C]'
+                    : 'bg-white text-[#5E5E5E] border-[#CFC4C5] hover:border-[#1A1C1C] hover:text-[#1A1C1C]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -120,6 +168,11 @@ export default function OrderDetails() {
 
               {!loading && !error && paginatedOrders.length === 0 && (
                 <tr><td colSpan={7} className="py-12 text-center text-sm text-[#5E5E5E]">No orders found.</td></tr>
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-sm text-[#5E5E5E]">
+                    No orders found matching your criteria.
+                  </td>
+                </tr>
               )}
 
               {!loading && !error && paginatedOrders.map((o) => {
