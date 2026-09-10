@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import {
-  ArrowLeft,
-  Package,
-  ShieldCheck,
-  MapPin,
-  CreditCard,
-  Truck,
-} from "lucide-react";
+import {ArrowLeft,Package,ShieldCheck,MapPin,CreditCard,Truck,} from "lucide-react";
 import { useApi } from "../hooks/useApi";
 
 const STATUS_STYLES = {
@@ -19,11 +12,14 @@ const STATUS_STYLES = {
 
 export default function OrderDetails() {
   const { id } = useParams();
-  const { get } = useApi();
+  const { get, post } = useApi();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
 
   // =========================
   // FETCH SINGLE ORDER
@@ -58,6 +54,154 @@ export default function OrderDetails() {
   }, [id]);
 
   // =========================
+  // PAY NOW / RETRY PAYMENT
+  // =========================
+  const handlePayment = async () => {
+    setPaymentLoading(true);
+    setPaymentError("");
+
+    try {
+      // Create a new Razorpay payment attempt
+      // for the SAME existing order
+      const res = await post(`/apiorders/retrypayment/${order._id}`);
+
+      if (!res?.status) {
+        throw new Error(
+          res?.message || "Could not start payment."
+        );
+      }
+
+      const { razorpayOrder, razorpayKey } = res;
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay is not loaded.");
+      }
+
+      const options = {
+        key: razorpayKey,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "Chronos",
+        description: "Payment for your Chronos order",
+        order_id: razorpayOrder.id,
+
+        // =========================
+        // PAYMENT SUCCESS
+        // =========================
+        handler: async function (paymentResponse) {
+          try {
+            const verifyRes = await post(
+              "/apiorders/verifypayment",
+              {
+                razorpay_order_id:
+                  paymentResponse.razorpay_order_id,
+
+                razorpay_payment_id:
+                  paymentResponse.razorpay_payment_id,
+
+                razorpay_signature:
+                  paymentResponse.razorpay_signature,
+              }
+            );
+
+            if (!verifyRes?.status) {
+              throw new Error(
+                verifyRes?.message ||
+                  "Payment verification failed."
+              );
+            }
+
+            // Update current order on the page
+            setOrder(verifyRes.order);
+
+            setPaymentError("");
+
+          } catch (error) {
+            console.error(
+              "Payment verification error:",
+              error
+            );
+
+            setPaymentError(
+              error?.message ||
+                "Payment verification failed."
+            );
+          } finally {
+            setPaymentLoading(false);
+          }
+        },
+
+        // =========================
+        // RAZORPAY MODAL CLOSED
+        // =========================
+        modal: {
+          ondismiss: function () {
+            setPaymentLoading(false);
+
+            setPaymentError(
+              "Payment was cancelled. You can try again."
+            );
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      // =========================
+      // PAYMENT FAILED
+      // =========================
+      razorpay.on(
+        "payment.failed",
+        async function (response) {
+          console.error("Payment failed:", response);
+
+          try {
+            const failedRes = await post(
+              "/apiorders/markpaymentfailed",
+              {
+                razorpay_order_id: razorpayOrder.id,
+              }
+            );
+
+            if (failedRes?.order) {
+              setOrder(failedRes.order);
+            } else {
+              setOrder((previousOrder) => ({
+                ...previousOrder,
+                paymentStatus: "Failed",
+              }));
+            }
+          } catch (error) {
+            console.error(
+              "Failed to update payment status:",
+              error
+            );
+          }
+
+          setPaymentError(
+            response?.error?.description ||
+              "Payment failed. Please try again."
+          );
+
+          setPaymentLoading(false);
+        }
+      );
+
+      razorpay.open();
+
+    } catch (error) {
+      console.error("Payment error:", error);
+
+      setPaymentError(
+        error?.message ||
+          "Could not start payment. Please try again."
+      );
+
+      setPaymentLoading(false);
+    }
+  };
+
+  // =========================
   // LOADING
   // =========================
   if (loading) {
@@ -81,7 +225,10 @@ export default function OrderDetails() {
     return (
       <div className="min-h-screen bg-[#08090C] text-white font-['Plus_Jakarta_Sans']">
         <section className="w-full bg-[#0B0D12] border-b border-white/10 px-6 py-14 text-center">
-          <Package size={32} className="mx-auto mb-4 text-gray-400" />
+          <Package
+            size={32}
+            className="mx-auto mb-4 text-gray-400"
+          />
 
           <h1 className="text-3xl sm:text-4xl font-bold">
             Order Not Found
@@ -412,6 +559,34 @@ export default function OrderDetails() {
                   </p>
                 </div>
               )}
+
+              {/* =========================
+                  PAY NOW / RETRY BUTTON
+              ========================= */}
+              {order.paymentStatus !== "Paid" &&
+                order.orderStatus !== "Cancelled" && (
+                  <div className="pt-4 border-t border-white/10">
+
+                    {paymentError && (
+                      <p className="text-sm text-red-400 mb-4">
+                        {paymentError}
+                      </p>
+                    )}
+
+                    <button
+                      onClick={handlePayment}
+                      disabled={paymentLoading}
+                      className="w-full py-4 bg-white text-black text-[11px] font-bold uppercase tracking-wider transition-opacity duration-300 hover:opacity-90 disabled:opacity-40"
+                    >
+                      {paymentLoading
+                        ? "Processing Payment..."
+                        : order.paymentStatus === "Failed"
+                        ? "Retry Payment"
+                        : "Pay Now"}
+                    </button>
+
+                  </div>
+                )}
 
             </div>
           </section>
