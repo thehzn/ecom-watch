@@ -24,7 +24,8 @@ export default function Cart() {
     setLoading(true);
     try {
       const res = await get("/apicarts/getcartitems", { allowNotFound: true });
-      setItems(res?.cart?.items ?? []);
+      const validItems = (res?.cart?.items ?? []).filter((it)=>it.product);
+      setItems(validItems);
       setOrderSummary(res?.orderSummary ?? { subtotal: 0, shipping: 0, tax: 0, total: 0 });
     } catch {
       setItems([]);
