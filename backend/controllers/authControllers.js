@@ -11,8 +11,19 @@ export const register = async (req, res) => {
     if (!firstName || !lastName || !email || !countryCode || !mobileNumber || !password || !confirmPassword) {
       return res.status(400).json({ status: false, message: "Must Fill all Fields" });
     }
-    
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const cleanEmail = email.toLowerCase().trim();
+
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ status: false, message: "Please enter a valid email address" });
+    }
+
+    if (/\s/.test(password)) {
+      return res.status(400).json({ status: false, message: "Password cannot contain spaces" });
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
 
     if (password !== confirmPassword) {
       return res.status(400).json({ status: false, message: "Passwords do not match" });
@@ -31,24 +42,26 @@ export const register = async (req, res) => {
       return res.status(400).json({ status: false, message: "Please enter a valid mobile number" });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+    const existingUser = await User.findOne({
+      email: { $regex: new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+    });
     if (existingUser) return res.status(400).json({ status: false, message: "User already exist" });
 
     const hashedPassword = await argon.hash(password);
     const userDetails = await User.create({
-      firstName,
-      lastName,
-      email: email.toLowerCase().trim(),
-      countryCode,
-      mobileNumber,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: cleanEmail,
+      countryCode: countryCode.trim(),
+      mobileNumber: mobileNumber.trim(),
       password: hashedPassword,
     });
     return res.status(200).json({ status: true, message: "User Registered Successfully", user: userDetails });
   } catch (error) {
-      console.error("REGISTER ERROR:", error);
+    console.error("REGISTER ERROR:", error);
     return res.status(500).json({ status: false, message: error.message });
   }
-}
+};
 
 
 export const login = async (req, res) => {

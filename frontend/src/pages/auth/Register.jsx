@@ -9,6 +9,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
 const MOBILE_REGEX = /^[0-9]{10}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const PASSWORD_ERROR =
   'Must be 8+ characters with uppercase, lowercase, number & symbol.';
@@ -48,7 +49,7 @@ const validationSchema = Yup.object({
       value ? value.trim().toLowerCase() : value
     )
     .required('Email address is required')
-    .email('Enter a valid email'),
+    .matches(EMAIL_REGEX, 'Please enter a valid email address (e.g. name@domain.com)'),
 
   countryCode: Yup.string()
     .trim()
@@ -62,6 +63,7 @@ const validationSchema = Yup.object({
   password: Yup.string()
     .required('Password is required')
     .min(8, PASSWORD_ERROR)
+    .matches(/^\S*$/, 'Password cannot contain spaces')
     .matches(/[a-z]/, PASSWORD_ERROR)
     .matches(/[A-Z]/, PASSWORD_ERROR)
     .matches(/\d/, PASSWORD_ERROR)
