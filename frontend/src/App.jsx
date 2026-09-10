@@ -33,12 +33,15 @@ import MyOrders from './pages/MyOrders';
 import ForgotPassword from './pages/ForgotPassword';
 import Security from './pages/Security';
 import EditProfile from './pages/EditProfile';
+import SingleOrder from "./pages/SingleOrder"
 // import Enquiry from './pages/Enquiry';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminEnquiries from './pages/admin/Adminenquiries';
 import ScrollToTop from './components/ScrollToTop';
 import AppInitializer from './AppInitializer';
+
+
 
 function App() {
   return (
@@ -65,6 +68,8 @@ function App() {
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/security" element={<Security />} />
           <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/my-orders/:id" element={<SingleOrder />} />
+
         </Route>
 
         {/* auth routes */}
@@ -89,6 +94,7 @@ function App() {
             <Route path="users" element={<Customers />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="enquiries" element={<AdminEnquiries />} />
+            
 
           </Route>
         </Route>

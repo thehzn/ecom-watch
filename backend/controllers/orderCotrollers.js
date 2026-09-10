@@ -40,11 +40,14 @@ export const createOrder = async ( req, res ) =>{
 
   subtotal += price * item.quantity;
 
-  return {
-    product: item.product._id,
-    quantity: item.quantity,
-    price
- };
+return {
+  product: item.product._id,
+  productName: item.product.modelName,
+  image: item.product.mainImage,
+  sku: item.product.sku,
+  quantity: item.quantity,
+  price
+}
 });
 
 const subscriber = await Newsletter.findOne({ user: userId });
@@ -70,6 +73,13 @@ let discount = 0;
     // 7. Total
     const total = subtotal - discount + shipping + tax;
     // 8. Create Razorpay order
+ // 8. Create Razorpay order
+  const razorpayOrder = await razorpay.orders.create({
+  amount: Math.round(total * 100),
+  currency: "INR",
+  receipt: `receipt_${Date.now()}`,
+});
+
     // const razorpayOrder = await razorpay.orders.create({
     //   amount: total * 100,
     //   currency: "INR",
@@ -117,6 +127,7 @@ let discount = 0;
     });
 
   } catch (error) {
+      console.error("CREATE ORDER ERROR:", error);
     return res.status(500).json({status: false, message: error.message,});
   }
 
@@ -292,33 +303,51 @@ export const markAsShipped = async (req, res) => {
 }
 
 
-
 export const cancelOrder = async (req, res) => {
   try {
     const { id } = req.params;
+
     const order = await Order.findById(id);
 
     if (!order) {
-      return res.status(404).json({status: false,message: "Order not found"});
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
     }
 
     if (order.orderStatus === "Cancelled") {
-      return res.status(400).json({status: false, message: "Order is already cancelled"});
+      return res.status(400).json({
+        status: false,
+        message: "Order is already cancelled",
+      });
     }
 
     if (order.orderStatus === "Shipped") {
-      return res.status(400).json({status: false,message: "Shipped order cannot be cancelled"});
+      return res.status(400).json({
+        status: false,
+        message: "Shipped order cannot be cancelled",
+      });
     }
 
-    order.orderStatus = "Cancelled";
-    await order.save();
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      { orderStatus: "Cancelled" },
+      {   returnDocument: "after", runValidators: false }
+    );
 
-    return res.status(200).json({status: true,message: "Order cancelled successfully",order});
-  } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(200).json({
+      status: true,
+      message: "Order cancelled successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {    
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
-}
-
+};
 
 export const confirmOrderReceived = async (req, res) => {
   try {
