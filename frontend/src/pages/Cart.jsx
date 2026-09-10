@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
@@ -34,7 +33,7 @@ export default function Cart() {
         allowNotFound: true,
       });
 
-      // Remove any invalid cart items where product is null
+      // Remove invalid cart items where product is null
       const validItems = (res?.cart?.items ?? []).filter(
         (item) => item?.product
       );
@@ -49,11 +48,6 @@ export default function Cart() {
           total: 0,
         }
       );
-
-      const res = await get("/apicarts/getcartitems", { allowNotFound: true });
-      const validItems = (res?.cart?.items ?? []).filter((it)=>it.product);
-      setItems(validItems);
-      setOrderSummary(res?.orderSummary ?? { subtotal: 0, shipping: 0, tax: 0, total: 0 });
     } catch {
       setItems([]);
 
@@ -167,7 +161,6 @@ export default function Cart() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
           {/* Items List */}
           <div className="lg:col-span-8 flex flex-col gap-4">
             {items.map(({ product, quantity }) => {
@@ -195,7 +188,7 @@ export default function Cart() {
                     </h3>
 
                     <p className="text-sm font-bold text-white">
-                      ₹{Number(product.price).toLocaleString()}
+                      ₹{Number(product.price).toLocaleString("en-IN")}
                     </p>
                   </div>
 
@@ -255,7 +248,7 @@ export default function Cart() {
                   <span>Subtotal</span>
 
                   <span className="font-bold text-white">
-                    ₹{Number(subtotal || 0).toLocaleString()}
+                    ₹{Number(subtotal || 0).toLocaleString("en-IN")}
                   </span>
                 </div>
 
@@ -272,7 +265,7 @@ export default function Cart() {
                     <span>Estimated Tax</span>
 
                     <span className="text-white">
-                      ₹{Number(tax).toLocaleString()}
+                      ₹{Number(tax).toLocaleString("en-IN")}
                     </span>
                   </div>
                 )}
@@ -284,7 +277,7 @@ export default function Cart() {
                     ₹
                     {Number(
                       total || subtotal || 0
-                    ).toLocaleString()}
+                    ).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
@@ -305,7 +298,6 @@ export default function Cart() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

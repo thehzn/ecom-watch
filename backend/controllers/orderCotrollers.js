@@ -4,60 +4,83 @@ import Newsletter from "../models/NewsletterModel.js";
 import Product from "../models/ProductModel.js";
 import razorpay from "../config/razorpay.js"
 import crypto from "crypto"
-
-
-export const createOrder = async ( req, res ) =>{
-    try {
+export const createOrder = async (req, res) => {
+  try {
     const userId = req.user.id;
 
     const { shippingMethod, shippingAddress } = req.body;
 
     // 1. Validate shipping method
     if (!shippingMethod) {
-      return res.status(400).json({status: false,message: "Shipping method is required"});
+      return res.status(400).json({
+        status: false,
+        message: "Shipping method is required",
+      });
     }
 
     // 2. Validate shipping address
-    if (!shippingAddress || !shippingAddress.firstName || !shippingAddress.lastName || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
-      return res.status(400).json({status: false,message: "Complete shipping address is required"});
+    if (
+      !shippingAddress ||
+      !shippingAddress.firstName ||
+      !shippingAddress.lastName ||
+      !shippingAddress.phone ||
+      !shippingAddress.address ||
+      !shippingAddress.city ||
+      !shippingAddress.state ||
+      !shippingAddress.pincode
+    ) {
+      return res.status(400).json({
+        status: false,
+        message: "Complete shipping address is required",
+      });
     }
 
     // 3. Get user's cart
-    const cart = await Cart.findOne({ user: userId }).populate("items.product");
+    const cart = await Cart.findOne({ user: userId }).populate(
+      "items.product"
+    );
 
     if (!cart || cart.items.length === 0) {
-      return res.status(404).json({status: false,message: "Cart is empty"});
+      return res.status(404).json({
+        status: false,
+        message: "Cart is empty",
+      });
     }
 
     // 4. Calculate subtotal and prepare order items
     let subtotal = 0;
+
     const orderItems = cart.items.map((item) => {
-    if (!item.product) {
-    throw new Error("A product in the cart no longer exists");
-  }
+      if (!item.product) {
+        throw new Error("A product in the cart no longer exists");
+      }
 
-  const price = item.product.price;
+      const price = item.product.price;
 
-  subtotal += price * item.quantity;
+      subtotal += price * item.quantity;
 
-return {
-  product: item.product._id,
-  productName: item.product.modelName,
-  image: item.product.mainImage,
-  sku: item.product.sku,
-  quantity: item.quantity,
-  price
-}
-});
+      return {
+        product: item.product._id,
+        productName: item.product.modelName,
+        image: item.product.mainImage,
+        sku: item.product.sku,
+        quantity: item.quantity,
+        price,
+      };
+    });
 
-const subscriber = await Newsletter.findOne({ user: userId });
-let discount = 0;
+    // 5. Newsletter discount
+    const subscriber = await Newsletter.findOne({
+      user: userId,
+    });
 
-  if (subscriber) {
-  discount = subtotal * 0.10;
-}
+    let discount = 0;
 
-    // 5. Shipping charge
+    if (subscriber) {
+      discount = subtotal * 0.10;
+    }
+
+    // 6. Shipping charge
     let shipping = 0;
 
     if (shippingMethod === "Standard") {
@@ -68,36 +91,34 @@ let discount = 0;
       shipping = 1000;
     }
 
-    // 6. Tax
+    // 7. Tax
     const tax = 10;
-    // 7. Total
-    const total = subtotal - discount + shipping + tax;
-    // 8. Create Razorpay order
- // 8. Create Razorpay order
-  const razorpayOrder = await razorpay.orders.create({
-  amount: Math.round(total * 100),
-  currency: "INR",
-  receipt: `receipt_${Date.now()}`,
-});
 
-    // const razorpayOrder = await razorpay.orders.create({
-    //   amount: total * 100,
-    //   currency: "INR",
-    //   receipt: `receipt_${Date.now()}`,
-    // });
-     let razorpayOrder;
+    // 8. Calculate total
+    const total = subtotal - discount + shipping + tax;
+
+    // 9. Create Razorpay order
+    let razorpayOrder;
+
     try {
       razorpayOrder = await razorpay.orders.create({
-        amount: total * 100,
+        amount: Math.round(total * 100),
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
       });
     } catch (rzpError) {
-      console.error("Razorpay order creation failed:", JSON.stringify(rzpError));
-      throw new Error(rzpError?.error?.description || "Could not create Razorpay order");
+      console.error(
+        "Razorpay order creation failed:",
+        JSON.stringify(rzpError)
+      );
+
+      throw new Error(
+        rzpError?.error?.description ||
+          "Could not create Razorpay order"
+      );
     }
 
-    // 9. Save order in MongoDB
+    // 10. Save order in MongoDB
     const order = await Order.create({
       user: userId,
       items: orderItems,
@@ -114,8 +135,10 @@ let discount = 0;
       orderStatus: "Pending",
     });
 
-    // 10. Send response
-    return res.status(201).json({ status: true, message: "Order created successfully",
+    // 11. Send response
+    return res.status(201).json({
+      status: true,
+      message: "Order created successfully",
       order,
       discount,
       razorpayOrder: {
@@ -125,14 +148,15 @@ let discount = 0;
       },
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
-
   } catch (error) {
-      console.error("CREATE ORDER ERROR:", error);
-    return res.status(500).json({status: false, message: error.message,});
+    console.error("CREATE ORDER ERROR:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
-
-}
-
+};
 
 export const verifyPayment = async (req, res) => {
    try {
