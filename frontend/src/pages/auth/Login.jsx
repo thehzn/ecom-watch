@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, ArrowRight ,ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Home, Compass } from 'lucide-react';
 import { login } from '../../redux/authSlice';
 import { useApi } from '../../hooks/useApi';
 import loginWatchImage from '../../assets/classic-watch.jpg';
 import ReCAPTCHA from 'react-google-recaptcha';
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -15,18 +17,21 @@ const validationSchema = Yup.object({
       value ? value.trim().toLowerCase() : value
     )
     .required('Email address is required')
-    .email('Enter a valid email'),
+    .matches(EMAIL_REGEX, 'Please enter a valid email address'),
 
   password: Yup.string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters'),
+
+  privacyAccepted: Yup.boolean()
+    .oneOf([true], 'You must accept the Privacy Policy to sign in'),
 });
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { post } = useApi();
+  const recaptchaRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -36,6 +41,7 @@ export default function Login() {
     initialValues: {
       email: '',
       password: '',
+      privacyAccepted: false,
     },
 
     validationSchema,
@@ -45,7 +51,7 @@ export default function Login() {
 
       // RECAPTCHA CHECK
       if (!captchaToken) {
-        setAuthError('Please complete the reCAPTCHA.');
+        setAuthError('Please complete the reCAPTCHA verification.');
         setSubmitting(false);
         return;
       }
@@ -70,7 +76,10 @@ export default function Login() {
           error.message || 'Invalid email or password'
         );
 
-        // Reset CAPTCHA after failed login
+        // Instant reset of CAPTCHA widget without delay
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
         setCaptchaToken(null);
       } finally {
         setSubmitting(false);
@@ -79,55 +88,69 @@ export default function Login() {
   });
 
   return (
-    <main className="min-h-screen w-full flex bg-white text-black font-['Plus_Jakarta_Sans']">
+    <main className="min-h-screen w-full flex flex-col lg:flex-row bg-white text-black font-['Plus_Jakarta_Sans']">
+
+      {/* =====================================================
+          MOBILE TOP NAVIGATION BAR
+      ====================================================== */}
+      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-black/10 bg-white lg:hidden sticky top-0 z-30">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
+        >
+          <ArrowLeft size={16} />
+          <span>Home</span>
+        </Link>
+
+        <Link to="/" className="text-center">
+          <span className="text-lg font-bold tracking-[0.25em]">CHRONOS</span>
+        </Link>
+
+        <Link
+          to="/shop"
+          className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
+        >
+          <Compass size={14} />
+          <span>Shop</span>
+        </Link>
+      </header>
 
       {/* =====================================================
           LEFT LOGIN SECTION
       ====================================================== */}
-      <section className="relative flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
-           {/* =================================================
-            BACK TO HOME LINK (Works on all screen sizes)
-        ================================================== */}
-        <div className="absolute top-6 left-6 sm:left-10 lg:left-16">
+      <section className="relative flex-1 min-h-[calc(100vh-65px)] lg:min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
+        
+        {/* DESKTOP BACK TO HOME LINK */}
+        <div className="hidden lg:flex absolute top-8 left-10 lg:left-16 items-center gap-4 z-20">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
             <span>Return to Catalog</span>
           </Link>
-        </div>
-        <div className="w-full max-w-[460px]">
-
-          {/* MOBILE LOGO */}
+          <span className="text-black/20">•</span>
           <Link
-            to="/"
-            className="lg:hidden block mb-10"
+            to="/shop"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors"
           >
-            <div className="text-2xl font-semibold tracking-[0.25em]">
-              CHRONOS
-            </div>
-
-            <div className="text-[8px] uppercase tracking-[0.3em] text-black/50 mt-1">
-              Haute Horlogerie
-            </div>
+            Browse Timepieces
           </Link>
+        </div>
+
+        <div className="w-full max-w-[460px]">
 
           {/* HEADER */}
           <div className="mb-8">
-
-            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-3">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-2 font-semibold">
               Client Access
             </p>
-
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-black">
               Welcome Back
             </h1>
-
-            <p className="text-sm text-black/50 mt-2">
-              Sign in to access your Chronos client account.
+            <p className="text-sm text-black/60 mt-2">
+              Sign in to access your Chronos client account and orders.
             </p>
-
           </div>
 
           {/* =================================================
@@ -141,7 +164,6 @@ export default function Login() {
 
             {/* EMAIL */}
             <div>
-
               <label
                 htmlFor="email"
                 className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
@@ -160,25 +182,21 @@ export default function Login() {
                 onBlur={formik.handleBlur}
                 className={`w-full bg-white border ${
                   formik.touched.email && formik.errors.email
-                    ? 'border-red-400'
+                    ? 'border-red-500'
                     : 'border-black/20'
                 } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
               />
 
-              {formik.touched.email &&
-                formik.errors.email && (
-                  <p className="mt-1.5 text-xs text-red-600">
-                    {formik.errors.email}
-                  </p>
-                )}
-
+              {formik.touched.email && formik.errors.email && (
+                <p className="mt-1.5 text-xs text-red-600">
+                  {formik.errors.email}
+                </p>
+              )}
             </div>
 
             {/* PASSWORD */}
             <div>
-
               <div className="flex items-center justify-between mb-2">
-
                 <label
                   htmlFor="password"
                   className="block text-[10px] font-semibold uppercase tracking-wider"
@@ -188,15 +206,13 @@ export default function Login() {
 
                 <Link
                   to="/forgot-password"
-                  className="text-[10px] uppercase tracking-wider text-black/100 hover:text-black transition-colors"
+                  className="text-[10px] uppercase tracking-wider text-black/70 hover:text-black font-semibold transition-colors"
                 >
                   Forgot Password?
                 </Link>
-
               </div>
 
-              <div className="relative">
-
+              <div className="relative flex items-center">
                 <input
                   id="password"
                   name="password"
@@ -207,42 +223,64 @@ export default function Login() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full bg-white border ${
-                    formik.touched.password &&
-                    formik.errors.password
-                      ? 'border-red-400'
+                    formik.touched.password && formik.errors.password
+                      ? 'border-red-500'
                       : 'border-black/20'
                   } focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30`}
                 />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword((value) => !value)
-                  }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
-                  tabIndex={-1}
-                  aria-label={
-                    showPassword
-                      ? 'Hide password'
-                      : 'Show password'
-                  }
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-black/50 hover:text-black focus:outline-none flex items-center justify-center cursor-pointer transition-colors z-10"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <EyeOff size={17} />
+                    <EyeOff size={18} className="text-black/70" />
                   ) : (
-                    <Eye size={17} />
+                    <Eye size={18} className="text-black/70" />
                   )}
                 </button>
-
               </div>
 
-              {formik.touched.password &&
-                formik.errors.password && (
-                  <p className="mt-1.5 text-xs text-red-600">
-                    {formik.errors.password}
-                  </p>
-                )}
+              {formik.touched.password && formik.errors.password && (
+                <p className="mt-1.5 text-xs text-red-600">
+                  {formik.errors.password}
+                </p>
+              )}
+            </div>
 
+            {/* PRIVACY POLICY ACCEPTANCE CHECKBOX */}
+            <div className="pt-1">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  id="privacyAccepted"
+                  name="privacyAccepted"
+                  type="checkbox"
+                  checked={formik.values.privacyAccepted}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="mt-0.5 h-4 w-4 rounded-none border border-black/30 accent-black cursor-pointer shrink-0"
+                />
+                <span className="text-xs text-black/70 leading-relaxed">
+                  I agree to the{' '}
+                  <Link
+                    to="/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-black underline hover:text-black/70 transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>{' '}
+                  and acknowledge data processing for client access.
+                </span>
+              </label>
+
+              {formik.touched.privacyAccepted && formik.errors.privacyAccepted && (
+                <p className="mt-1.5 text-xs text-red-600">
+                  {formik.errors.privacyAccepted}
+                </p>
+              )}
             </div>
 
             {/* SERVER ERROR */}
@@ -253,12 +291,19 @@ export default function Login() {
             )}
 
             {/* GOOGLE RECAPTCHA */}
-            <div className="mt-2">
+            <div className="mt-1">
               <ReCAPTCHA
+                ref={recaptchaRef}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                 onChange={(token) => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-                onErrored={() => setCaptchaToken(null)}
+                onExpired={() => {
+                  if (recaptchaRef.current) recaptchaRef.current.reset();
+                  setCaptchaToken(null);
+                }}
+                onErrored={() => {
+                  if (recaptchaRef.current) recaptchaRef.current.reset();
+                  setCaptchaToken(null);
+                }}
               />
             </div>
 
@@ -266,33 +311,23 @@ export default function Login() {
             <button
               type="submit"
               disabled={formik.isSubmitting}
-              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all"
+              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all cursor-pointer shadow-sm"
             >
-
               <span>
-                {formik.isSubmitting
-                  ? 'Signing In...'
-                  : 'Sign In'}
+                {formik.isSubmitting ? 'Signing In...' : 'Sign In'}
               </span>
-
-              {!formik.isSubmitting && (
-                <ArrowRight size={15} />
-              )}
-
+              {!formik.isSubmitting && <ArrowRight size={15} />}
             </button>
 
-            {/* REGISTER */}
-            <p className="text-center text-xs text-black/50 pt-1">
-
+            {/* REGISTER LINK */}
+            <p className="text-center text-xs text-black/60 pt-2">
               Don't have a Chronos account?{' '}
-
               <Link
                 to="/register"
                 className="font-semibold text-black hover:underline"
               >
                 Create Account
               </Link>
-
             </p>
 
           </form>
@@ -301,12 +336,11 @@ export default function Login() {
 
       </section>
 
-
       {/* =====================================================
-          RIGHT WATCH IMAGE SECTION
+          RIGHT WATCH IMAGE SECTION (DESKTOP)
       ====================================================== */}
       <section className="relative hidden lg:flex w-1/2 min-h-screen bg-black overflow-hidden">
-
+        
         {/* WATCH IMAGE */}
         <img
           src={loginWatchImage}
@@ -325,28 +359,21 @@ export default function Login() {
           to="/"
           className="absolute top-10 right-12 z-10 text-right"
         >
-
           <div className="text-white text-3xl font-semibold tracking-[0.25em]">
             CHRONOS
           </div>
-
           <div className="text-white/60 text-[9px] uppercase tracking-[0.3em] mt-1">
             Haute Horlogerie
           </div>
-
         </Link>
 
         {/* IMAGE CONTENT */}
         <div className="absolute left-12 bottom-14 z-10 max-w-[400px]">
-
           <div className="flex items-center gap-4 mb-5">
-
             <div className="w-10 h-px bg-white/70" />
-
             <span className="text-white/70 text-[10px] uppercase tracking-[0.3em]">
               Private Collection
             </span>
-
           </div>
 
           <h2 className="text-white text-4xl xl:text-5xl font-light tracking-tight leading-[1.05]">
@@ -356,23 +383,18 @@ export default function Login() {
           </h2>
 
           <p className="text-white/60 text-sm leading-relaxed mt-5 max-w-[330px]">
-            Discover exceptional timepieces crafted with
-            precision, heritage and timeless elegance.
+            Discover exceptional timepieces crafted with precision, heritage and timeless elegance.
           </p>
-
         </div>
 
         {/* BOTTOM DETAILS */}
         <div className="absolute bottom-10 left-12 right-12 z-10 flex items-center justify-between">
-
           <span className="text-white/45 text-[9px] uppercase tracking-[0.25em]">
             Est. 1985
           </span>
-
           <span className="text-white/45 text-[9px] uppercase tracking-[0.25em]">
             Geneva • Switzerland
           </span>
-
         </div>
 
       </section>

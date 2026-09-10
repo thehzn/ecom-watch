@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import {Eye,EyeOff,ArrowRight,ChevronDown,ArrowLeft} from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, ChevronDown, ArrowLeft, Compass } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import watchImage from '../../assets/luxury_titanium_watch.jpg';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -79,8 +79,8 @@ const validationSchema = Yup.object({
 
 export default function Register() {
   const navigate = useNavigate();
-
   const { post } = useApi();
+  const recaptchaRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -151,6 +151,11 @@ export default function Register() {
         } else {
           setFormError(message);
         }
+
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
+        setCaptchaToken(null);
       } finally {
         setSubmitting(false);
       }
@@ -162,7 +167,32 @@ export default function Register() {
   );
 
   return (
-    <main className="min-h-screen w-full flex bg-white text-black font-['Plus_Jakarta_Sans']">
+    <main className="min-h-screen w-full flex flex-col lg:flex-row bg-white text-black font-['Plus_Jakarta_Sans']">
+
+      {/* =====================================================
+          MOBILE TOP NAVIGATION BAR
+      ====================================================== */}
+      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-black/10 bg-white lg:hidden sticky top-0 z-30">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
+        >
+          <ArrowLeft size={16} />
+          <span>Home</span>
+        </Link>
+
+        <Link to="/" className="text-center">
+          <span className="text-lg font-bold tracking-[0.25em]">CHRONOS</span>
+        </Link>
+
+        <Link
+          to="/shop"
+          className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
+        >
+          <Compass size={14} />
+          <span>Shop</span>
+        </Link>
+      </header>
 
       {/* =====================================================
           LEFT IMAGE SECTION
@@ -194,13 +224,10 @@ export default function Register() {
 
         {/* Bottom text */}
         <div className="absolute bottom-12 left-12 z-10">
-
           <p className="text-white text-sm tracking-wide">
             Timeless design. Precise craftsmanship.
           </p>
-
           <div className="w-12 h-px bg-white mt-4" />
-
         </div>
 
       </section>
@@ -208,19 +235,26 @@ export default function Register() {
       {/* =====================================================
           RIGHT REGISTER SECTION
       ====================================================== */}
-      <section className=" relative flex-1 min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
-            {/* =================================================
-            BACK TO HOME LINK (Works on all screen sizes)
-        ================================================== */}
-        <div className="absolute top-6 left-6 sm:left-10 lg:left-16">
+      <section className="relative flex-1 min-h-[calc(100vh-65px)] lg:min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
+        
+        {/* DESKTOP BACK TO HOME LINK */}
+        <div className="hidden lg:flex absolute top-8 left-10 lg:left-16 items-center gap-4 z-20">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
             <span>Return to Catalog</span>
           </Link>
+          <span className="text-black/20">•</span>
+          <Link
+            to="/shop"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors"
+          >
+            Browse Timepieces
+          </Link>
         </div>
+
         <div className="w-full max-w-[480px]">
 
           {/* MOBILE LOGO */}
@@ -529,8 +563,7 @@ export default function Register() {
                 Password
               </label>
 
-              <div className="relative">
-
+              <div className="relative flex items-center">
                 <input
                   id="password"
                   name="password"
@@ -548,21 +581,19 @@ export default function Register() {
                   onClick={() =>
                     setShowPassword((value) => !value)
                   }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-black/50 hover:text-black focus:outline-none flex items-center justify-center cursor-pointer transition-colors z-10"
                   aria-label={
                     showPassword
                       ? 'Hide password'
                       : 'Show password'
                   }
-                  tabIndex={-1}
                 >
                   {showPassword ? (
-                    <EyeOff size={17} />
+                    <EyeOff size={18} className="text-black/70" />
                   ) : (
-                    <Eye size={17} />
+                    <Eye size={18} className="text-black/70" />
                   )}
                 </button>
-
               </div>
 
               {formik.touched.password &&
@@ -586,8 +617,7 @@ export default function Register() {
                 Confirm Password
               </label>
 
-              <div className="relative">
-
+              <div className="relative flex items-center">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -611,21 +641,19 @@ export default function Register() {
                       (value) => !value
                     )
                   }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-black/50 hover:text-black focus:outline-none flex items-center justify-center cursor-pointer transition-colors z-10"
                   aria-label={
                     showConfirmPassword
                       ? 'Hide confirm password'
                       : 'Show confirm password'
                   }
-                  tabIndex={-1}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff size={17} />
+                    <EyeOff size={18} className="text-black/70" />
                   ) : (
-                    <Eye size={17} />
+                    <Eye size={18} className="text-black/70" />
                   )}
                 </button>
-
               </div>
 
               {formik.touched.confirmPassword &&
@@ -681,10 +709,17 @@ export default function Register() {
             {/* GOOGLE RECAPTCHA */}
             <div className="mt-2">
               <ReCAPTCHA
+                ref={recaptchaRef}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                 onChange={(token) => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-                onErrored={() => setCaptchaToken(null)}
+                onExpired={() => {
+                  if (recaptchaRef.current) recaptchaRef.current.reset();
+                  setCaptchaToken(null);
+                }}
+                onErrored={() => {
+                  if (recaptchaRef.current) recaptchaRef.current.reset();
+                  setCaptchaToken(null);
+                }}
               />
             </div>
 
