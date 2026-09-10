@@ -271,6 +271,15 @@ export default function Navbar() {
               <div className="text-xs text-gray-400">
                 Signed in as <span className="text-white font-medium">{user.firstName}</span>
               </div>
+              {user.role !== 'admin' && (
+      <Link
+        to="/myaccount"
+        onClick={() => setMobileMenuOpen(false)}
+        className="text-left text-sm uppercase tracking-[0.15em] text-gray-300 hover:text-white py-2 border-b border-white/5 transition-colors"
+      >
+        Client Dashboard
+      </Link>
+    )}
               <button
                 onClick={handleLogout}
                 className="w-full bg-white text-black text-xs font-bold uppercase tracking-wider py-3 rounded-lg"
