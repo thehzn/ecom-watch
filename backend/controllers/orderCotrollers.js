@@ -4,11 +4,19 @@ import Newsletter from "../models/NewsletterModel.js";
 import Product from "../models/ProductModel.js";
 import razorpay from "../config/razorpay.js"
 import crypto from "crypto"
+import User from "../models/UserModel.js"
+
+
 export const createOrder = async (req, res) => {
   try {
     const userId = req.user.id;
+    const currentUser = await User.findById(userId).select("email");
 
     const { shippingMethod, shippingAddress } = req.body;
+
+    if(!currentUser){
+      return res.status(404).json({ statuss:false, message:"User not found"})
+    }
 
     // 1. Validate shipping method
     if (!shippingMethod) {
@@ -121,6 +129,7 @@ export const createOrder = async (req, res) => {
     // 10. Save order in MongoDB
     const order = await Order.create({
       user: userId,
+      customerEmail: currentUser.email,
       items: orderItems,
       shippingMethod,
       subtotal,
@@ -133,8 +142,20 @@ export const createOrder = async (req, res) => {
       paymentStatus: "Pending",
       razorpayOrderId: razorpayOrder.id,
       orderStatus: "Pending",
-    });
+    })
 
+    await Cart.updateOne(
+  { user: userId },
+  {
+    $pull: {
+      items: {
+        product: {
+          $in: orderItems.map((item) => item.product),
+        },
+      },
+    },
+  }
+);
     // 11. Send response
     return res.status(201).json({
       status: true,
@@ -149,14 +170,13 @@ export const createOrder = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    console.error("CREATE ORDER ERROR:", error);
-
     return res.status(500).json({
       status: false,
       message: error.message,
     });
   }
-};
+}
+
 
 export const verifyPayment = async (req, res) => {
    try {
@@ -196,17 +216,139 @@ export const verifyPayment = async (req, res) => {
     order.razorpaySignature = razorpay_signature;
 
     await order.save();
-    // 6. Clear user's cart
-    await Cart.findOneAndUpdate(
-      { user: userId },
-      { $set: { items: [] } }
-    );
-
     // 7. Send response
-    return res.status(200).json({status: true, message: "Payment verified and cart cleared successfully",order});
+    return res.status(200).json({status: true, message: "Payment verified successfully",order});
 
   } catch (error) {
     return res.status(500).json({status: false, message: error.message});
+  }
+}
+
+// =========================
+// RETRY PAYMENT
+// =========================
+export const retryPayment = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    // Find user's existing order
+    const order = await Order.findOne({
+      _id: id,
+      user: userId,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
+    }
+
+    // Do not allow payment for cancelled orders
+    if (order.orderStatus === "Cancelled") {
+      return res.status(400).json({
+        status: false,
+        message: "Cancelled order cannot be paid",
+      });
+    }
+
+    // Do not allow payment again if already paid
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({
+        status: false,
+        message: "This order has already been paid",
+      });
+    }
+
+    // Create a new Razorpay payment order
+    // The customer's MongoDB order remains the SAME.
+    const razorpayOrder = await razorpay.orders.create({
+      amount: Math.round(order.total * 100),
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+    });
+
+    // Update the existing order with the new Razorpay order ID
+    order.razorpayOrderId = razorpayOrder.id;
+    order.paymentStatus = "Pending";
+
+    await order.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Payment retry initialized successfully",
+      order,
+      razorpayOrder: {
+        id: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+      },
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+    });
+
+  } catch (error) {
+    console.error("RETRY PAYMENT ERROR:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
+}
+
+// =========================
+// MARK PAYMENT AS FAILED
+// =========================
+export const markPaymentFailed = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { razorpay_order_id } = req.body;
+
+    if (!razorpay_order_id) {
+      return res.status(400).json({
+        status: false,
+        message: "Razorpay order ID is required",
+      });
+    }
+
+    const order = await Order.findOne({
+      razorpayOrderId: razorpay_order_id,
+      user: userId,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
+    }
+
+    // Do not change an already-paid order to Failed
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({
+        status: false,
+        message: "Payment is already completed",
+      });
+    }
+
+    order.paymentStatus = "Failed";
+
+    await order.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Payment marked as failed",
+      order,
+    });
+
+  } catch (error) {
+    console.error("MARK PAYMENT FAILED ERROR:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
 }
 
@@ -241,38 +383,6 @@ export const getSingleOrder = async (req, res) => {
   }
 }
 
-
-export const cancelMyOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-
-    const order = await Order.findOne({
-      _id: id,
-      user: userId
-    });
-
-    if (!order) {
-      return res.status(404).json({status: false,message: "Order not found"});
-    }
-
-    if (order.orderStatus === "Shipped" || order.orderStatus === "Delivered") {
-      return res.status(400).json({status: false,message: "This order cannot be cancelled"});
-    }
-
-    order.orderStatus = "Cancelled";
-    await order.save();
-
-    return res.status(200).json({status: true,message: "Order cancelled successfully",order});
-
-  } catch (error) {
-    return res.status(500).json({status: false,message: error.message});
-  }
-}
-
-
-
-//for admin 
 
 export const getAllOrders = async (req, res) => {
   try {
@@ -315,6 +425,20 @@ export const markAsShipped = async (req, res) => {
 
     if (order.orderStatus === "Shipped") {
       return res.status(400).json({status: false,message: "Order is already shipped" });
+    }
+
+    if (order.paymentStatus !== "Paid") {
+      return res.status(400).json({status: false,
+        message: "This order's payment is still pending. It cannot be marked as shipped until payment is confirmed."
+      });
+    }
+
+    const customerExists = await User.exists({ _id: order.user });
+    if (!customerExists) {
+      return res.status(400).json({
+        status: false,
+        message: "This customer's account has been deleted. Orders cannot be marked as shipped without a valid customer account."
+      });
     }
 
     order.orderStatus = "Shipped";
@@ -371,41 +495,7 @@ export const cancelOrder = async (req, res) => {
       message: error.message,
     });
   }
-};
-
-export const confirmOrderReceived = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-
-    const order = await Order.findOne({_id: id,user: userId});
-
-    if (!order) {
-    return res.status(404).json({status: false,message: "Order not found"
-    });
-    }
-
-    if (order.paymentStatus !== "Paid") {
-    return res.status(400).json({ status: false, message: "Order payment is not completed"
-    });
-    }
-
-    if (order.orderStatus !== "Shipped") {
-    return res.status(400).json({status: false,message: "Only shipped orders can be marked as delivered"
-    });
-    }
-
-  order.orderStatus = "Delivered";
-  await order.save();
-
-  return res.status(200).json({status: true,message: "Order marked as delivered successfully",order});
-
-  } catch (error) {
-  return res.status(500).json({status: false,message: error.message
-  });
-  }
 }
-
 
 
 export const getTrendingProducts = async (req, res) => {
@@ -451,5 +541,154 @@ export const getTrendingProducts = async (req, res) => {
 
   } catch (error) {
   return res.status(500).json({status: false, message: error.message});
+  }
+}
+
+
+
+export const cancelMyOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({
+      _id: id,
+      user: userId,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
+    }
+
+    if (
+      order.orderStatus === "Shipped" ||
+      order.orderStatus === "Delivered"
+    ) {
+      return res.status(400).json({
+        status: false,
+        message: "This order cannot be cancelled",
+      });
+    }
+
+    // Check whether payment was completed before cancellation
+    const wasPaid = order.paymentStatus === "Paid";
+
+    // Cancel the order
+    order.orderStatus = "Cancelled";
+
+    await order.save();
+
+    // Send refund email only if payment was already completed
+    if (wasPaid && order.customerEmail) {
+      try {
+        if (
+          process.env.BREVO_API_KEY &&
+          process.env.BREVO_SENDER_EMAIL
+        ) {
+          const response = await fetch(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+              method: "POST",
+              headers: {
+                accept: "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                sender: {
+                  name: "Chronos Haute Horlogerie",
+                  email: process.env.BREVO_SENDER_EMAIL,
+                },
+                to: [
+                  {
+                    email: order.customerEmail,
+                  },
+                ],
+                subject:
+                  "Chronos Haute Horlogerie - Order Cancellation & Refund",
+                htmlContent: `
+                  <h2>Order Cancelled Successfully</h2>
+
+                  <p>Dear Customer,</p>
+
+                  <p>
+                    Thank you for your order with
+                    <strong>Chronos Haute Horlogerie</strong>.
+                  </p>
+
+                  <p>
+                    Your order has been successfully cancelled as requested.
+                  </p>
+
+                  <p>
+                    Since your payment was already completed, your refund
+                    will be processed and credited to your original payment
+                    method within <strong>5 working days</strong>.
+                  </p>
+
+                  <p>
+                    If you do not receive the refund within this timeframe,
+                    please contact our customer service team.
+                  </p>
+
+                  <p>
+                    Thank you for choosing Chronos Haute Horlogerie.
+                  </p>
+
+                  <p>
+                    Best regards,<br />
+                    Chronos Customer Service
+                  </p>
+                `,
+              }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error(
+              "========== BREVO REFUND EMAIL ERROR =========="
+            );
+            console.error(data);
+            console.error(
+              "=============================================="
+            );
+          } else {
+            console.log(
+              "Customer cancellation/refund email sent successfully"
+            );
+            console.log("Brevo message ID:", data.messageId);
+          }
+        } else {
+          console.error(
+            "Brevo email configuration is missing"
+          );
+        }
+      } catch (emailError) {
+        console.error(
+          "Cancellation email error:",
+          emailError.message
+        );
+      }
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: wasPaid
+        ? "Order cancelled successfully. Refund will be processed within 5 working days."
+        : "Order cancelled successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("CANCEL ORDER ERROR:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
 }
