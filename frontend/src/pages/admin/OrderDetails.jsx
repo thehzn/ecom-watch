@@ -1,3 +1,4 @@
+
 // import { useEffect, useState, useMemo } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import { Search, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,7 +17,7 @@
 //   const { bg, color } = STATUS_STYLES[status] || STATUS_STYLES.Pending;
 //   return (
 //     <span
-//       className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+//       className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap"
 //       style={{ backgroundColor: bg, color }}
 //     >
 //       {status}
@@ -83,17 +84,17 @@
 
 //   return (
 //     <main
-//       className="min-h-screen max-w-[1440px] mx-auto px-10 py-16 bg-[#F9F9F9] text-[#1A1C1C]"
+//       className="min-h-screen max-w-[1440px] mx-auto px-4 py-10 sm:px-6 sm:py-12 lg:px-10 lg:py-16 bg-[#F9F9F9] text-[#1A1C1C]"
 //       style={{ fontFamily: "'Work Sans', sans-serif" }}
 //     >
 //       <div className="w-full max-w-[1440px] mx-auto">
 //         {/* Header */}
-//         <div className="flex flex-col gap-2 mb-12">
+//         <div className="flex flex-col gap-2 mb-8 sm:mb-10 lg:mb-12">
 //           <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#5E5E5E]">
 //             Order Management
 //           </span>
 //           <h1
-//             className="text-[48px] leading-[56px] font-normal text-black"
+//             className="text-[32px] leading-10 sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-normal text-black"
 //             style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //           >
 //             Order Details
@@ -101,7 +102,7 @@
 //         </div>
 
 //         {/* Toolbar */}
-//         <div className="flex justify-between gap-6 border-b border-[#CFC4C5] pb-8 mb-8">
+//         <div className="flex flex-col sm:flex-row justify-between gap-6 border-b border-[#CFC4C5] pb-6 sm:pb-8 mb-6 sm:mb-8">
 //           <div className="relative w-full sm:w-[384px]">
 //             <Search
 //               size={20}
@@ -126,25 +127,25 @@
 //           <table className="w-full border-collapse min-w-[1000px]">
 //             <thead>
 //               <tr className="border-b border-[#7E7576]">
-//                 <th className="text-left py-6 pr-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-left py-6 pr-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Product
 //                 </th>
-//                 <th className="text-center py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-center py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Qty
 //                 </th>
-//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Customer
 //                 </th>
-//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Shipping Address
 //                 </th>
-//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Order Date
 //                 </th>
-//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-left py-6 px-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Status
 //                 </th>
-//                 <th className="text-right py-6 pl-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal">
+//                 <th className="text-right py-6 pl-4 text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E] font-normal whitespace-nowrap">
 //                   Actions
 //                 </th>
 //               </tr>
@@ -201,7 +202,7 @@
 //                           >
 //                             {firstItem?.product?.modelName || 'Unknown product'}
 //                           </p>
-//                           <p className="text-[10px] uppercase text-[#5E5E5E] mt-1">
+//                           <p className="text-[10px] uppercase text-[#5E5E5E] mt-1 whitespace-nowrap">
 //                             {firstItem?.product?.sku}
 //                             {extraItemsCount > 0 && ` · +${extraItemsCount} more`}
 //                           </p>
@@ -216,19 +217,19 @@
 
 //                     {/* Customer */}
 //                     <td className="py-6 px-4">
-//                       <p className="text-sm text-[#1A1C1C]">{customerName(o)}</p>
-//                       <p className="text-[10px] uppercase text-[#5E5E5E] mt-1">
+//                       <p className="text-sm text-[#1A1C1C] whitespace-nowrap">{customerName(o)}</p>
+//                       <p className="text-[10px] uppercase text-[#5E5E5E] mt-1 break-all">
 //                         {o.user?.email}
 //                       </p>
 //                     </td>
 
 //                     {/* Shipping Address */}
-//                     <td className="py-6 px-4 text-sm leading-relaxed text-[#5E5E5E]">
+//                     <td className="py-6 px-4 text-sm leading-relaxed text-[#5E5E5E] max-w-[220px]">
 //                       {addressLine(o)}
 //                     </td>
 
 //                     {/* Order Date */}
-//                     <td className="py-6 px-4 text-sm text-black">
+//                     <td className="py-6 px-4 text-sm text-black whitespace-nowrap">
 //                       {o.createdAt ? new Date(o.createdAt).toLocaleDateString() : ''}
 //                     </td>
 
@@ -241,7 +242,7 @@
 //                     <td className="py-6 pl-4 text-right">
 //                       <button
 //                         onClick={() => navigate(`/admin/order/${o._id}`)}
-//                         className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-[#5E5E5E] hover:text-black transition-colors duration-200"
+//                         className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-[#5E5E5E] hover:text-black transition-colors duration-200 whitespace-nowrap"
 //                         aria-label="View order"
 //                       >
 //                         <Eye size={16} />
@@ -256,7 +257,7 @@
 //         </div>
 
 //         {/* Pagination */}
-//         <div className="flex items-center justify-between mt-12">
+//         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-10 sm:mt-12">
 //           <p className="text-[11px] uppercase tracking-[0.15em] text-[#5E5E5E]">
 //             {filteredOrders.length === 0
 //               ? 'Showing 0 orders'
@@ -266,7 +267,7 @@
 //                 )} of ${filteredOrders.length} orders`}
 //           </p>
 
-//           <div className="flex items-center gap-8">
+//           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4 sm:gap-8">
 //             <button
 //               onClick={() => setPage((p) => Math.max(1, p - 1))}
 //               disabled={currentPage === 1}
@@ -276,7 +277,7 @@
 //               Previous
 //             </button>
 
-//             <div className="flex items-center gap-4">
+//             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-full">
 //               {[...Array(totalPages)].map((_, i) => {
 //                 const pageNum = i + 1;
 //                 const isActive = pageNum === currentPage;
@@ -314,6 +315,13 @@ import { Search, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 
 const PAGE_SIZE = 5;
+
+const FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'shipped', label: 'Shipped' },
+  { key: 'cancelled', label: 'Cancelled' },
+];
 
 const STATUS_STYLES = {
   Pending: { bg: '#FAEEDA', color: '#854F0B' },
@@ -353,9 +361,10 @@ export default function OrderDetails() {
 
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
 
-  // Fetch once — pagination and search both happen client-side below
+  // Fetch once — pagination, filtering, and search happen client-side below
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -370,19 +379,28 @@ export default function OrderDetails() {
 
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return orders;
+    
     return orders.filter((o) => {
+      // 1. Status Filter check
+      if (filter !== 'all' && o.orderStatus?.toLowerCase() !== filter) {
+        return false;
+      }
+
+      // 2. Search Query check
+      if (!query) return true;
+
       const productName = o.items?.[0]?.product?.modelName;
       const sku = o.items?.[0]?.product?.sku;
       const name = o.user?.firstName
         ? `${o.user.firstName} ${o.user.lastName || ''}`
         : `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`;
       const address = `${o.shippingAddress?.address || ''} ${o.shippingAddress?.city || ''} ${o.shippingAddress?.state || ''} ${o.shippingAddress?.pincode || ''}`;
+      
       return [productName, sku, name, address, o.orderStatus]
         .filter(Boolean)
         .some((field) => field.toLowerCase().includes(query));
     });
-  }, [orders, search]);
+  }, [orders, search, filter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -390,6 +408,11 @@ export default function OrderDetails() {
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+
+  const handleFilterChange = (key) => {
+    setFilter(key);
+    setPage(1);
+  };
 
   return (
     <main
@@ -410,8 +433,9 @@ export default function OrderDetails() {
           </h1>
         </div>
 
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row justify-between gap-6 border-b border-[#CFC4C5] pb-6 sm:pb-8 mb-6 sm:mb-8">
+        {/* Toolbar & Filter Tabs */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#CFC4C5] pb-6 sm:pb-8 mb-6 sm:mb-8">
+          {/* Search */}
           <div className="relative w-full sm:w-[384px]">
             <Search
               size={20}
@@ -428,6 +452,23 @@ export default function OrderDetails() {
               className="w-full pl-8 pr-4 py-2 border-0 border-b border-[#7E7576] bg-transparent uppercase text-[11px] placeholder:text-[#5E5E5E] focus:outline-none"
               style={{ fontFamily: "'Work Sans', sans-serif" }}
             />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
+            {FILTERS.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleFilterChange(key)}
+                className={`text-[11px] uppercase tracking-wide px-4 py-2 rounded-full border transition-colors duration-200 whitespace-nowrap ${
+                  filter === key
+                    ? 'bg-[#1A1C1C] text-white border-[#1A1C1C]'
+                    : 'bg-white text-[#5E5E5E] border-[#CFC4C5] hover:border-[#1A1C1C] hover:text-[#1A1C1C]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -479,7 +520,7 @@ export default function OrderDetails() {
               {!loading && !error && paginatedOrders.length === 0 && (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-sm text-[#5E5E5E]">
-                    No orders found.
+                    No orders found matching your criteria.
                   </td>
                 </tr>
               )}
