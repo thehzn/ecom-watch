@@ -21,7 +21,7 @@ router.post("/ordercreate", verifyUser, createOrder);
 router.post("/verifypayment", verifyUser, verifyPayment);
 
 router.get("/myordes", verifyUser, getMyOrders);
-router.get("/signleorder/:id", verifyUser, getSingleOrder);
+router.get("/singleorder/:id", verifyUser, getSingleOrder);
 
 // User cancel order routes (supports multiple casing conventions)
 router.delete("/cancelMyOrder/:id", verifyUser, cancelMyOrder);
