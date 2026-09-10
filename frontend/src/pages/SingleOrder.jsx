@@ -34,7 +34,7 @@ export default function OrderDetails() {
       setError("");
 
       try {
-        const res = await get(`/apiorders/signleorder/${id}`);
+        const res = await get(`/apiorders/singleorder/${id}`);
 
         if (!res?.order) {
           setError("Order not found.");
