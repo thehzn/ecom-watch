@@ -158,7 +158,6 @@ export const deleteProduct = async (req, res) => {
     return res.status(500).json({ status: false, message: error.message });
   }
 }
-
 export const searchProducts = async (req, res) => {
   try {
     const { search } = req.query;
@@ -167,18 +166,28 @@ export const searchProducts = async (req, res) => {
     }
 
     const keyword = search.trim();
+
+    // Escape regex special characters so a literal search term like
+    // "18k" or "3.5"" doesn't get misinterpreted as a regex pattern.
+    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // productFor is a fixed enum (Men / Women / Children), not free text —
+    // use a word-boundary match so searching "men" doesn't also match
+    // "Women" (which contains "men" as a substring).
+    const wordBoundaryRegex = new RegExp(`\\b${escapedKeyword}\\b`, "i");
+
     const products = await Product.find({
       $or: [
-        { modelName: { $regex: keyword, $options: "i" } },
-        { brand: { $regex: keyword, $options: "i" } },
-        { category: { $regex: keyword, $options: "i" } },
-        { productFor: { $regex: keyword, $options: "i" } },
-        { caseMaterial: { $regex: keyword, $options: "i" } },
-        { modelNumber: { $regex: keyword, $options: "i" } },
-        { sku: { $regex: keyword, $options: "i" } },
-        { glassType: { $regex: keyword, $options: "i" } },
-        { strapBracelet: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
+        { modelName: { $regex: escapedKeyword, $options: "i" } },
+        { brand: { $regex: escapedKeyword, $options: "i" } },
+        { category: { $regex: escapedKeyword, $options: "i" } },
+        { productFor: wordBoundaryRegex },
+        { caseMaterial: { $regex: escapedKeyword, $options: "i" } },
+        { modelNumber: { $regex: escapedKeyword, $options: "i" } },
+        { sku: { $regex: escapedKeyword, $options: "i" } },
+        { glassType: { $regex: escapedKeyword, $options: "i" } },
+        { strapBracelet: { $regex: escapedKeyword, $options: "i" } },
+        { description: { $regex: escapedKeyword, $options: "i" } },
       ],
     }).sort({ _id: -1 });
 
@@ -190,3 +199,35 @@ export const searchProducts = async (req, res) => {
     return res.status(500).json({status: false,message: error.message});
   }
 }
+
+// export const searchProducts = async (req, res) => {
+//   try {
+//     const { search } = req.query;
+//     if (!search || !search.trim()) {
+//       return res.status(400).json({status: false,message: "Search query is required"});
+//     }
+
+//     const keyword = search.trim();
+//     const products = await Product.find({
+//       $or: [
+//         { modelName: { $regex: keyword, $options: "i" } },
+//         { brand: { $regex: keyword, $options: "i" } },
+//         { category: { $regex: keyword, $options: "i" } },
+//         { productFor: { $regex: keyword, $options: "i" } },
+//         { caseMaterial: { $regex: keyword, $options: "i" } },
+//         { modelNumber: { $regex: keyword, $options: "i" } },
+//         { sku: { $regex: keyword, $options: "i" } },
+//         { glassType: { $regex: keyword, $options: "i" } },
+//         { strapBracelet: { $regex: keyword, $options: "i" } },
+//         { description: { $regex: keyword, $options: "i" } },
+//       ],
+//     }).sort({ _id: -1 });
+
+//     return res.status(200).json({status: true,message: "Products found successfully",products});
+
+//   } catch (error) {
+//     console.error("searchProducts error:", error);
+
+//     return res.status(500).json({status: false,message: error.message});
+//   }
+// }
