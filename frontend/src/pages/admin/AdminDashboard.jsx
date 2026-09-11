@@ -1,3 +1,4 @@
+
 // import { useEffect, useState, useMemo } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import {
@@ -163,10 +164,10 @@
 
 //   return (
 //     <main
-//       className="min-h-screen max-w-[1440px] mx-auto px-10 py-10 bg-[#F9F9F9] text-[#1A1C1C]"
+//       className="min-h-screen max-w-[1440px] mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10 bg-[#F9F9F9] text-[#1A1C1C]"
 //       style={{ fontFamily: "'Work Sans', sans-serif" }}
 //     >
-//       <div className="w-full max-w-[1440px] mx-auto flex flex-col gap-16">
+//       <div className="w-full max-w-[1440px] mx-auto flex flex-col gap-10 sm:gap-12 lg:gap-16">
 //         {loading && <DashboardSkeleton />}
 
 //         {!loading && error && (
@@ -178,10 +179,10 @@
 //         {!loading && !error && data && (
 //           <>
 //             {/* Hero Header */}
-//             <div className="flex justify-between items-end">
+//             <div className="flex flex-wrap justify-between items-end gap-4">
 //               <div>
 //                 <h1
-//                   className="text-[32px] leading-10 font-normal text-black"
+//                   className="text-[26px] leading-9 sm:text-[32px] sm:leading-10 font-normal text-black"
 //                   style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //                 >
 //                   Operational Overview
@@ -193,17 +194,17 @@
 //             </div>
 
 //             {/* Matrix Overview Section — 3 columns: orders, revenue, customers */}
-//             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+//             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
 //               {data.metrics.map((m) => (
 //                 <div
 //                   key={m.label}
-//                   className="bg-white p-8 border-l border-black shadow-sm transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
+//                   className="bg-white p-6 sm:p-8 border-l border-black shadow-sm transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
 //                 >
 //                   <p className="text-[11px] font-normal uppercase text-[#5E5E5E] tracking-wide">
 //                     {m.label}
 //                   </p>
 //                   <p
-//                     className="text-[30px] text-black mt-3"
+//                     className="text-[26px] sm:text-[30px] text-black mt-3 break-words"
 //                     style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //                   >
 //                     {m.format === 'currency' ? formatCurrency(m.value) : m.value}
@@ -215,9 +216,9 @@
 //             {/* Inventory Notification Section — only renders when alerts exist */}
 //             {visibleAlerts.length > 0 && (
 //               <div className="flex flex-col gap-6">
-//                 <div className="flex justify-between items-center">
+//                 <div className="flex flex-wrap justify-between items-center gap-3">
 //                   <h2
-//                     className="text-2xl text-black"
+//                     className="text-xl sm:text-2xl text-black"
 //                     style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //                   >
 //                     Inventory Notifications
@@ -250,7 +251,7 @@
 
 //                       <div>
 //                         <h3
-//                           className="text-2xl text-black"
+//                           className="text-xl sm:text-2xl text-black break-words"
 //                           style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //                         >
 //                           {n.name}
@@ -274,14 +275,14 @@
 
 //             {/* Recent Commissions Section */}
 //             <div className="flex flex-col gap-6">
-//               <div className="flex justify-between items-center">
+//               <div className="flex flex-wrap justify-between items-center gap-4">
 //                 <h2
-//                   className="text-2xl text-black"
+//                   className="text-xl sm:text-2xl text-black"
 //                   style={{ fontFamily: "'Libre Caslon Text', serif" }}
 //                 >
 //                   Recent Commissions
 //                 </h2>
-//                 <div className="flex items-center gap-6">
+//                 <div className="flex flex-wrap items-center gap-4 sm:gap-6">
 //                   {/* Filter — by order status */}
 //                   <div className="flex items-center gap-1.5">
 //                     <Filter size={14} className="text-[#5E5E5E]" />
@@ -310,15 +311,15 @@
 //                 </div>
 //               </div>
 
-//               {/* Order Data Table */}
-//               <div className="bg-white border-t border-black shadow-sm overflow-hidden">
-//                 <table className="w-full text-sm border-collapse">
+//               {/* Order Data Table — horizontally scrollable on narrow screens so no columns get clipped */}
+//               <div className="bg-white border-t border-black shadow-sm overflow-x-auto">
+//                 <table className="w-full min-w-[640px] text-sm border-collapse">
 //                   <thead>
 //                     <tr className="border-b border-[#CFC4C5]">
 //                       {['Order ID', 'Customer', 'Date', 'Amount', 'Status', 'Actions'].map((h) => (
 //                         <th
 //                           key={h}
-//                           className="text-left px-6 py-4 text-[10px] font-normal uppercase opacity-60"
+//                           className="text-left px-6 py-4 text-[10px] font-normal uppercase opacity-60 whitespace-nowrap"
 //                         >
 //                           {h}
 //                         </th>
@@ -335,21 +336,22 @@
 //                     ) : (
 //                       visibleOrders.map((o) => (
 //                         <tr key={o.id} className="border-b border-[#CFC4C5]/60 last:border-b-0">
-//                           <td className="px-6 py-4 text-sm font-bold text-black">
+//                           <td className="px-6 py-4 text-sm font-bold text-black whitespace-nowrap">
 //                             #{o.id.slice(-6).toUpperCase()}
 //                           </td>
-//                           <td className="px-6 py-4 text-sm text-[#1A1C1C]">{o.customer}</td>
-//                           <td className="px-6 py-4 text-sm opacity-60">{formatDate(o.date)}</td>
-//                           <td className="px-6 py-4 text-sm text-[#1A1C1C]">
+//                           <td className="px-6 py-4 text-sm text-[#1A1C1C] whitespace-nowrap">{o.customer}</td>
+//                           <td className="px-6 py-4 text-sm opacity-60 whitespace-nowrap">{formatDate(o.date)}</td>
+//                           <td className="px-6 py-4 text-sm text-[#1A1C1C] whitespace-nowrap">
 //                             {formatCurrency(o.amount)}
 //                           </td>
-//                           <td className="px-6 py-4">
+//                           <td className="px-6 py-4 whitespace-nowrap">
 //                             <StatusBadge status={o.status} />
 //                           </td>
-//                           <td className="px-6 py-4">
-//                             <button 
-//                             onClick={() => navigate(`/admin/order/${o.id}`)}
-//                             className="text-[10px] uppercase text-[#5E5E5E] tracking-wide hover:text-black transition-colors duration-300">
+//                           <td className="px-6 py-4 whitespace-nowrap">
+//                             <button
+//                               onClick={() => navigate(`/admin/order/${o.id}`)}
+//                               className="text-[10px] uppercase text-[#5E5E5E] tracking-wide hover:text-black transition-colors duration-300"
+//                             >
 //                               View
 //                             </button>
 //                           </td>
@@ -423,7 +425,7 @@ function NotificationBadge({ stock }) {
   );
 }
 
-// Handles all four backend order statuses: Processing, Shipped, Delivered, Cancelled
+// Handles all four backend order statuses: Pending, Shipped, Delivered, Cancelled
 function StatusBadge({ status }) {
   const base = 'inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wide';
   const normalized = (status || '').toLowerCase();
@@ -445,7 +447,8 @@ function StatusBadge({ status }) {
       </span>
     );
   }
-  return <span className={`${base} border border-black text-black`}>Processing</span>;
+  // "pending" (and any unrecognized status) falls through here
+  return <span className={`${base} border border-black text-black`}>Pending</span>;
 }
 
 function DashboardSkeleton() {
@@ -471,7 +474,7 @@ const SORT_MODES = [
 
 const STATUS_FILTER_OPTIONS = [
   { value: 'all', label: 'All' },
-  { value: 'processing', label: 'Processing' },
+  { value: 'pending', label: 'Pending' },
   { value: 'shipped', label: 'Shipped' },
   { value: 'delivered', label: 'Delivered' },
   { value: 'cancelled', label: 'Cancelled' },
