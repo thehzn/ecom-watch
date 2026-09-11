@@ -34,7 +34,6 @@ import ForgotPassword from './pages/ForgotPassword';
 import Security from './pages/Security';
 import EditProfile from './pages/EditProfile';
 import SingleOrder from "./pages/SingleOrder"
-// import Enquiry from './pages/Enquiry';
 import AdminForgotPassword from './pages/admin/Adminforgotpassword';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminEnquiries from './pages/admin/Adminenquiries';
@@ -62,7 +61,6 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
-          {/* <Route path="/enquiry" element={<Enquiry />} /> */}
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmed" element={<OrderConfirmed />} />
           <Route path="/myaccount" element={<MyAccount />} />
