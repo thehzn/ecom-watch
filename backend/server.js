@@ -53,7 +53,6 @@ app.use("/enquiry",enquiryRoutes)
 app.use("/apireview", reviewRoutes)
 
 
-
 app.listen(PORT, async()=>{
    await createAdmin()
     console.log(`Server is running on PORT ${PORT}`);   

@@ -47,6 +47,18 @@ const userSchema = new mongoose.Schema(
 
     otpExpiresAt: { type: Date },
 
+    emailChangeOtp: { type: String },
+    
+    emailChangeOtpExpiresAt: { type: Date },
+    
+    emailChangeVerified: { type: Boolean, default: false },
+
+    passwordChangeOtp: {type: String},
+
+    passwordChangeOtpExpiresAt: {type: Date},
+    
+    passwordChangeVerified: {type: Boolean,default: false},
+
     addresses: [
       {
         firstName: { type: String, trim: true },
