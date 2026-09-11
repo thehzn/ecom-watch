@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -65,6 +66,7 @@ export default function AddProduct() {
   const token = useSelector((state) => state.auth.token);
 
   const [form, setForm] = useState(initialFormState);
+  const [fieldErrors, setFieldErrors] = useState({ price: '', stock: '' });
   const [mainImage, setMainImage] = useState(null);
   const [mainImagePreview, setMainImagePreview] = useState(null);
   const [additionalImages, setAdditionalImages] = useState([null, null, null]);
@@ -72,9 +74,45 @@ export default function AddProduct() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  // Field-level validator for Price and Stock
+  const validateField = (name, value) => {
+    let errorMsg = '';
+
+    if (name === 'price') {
+      const num = parseFloat(value);
+      if (!value) {
+        errorMsg = 'Price is required.';
+      } else if (isNaN(num)) {
+        errorMsg = 'Price must be a valid number.';
+      } else if (num < 99) {
+        errorMsg = 'Price must be at least ₹99.00.';
+      }
+    }
+
+    if (name === 'stock') {
+      const num = Number(value);
+      if (value === '' || value === null || value === undefined) {
+        errorMsg = 'Stock quantity is required.';
+      } else if (!Number.isInteger(num)) {
+        errorMsg = 'Stock must be a whole integer.';
+      } else if (num < 1) {
+        errorMsg = 'Stock must be at least 1.';
+      } else if (num > 100000) {
+        errorMsg = 'Stock cannot exceed 100,000.';
+      }
+    }
+
+    setFieldErrors((prev) => ({ ...prev, [name]: errorMsg }));
+    return errorMsg;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'price' || name === 'stock') {
+      validateField(name, value);
+    }
   };
 
   const handleMainImageChange = (e) => {
@@ -103,20 +141,17 @@ export default function AddProduct() {
     e.preventDefault();
     setError(null);
 
+    // Validate Price and Stock before submission
+    const priceErr = validateField('price', form.price);
+    const stockErr = validateField('stock', form.stock);
+
+    if (priceErr || stockErr) {
+      setError('Please correct the validation errors in the form.');
+      return;
+    }
+
     if (!mainImage) {
       setError('A primary image is required.');
-      return;
-    }
-
-    const priceValue = Number(form.price);
-    if (!form.price || Number.isNaN(priceValue) || priceValue <= 0) {
-      setError('Price must be greater than 0.');
-      return;
-    }
-
-    const stockValue = Number(form.stock);
-    if (!form.stock || Number.isNaN(stockValue) || stockValue < 1) {
-      setError('Stock quantity must be at least 1.');
       return;
     }
 
@@ -142,8 +177,8 @@ export default function AddProduct() {
       additionalImages.forEach((file) => {
         if (file) payload.append('images', file);
       });
-      console.log('token:', token);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/apiproduct/addproduct`, {
+
+      const res = await fetch(`${BASE_URL}/apiproduct/addproduct`, {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -312,8 +347,9 @@ export default function AddProduct() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
+              {/* PRICE FIELD WITH VALIDATION */}
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Price *</label>
                 <input
                   type="number"
                   name="price"
@@ -323,11 +359,20 @@ export default function AddProduct() {
                   min="99"
                   step="0.01"
                   required
-                  className={underlineInput}
+                  className={`${underlineInput} ${
+                    fieldErrors.price ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
+                {fieldErrors.price && (
+                  <p className="text-[11px] text-[#A32D2D] mt-1.5 font-medium">
+                    {fieldErrors.price}
+                  </p>
+                )}
               </div>
+
+              {/* STOCK QUANTITY FIELD WITH VALIDATION */}
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity *</label>
                 <input
                   type="number"
                   name="stock"
@@ -338,8 +383,15 @@ export default function AddProduct() {
                   max="100000"
                   step="1"
                   required
-                  className={underlineInput}
+                  className={`${underlineInput} ${
+                    fieldErrors.stock ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
+                {fieldErrors.stock && (
+                  <p className="text-[11px] text-[#A32D2D] mt-1.5 font-medium">
+                    {fieldErrors.stock}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -357,7 +409,7 @@ export default function AddProduct() {
             </div>
 
             <div>
-              <label className="block text-[11px] text-[#5E5E5E] mb-2">Description</label>
+              <label className="block text-[11px] text-[#5E5E5E] mb-2">Description *</label>
               <textarea
                 name="description"
                 value={form.description}
