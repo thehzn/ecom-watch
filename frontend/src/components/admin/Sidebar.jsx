@@ -6,6 +6,7 @@ const navItems = [
   { label: 'Order Details', icon: 'receipt', path: '/admin/orders' },
   { label: 'Customer Details', icon: 'group', path: '/admin/users' },
   { label: 'Enquiries', icon: 'mail', path: '/admin/enquiries' },
+  { label: 'Reviews', icon: 'star', path: '/admin/reviews' }
 
 ];
 

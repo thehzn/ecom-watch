@@ -40,6 +40,7 @@ import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminEnquiries from './pages/admin/Adminenquiries';
 import ScrollToTop from './components/ScrollToTop';
 import AppInitializer from './AppInitializer';
+import AdminReviewList from './pages/admin/AdminReviewList'; // Import the AdminReviewList component
 
 
 
@@ -94,6 +95,7 @@ function App() {
             <Route path="users" element={<Customers />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="enquiries" element={<AdminEnquiries />} />
+            <Route path="reviews" element={<AdminReviewList />} />
             
 
           </Route>
