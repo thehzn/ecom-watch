@@ -27,6 +27,8 @@ const LIVE_RULES = [
   },
 ];
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const { post } = useApi();
@@ -46,11 +48,9 @@ export default function ForgotPassword() {
 
     validationSchema: Yup.object({
       email: Yup.string()
-        .transform((value) =>
-          value ? value.trim().toLowerCase() : value
-        )
-        .email("Enter a valid email address")
-        .required("Email is required"),
+        .trim()
+        .required("Email is required")
+        .matches(EMAIL_REGEX, "Enter a valid email address"),
     }),
 
     onSubmit: async (values, { setSubmitting }) => {
@@ -321,7 +321,9 @@ export default function ForgotPassword() {
                         placeholder="Enter your email"
                         autoComplete="email"
                         value={emailForm.values.email}
-                        onChange={emailForm.handleChange}
+                        onChange={(e) => {
+                          emailForm.setFieldValue("email", e.target.value.trim());
+                        }}
                         onBlur={emailForm.handleBlur}
                         className={`w-full h-14 border ${
                           emailForm.touched.email &&

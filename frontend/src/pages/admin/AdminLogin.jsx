@@ -366,18 +366,18 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../../redux/authSlice';
 import { LockKeyhole, Eye, EyeOff } from 'lucide-react';
 import ReCAPTCHA from 'react-google-recaptcha';
-
 import watchImage from '../../assets/admin-watch.avif';
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const PASSWORD_ERROR =
   'Password must be 8–64 characters, start with a letter, and include at least one uppercase letter, one lowercase letter, one number, and one special character. Spaces are not allowed.';
 
 const validationSchema = Yup.object({
   email: Yup.string()
-    .transform((value) => (value ? value.trim().toLowerCase() : value))
-    .max(254, 'Email address is required')
-    .email('Please enter a valid email address')
-    .required('Email address is required'),
+    .trim()
+    .required('Email address is required')
+    .matches(EMAIL_REGEX, 'Please enter a valid email address'),
 
   password: Yup.string()
     .required('Password is required')
@@ -585,7 +585,9 @@ export default function AdminLogin() {
                 autoComplete="username"
                 placeholder="admin@example.com"
                 value={formik.values.email}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  formik.setFieldValue('email', e.target.value.trim());
+                }}
                 onBlur={formik.handleBlur}
                 className="w-full border-0 border-b border-[rgba(93,94,99,0.30)] bg-transparent py-3 text-[16px] font-normal text-[#1A1C1C] outline-none transition-colors duration-200 placeholder:text-[#C4C7C7] focus:border-black"
                 style={{ fontFamily: 'Inter, sans-serif' }}

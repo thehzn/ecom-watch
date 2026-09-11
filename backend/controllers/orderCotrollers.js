@@ -145,17 +145,9 @@ export const createOrder = async (req, res) => {
     })
 
     await Cart.updateOne(
-  { user: userId },
-  {
-    $pull: {
-      items: {
-        product: {
-          $in: orderItems.map((item) => item.product),
-        },
-      },
-    },
-  }
-);
+      { user: userId },
+      { $set: { items: [] } }
+    );
     // 11. Send response
     return res.status(201).json({
       status: true,
