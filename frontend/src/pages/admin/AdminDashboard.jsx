@@ -505,13 +505,19 @@ export default function AdminDashboard() {
             name: n.modelName,
             stock: n.stock,
           })),
-          recentOrders: (result.recentOrders || []).map((o) => ({
-            id: o._id,
-            customer: `${o.user?.firstName ?? ''} ${o.user?.lastName ?? ''}`.trim(),
-            date: o.createdAt,
-            amount: o.total,
-            status: (o.orderStatus || '').toLowerCase(),
-          })),
+          recentOrders: (result.recentOrders || []).map((o) => {
+            const userFullName = `${o.user?.firstName || ''} ${o.user?.lastName || ''}`.trim();
+            const shippingFullName = `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`.trim();
+            const customerName = userFullName || shippingFullName || o.customerEmail || 'Guest Client';
+
+            return {
+              id: o._id,
+              customer: customerName,
+              date: o.createdAt,
+              amount: o.total,
+              status: (o.orderStatus || '').toLowerCase(),
+            };
+          }),
         });
       } catch (err) {
         // error state already captured by useApi

@@ -85,7 +85,7 @@ export const getDashboard = async (req, res) => {
       .populate("user", "firstName lastName")
       .sort({ createdAt: -1 })
       .limit(5)
-      .select("user total orderStatus createdAt");
+      .select("user total orderStatus createdAt shippingAddress customerEmail");
 
     return res.status(200).json({
       status: true,

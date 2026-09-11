@@ -37,15 +37,9 @@ function StatusBadge({ status }) {
 }
 
 function customerName(order) {
-  if (order.user?.firstName) {
-    return `${order.user.firstName} ${
-      order.user.lastName || ''
-    }`.trim();
-  }
-
-  return `${order.shippingAddress?.firstName || ''} ${
-    order.shippingAddress?.lastName || ''
-  }`.trim();
+  const userName = `${order.user?.firstName || ''} ${order.user?.lastName || ''}`.trim();
+  const shippingName = `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim();
+  return userName || shippingName || order.customerEmail || order.user?.email || 'Guest Client';
 }
 
 function addressLine(order) {
@@ -117,11 +111,7 @@ export default function OrderDetails() {
         '';
 
       // Customer name
-      const name = o.user?.firstName
-        ? `${o.user.firstName} ${o.user.lastName || ''}`
-        : `${o.shippingAddress?.firstName || ''} ${
-            o.shippingAddress?.lastName || ''
-          }`;
+      const name = customerName(o);
 
       // Shipping address
       const address = [
