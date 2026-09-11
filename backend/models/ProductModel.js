@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema({
         "Heritage",
         "Contemporary",
         "Sports",]},
+    
 
     productFor: {type: String, enum: ["Men", "Women", "Children"],default: "Men"},
 
@@ -33,6 +34,14 @@ const productSchema = new mongoose.Schema({
     mainImage: {type: String,required: true},
 
     images: [{type: String}],
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
   
 })
 
