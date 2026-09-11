@@ -15,6 +15,7 @@ import newsletterRoutes from "./routes/newsletterRoutes.js"
 import notificationRoutes from "./routes/NotificationRoutes.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
 import enquiryRoutes from "./routes/EnquiryRoutes.js"
+import reviewRoutes from "./routes/reviewRoutes.js"
 import { createAdmin } from "./utils/createAdmin.js";
 
 
@@ -49,6 +50,7 @@ app.use("/newsletter",newsletterRoutes)
 app.use("/apinotify",notificationRoutes)
 app.use("/dashboard", dashboardRoutes)
 app.use("/enquiry",enquiryRoutes)
+app.use("/apireview", reviewRoutes)
 
 
 app.listen(PORT, async()=>{

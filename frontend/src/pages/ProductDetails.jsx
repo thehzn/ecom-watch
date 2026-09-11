@@ -5,7 +5,8 @@
 // import { ShieldCheck, Sparkles, Award, Heart, Check, ArrowRight } from "lucide-react";
 // import { useApi } from "../hooks/useApi";
 // import { addOrIncrementCartItem } from "../redux/cartSlice";
-// import { addToWishlistLocal } from "../redux/wishlistSlice";
+// import { addToWishlistLocal, removeFromWishlist } from "../redux/wishlistSlice";
+// import ProductReviews from "../components/ProductReviews";
 
 // const SPEC_FIELDS = [
 //   { key: "brand", label: "Maison" },
@@ -20,7 +21,7 @@
 
 // export default function ProductDetails() {
 //   const { id } = useParams();
-//   const { get, post } = useApi();
+//   const { get, post, del } = useApi();
 //   const dispatch = useDispatch();
 
 //   const [product, setProduct] = useState(null);
@@ -30,9 +31,17 @@
 //   const [adding, setAdding] = useState(false);
 //   const [addedMessage, setAddedMessage] = useState("");
 //   const [selectedImage, setSelectedImage] = useState("");
+//   const [wishlistSaving, setWishlistSaving] = useState(false);
 
 //   const isWishlisted = useSelector((state) =>
 //     state.wishlist?.items?.some((item) => item._id === id)
+//   );
+
+//   // Whether this product is already in the cart. Used to disable the
+//   // "Acquire" button so it can't be added/incremented more than once
+//   // from this page.
+//   const isInCart = useSelector((state) =>
+//     state.cart?.items?.some((item) => item._id === id)
 //   );
 
 //   useEffect(() => {
@@ -72,6 +81,10 @@
 //   }, [id, get]);
 
 //   const handleAddToCart = async () => {
+//     // Already adding, or already in the cart — do nothing. The button is
+//     // also disabled in this case, this is just a safety guard.
+//     if (adding || isInCart) return;
+
 //     setAdding(true);
 //     setAddedMessage("");
 //     try {
@@ -91,13 +104,26 @@
 //     }
 //   };
 
+//   // Toggles the product in/out of the wishlist. Previously this only ever
+//   // added — clicking the heart on an already-wishlisted product silently
+//   // re-added it (a no-op) instead of removing it.
 //   const handleWishlist = async () => {
+//     if (wishlistSaving) return;
+//     setWishlistSaving(true);
+
 //     try {
-//       await post(`/apiwishlist/addwishlist/${id}`);
+//       if (isWishlisted) {
+//         await del(`/apiwishlist/removefromlist/${id}`);
+//         dispatch(removeFromWishlist(id));
+//       } else {
+//         await post(`/apiwishlist/addwishlist/${id}`);
+//         dispatch(addToWishlistLocal(product));
+//       }
 //     } catch {
 //       // ignore
+//     } finally {
+//       setWishlistSaving(false);
 //     }
-//     dispatch(addToWishlistLocal(product));
 //   };
 
 //   if (loading) {
@@ -141,8 +167,9 @@
 //               />
 //               <button
 //                 onClick={handleWishlist}
-//                 aria-label="Wishlist"
-//                 className="absolute top-6 right-6 w-11 h-11 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"
+//                 disabled={wishlistSaving}
+//                 aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+//                 className="absolute top-6 right-6 w-11 h-11 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all disabled:opacity-60"
 //               >
 //                 <Heart size={18} className={isWishlisted ? 'fill-white text-white' : ''} />
 //               </button>
@@ -195,10 +222,23 @@
 //             <div className="mt-8 flex flex-col gap-3">
 //               <button
 //                 onClick={handleAddToCart}
-//                 disabled={adding}
+//                 disabled={adding || isInCart}
 //                 className="w-full bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full shadow-lg transition-all disabled:opacity-60"
 //               >
-//                 {adding ? "Securing Timepiece..." : "Acquire Timepiece"}
+//                 {adding
+//                   ? "Securing Timepiece..."
+//                   : isInCart
+//                   ? "Already in Bag"
+//                   : "Acquire Timepiece"}
+//               </button>
+
+//               <button
+//                 onClick={handleWishlist}
+//                 disabled={wishlistSaving}
+//                 className="w-full border border-white/20 hover:border-white text-white text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+//               >
+//                 <Heart size={14} className={isWishlisted ? 'fill-white text-white' : ''} />
+//                 {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
 //               </button>
 
 //               {addedMessage && (
@@ -249,9 +289,17 @@
 //         </div>
 //       </section>
 
+//       {/* Reviews Section  */}
+//        <section className="w-full border-t border-white/10 bg-[#0B0D12] py-16 px-6">
+//         <div className="max-w-[1600px] mx-auto">
+         
+//           {id && <ProductReviews productId={id} />}
+//         </div>
+//       </section> 
+
 //       {/* Related Timepieces */}
 //       {related.length > 0 && (
-//         <section className="w-full border-t border-white/10 bg-[#0B0D12] py-16 px-6">
+//         <section className="w-full border-t border-white/10 bg-[#08090C] py-16 px-6">
 //           <div className="max-w-[1600px] mx-auto">
 //             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8">
 //               Complementary Timepieces
@@ -286,6 +334,7 @@ import { ShieldCheck, Sparkles, Award, Heart, Check, ArrowRight } from "lucide-r
 import { useApi } from "../hooks/useApi";
 import { addOrIncrementCartItem } from "../redux/cartSlice";
 import { addToWishlistLocal, removeFromWishlist } from "../redux/wishlistSlice";
+import ProductReviews from "../components/ProductReviews";
 
 const SPEC_FIELDS = [
   { key: "brand", label: "Maison" },
@@ -314,6 +363,13 @@ export default function ProductDetails() {
 
   const isWishlisted = useSelector((state) =>
     state.wishlist?.items?.some((item) => item._id === id)
+  );
+
+  // Whether this product is already in the cart. Used to disable the
+  // "Acquire" button so it can't be added/incremented more than once
+  // from this page.
+  const isInCart = useSelector((state) =>
+    state.cart?.items?.some((it) => it.product._id === id)
   );
 
   useEffect(() => {
@@ -353,6 +409,10 @@ export default function ProductDetails() {
   }, [id, get]);
 
   const handleAddToCart = async () => {
+    // Already adding, or already in the cart — do nothing. The button is
+    // also disabled in this case, this is just a safety guard.
+    if (adding || isInCart) return;
+
     setAdding(true);
     setAddedMessage("");
     try {
@@ -490,10 +550,18 @@ export default function ProductDetails() {
             <div className="mt-8 flex flex-col gap-3">
               <button
                 onClick={handleAddToCart}
+
                 disabled={adding}
                 className="w-full bg-white hover:bg-[#F3F3F4] text-black text-xs font-semibold uppercase tracking-[0.2em] py-4 rounded-lg shadow-md transition-all disabled:opacity-60 active:scale-[0.98]"
+
+                disabled={adding || isInCart}
+                className="w-full bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full shadow-lg transition-all disabled:opacity-60"
               >
-                {adding ? "Securing Timepiece..." : "Acquire Timepiece"}
+                {adding
+                  ? "Securing Timepiece..."
+                  : isInCart
+                  ? "Already in Bag"
+                  : "Acquire Timepiece"}
               </button>
 
               <button
@@ -553,9 +621,17 @@ export default function ProductDetails() {
         </div>
       </section>
 
+      {/* Reviews Section  */}
+       <section className="w-full border-t border-white/10 bg-[#0B0D12] py-16 px-6">
+        <div className="max-w-[1600px] mx-auto">
+         
+          {id && <ProductReviews productId={id} />}
+        </div>
+      </section> 
+
       {/* Related Timepieces */}
       {related.length > 0 && (
-        <section className="w-full border-t border-white/10 bg-[#0B0D12] py-16 px-6">
+        <section className="w-full border-t border-white/10 bg-[#08090C] py-16 px-6">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="font-caslon text-2xl sm:text-3xl font-normal text-white mb-8">
               Complementary Timepieces

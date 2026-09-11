@@ -2,11 +2,19 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, Receipt, Users, Mail, LogOut } from 'lucide-react';
 
 const navItems = [
+
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
   { label: 'Product List', icon: Package, path: '/admin/products' },
   { label: 'Order Details', icon: Receipt, path: '/admin/orders' },
   { label: 'Customer Details', icon: Users, path: '/admin/users' },
   { label: 'Enquiries', icon: Mail, path: '/admin/enquiries' },
+  { label: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard' },
+  { label: 'Product List', icon: 'inventory_2', path: '/admin/products' },
+  { label: 'Order Details', icon: 'receipt', path: '/admin/orders' },
+  { label: 'Customer Details', icon: 'group', path: '/admin/users' },
+  { label: 'Enquiries', icon: 'mail', path: '/admin/enquiries' },
+  { label: 'Reviews', icon: 'star', path: '/admin/reviews' }
+
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
