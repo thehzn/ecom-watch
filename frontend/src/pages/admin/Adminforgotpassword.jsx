@@ -527,11 +527,16 @@ export default function AdminForgotPassword() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   // --- Step 1: email ---
   const emailForm = useFormik({
     initialValues: { email: '' },
     validationSchema: Yup.object({
-      email: Yup.string().email('Enter a valid email address').required('Email is required'),
+      email: Yup.string()
+        .trim()
+        .required('Email is required')
+        .matches(EMAIL_REGEX, 'Enter a valid email address'),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitError('');
@@ -667,7 +672,9 @@ export default function AdminForgotPassword() {
                     autoComplete="username"
                     placeholder="admin@example.com"
                     value={emailForm.values.email}
-                    onChange={emailForm.handleChange}
+                    onChange={(e) => {
+                      emailForm.setFieldValue('email', e.target.value.trim());
+                    }}
                     onBlur={emailForm.handleBlur}
                     className="w-full border-0 border-b border-[rgba(93,94,99,0.30)] bg-transparent py-3 text-[16px] font-normal text-[#1A1C1C] outline-none transition-colors duration-200 placeholder:text-[#C4C7C7] focus:border-black"
                     style={{ fontFamily: 'Inter, sans-serif' }}

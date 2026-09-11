@@ -229,6 +229,10 @@ export default function Checkout() {
 
         const { order, razorpayOrder, razorpayKey, discount } = res;
 
+        // Immediately empty the cart in state and Redux once order is created
+        setCartItems([]);
+        dispatch(clearCart());
+
         console.log("MongoDB Order:", order);
         console.log("Razorpay Order:", razorpayOrder);
         console.log("Razorpay Key:", razorpayKey);

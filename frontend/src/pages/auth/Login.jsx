@@ -178,7 +178,9 @@ export default function Login() {
                 placeholder="your@email.com"
                 autoComplete="email"
                 value={formik.values.email}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  formik.setFieldValue('email', e.target.value.trim());
+                }}
                 onBlur={formik.handleBlur}
                 className={`w-full bg-white border ${
                   formik.touched.email && formik.errors.email

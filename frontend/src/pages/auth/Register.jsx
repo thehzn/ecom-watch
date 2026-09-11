@@ -380,7 +380,9 @@ export default function Register() {
                 placeholder="your@email.com"
                 autoComplete="email"
                 value={formik.values.email}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  formik.setFieldValue('email', e.target.value.trim());
+                }}
                 onBlur={formik.handleBlur}
                 className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
               />
