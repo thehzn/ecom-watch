@@ -54,6 +54,9 @@ customerEmail: {type: String},
       enum: ["Pending", "Paid", "Failed"],
       default: "Pending",
      },
+
+    paidAt: {type: Date},
+    
     razorpayOrderId: {type: String},
 
     razorpayPaymentId: {type: String},
@@ -65,6 +68,8 @@ customerEmail: {type: String},
       enum: ["Pending", "Shipped", "Cancelled", "Delivered"],
       default: "Pending",
     },
+
+    deliveredAt: {type: Date},
   },
   {
     timestamps: true,
