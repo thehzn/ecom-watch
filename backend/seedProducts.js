@@ -22,7 +22,7 @@ const products = [
         modelNumber: "CT-1801",
         category: "Luxury Watch",
         productFor: "Men",
-        price: 7800000,
+        price: 380000,
         stock: 4,
         description:
             "A commanding haute horlogerie timepiece pairing an open-worked tourbillon with an 18K rose-gold case and hand-finished details.",
@@ -39,7 +39,7 @@ const products = [
         modelNumber: "CD-3602",
         category: "Luxury Watch",
         productFor: "Women",
-        price: 6400000,
+        price: 320000,
         stock: 3,
         description:
             "An elegant jewel-set creation with a luminous dial, diamond-set case and bracelet, and a refined automatic movement.",
@@ -56,7 +56,7 @@ const products = [
         modelNumber: "LM-3203",
         category: "Luxury Watch",
         productFor: "Children",
-        price: 950000,
+        price: 95000,
         stock: 5,
         description:
             "A petite celestial watch designed for young collectors, featuring a moonphase-inspired dial and polished precious-metal case.",
@@ -73,7 +73,7 @@ const products = [
         modelNumber: "VH-4004",
         category: "Heritage",
         productFor: "Men",
-        price: 890000,
+        price: 89000,
         stock: 8,
         description:
             "A timeless dress watch inspired by mid-century proportions, with a warm ivory dial and traditional leather strap.",
@@ -90,7 +90,7 @@ const products = [
         modelNumber: "CR-2805",
         category: "Heritage",
         productFor: "Women",
-        price: 680000,
+        price: 68000,
         stock: 7,
         description:
             "A graceful rectangular silhouette that blends vintage elegance with contemporary finishing for formal and everyday wear.",
@@ -107,7 +107,7 @@ const products = [
         modelNumber: "JC-3006",
         category: "Heritage",
         productFor: "Children",
-        price: 320000,
+        price: 32000,
         stock: 10,
         description:
             "A friendly heritage-inspired design with a compact case and playful dial details for younger collectors.",
@@ -124,7 +124,7 @@ const products = [
         modelNumber: "SP-4207",
         category: "Sports",
         productFor: "Men",
-        price: 820000,
+        price: 82000,
         stock: 9,
         description:
             "A performance-focused chronograph with a high-contrast dial, robust steel case, and precise manually wound movement.",
@@ -141,7 +141,7 @@ const products = [
         modelNumber: "AC-3608",
         category: "Sports",
         productFor: "Women",
-        price: 590000,
+        price: 59000,
         stock: 11,
         description:
             "A versatile sport chronograph built around a compact case, luminous markers, and a water-ready steel bracelet.",

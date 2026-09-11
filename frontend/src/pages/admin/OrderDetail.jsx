@@ -114,13 +114,12 @@ export default function OrderDetail() {
   }
 
   const customer = {
-    name: order.user?.firstName
-      ? `${order.user.firstName} ${
-          order.user.lastName || ''
-        }`.trim()
-      : `${order.shippingAddress?.firstName || ''} ${
-          order.shippingAddress?.lastName || ''
-        }`.trim(),
+    name:
+      `${order.user?.firstName || ''} ${order.user?.lastName || ''}`.trim() ||
+      `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() ||
+      order.customerEmail ||
+      order.user?.email ||
+      'Guest Client',
 
     email:
       order.customerEmail ||
