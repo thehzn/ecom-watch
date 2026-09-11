@@ -132,14 +132,41 @@ export const getSingleProduct = async (req, res) => {
   }
 };
 
+// export const updateProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updatedProduct = await Product.findByIdAndUpdate(id, req.body, { returnDocument: "after" });
+//     if (!updatedProduct) {
+//       return res.status(404).json({ status: false, message: "Product not found" });
+//     }
+//     return res.status(200).json({ status: true, message: "Product updated successfully", product: updatedProduct });
+//   } catch (error) {
+//     return res.status(500).json({ status: false, message: error.message });
+//   }
+// };
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, { returnDocument: "after" });
+
+    // SKU is immutable once a product is created — strip it out even if a client
+    // sends it (e.g. via Postman or a stale frontend build), so it can never be changed here.
+    const { sku, ...updateFields } = req.body;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateFields,
+      { new: true, runValidators: true } // `new: true` is Mongoose's option for returning the post-update doc — `returnDocument` is the native MongoDB driver option and is ignored by Mongoose
+    );
+
     if (!updatedProduct) {
       return res.status(404).json({ status: false, message: "Product not found" });
     }
-    return res.status(200).json({ status: true, message: "Product updated successfully", product: updatedProduct });
+
+    return res.status(200).json({
+      status: true,
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
   } catch (error) {
     return res.status(500).json({ status: false, message: error.message });
   }

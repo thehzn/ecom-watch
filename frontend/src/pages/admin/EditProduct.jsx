@@ -1,4 +1,446 @@
 
+// import { useState, useEffect } from 'react';
+// import { useNavigate, useParams } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+
+// const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Sports'];
+// const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
+// const BASE_URL = import.meta.env.VITE_API_URL;
+
+// // Shared class strings so every field is consistent and text is always visible
+// const underlineInput =
+//   "w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+// const underlineInputStrong =
+//   "w-full border-0 border-b border-[#1A1C1C] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+// const boxInput =
+//   "w-full border border-[#CFC4C5] bg-white py-2 px-3 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+// const textareaClass =
+//   "w-full border border-[#CFC4C5] bg-white p-3 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] resize-none focus:outline-none focus:border-black";
+
+// const initialFormState = {
+//   modelName: '',
+//   sku: '',
+//   brand: '',
+//   modelNumber: '',
+//   category: 'Luxury Watch',
+//   productFor: 'Men',
+//   price: '',
+//   stock: 1,
+//   description: '',
+//   caseMaterial: '',
+//   glassType: '',
+//   strapBracelet: '',
+// };
+
+// function ImagePreview({ label, src }) {
+//   return (
+//     <div className="relative flex flex-col items-center justify-center gap-2 border border-[#CFC4C5] bg-[#F3F3F1] h-[110px] sm:h-[130px] overflow-hidden">
+//       {src ? (
+//         <img src={src} alt={label} className="absolute inset-0 w-full h-full object-cover" />
+//       ) : (
+//         <span className="text-[10px] text-[#5E5E5E]">No image</span>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default function EditProduct() {
+//   const navigate = useNavigate();
+//   const { id } = useParams();
+//   const token = useSelector((state) => state.auth.token);
+
+//   const [form, setForm] = useState(initialFormState);
+
+//   // Existing images — display only, not editable on this page
+//   const [existingMainImage, setExistingMainImage] = useState(null);
+//   const [existingImages, setExistingImages] = useState([null, null, null]);
+
+//   const [loadingProduct, setLoadingProduct] = useState(true);
+//   const [submitting, setSubmitting] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     const fetchProduct = async () => {
+//       setLoadingProduct(true);
+//       setError(null);
+//       try {
+//         const res = await fetch(`${BASE_URL}/apiproduct/getsingleproduct/${id}`, {
+//           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+//         });
+//         if (!res.ok) throw new Error(`Failed to load product: ${res.status}`);
+
+//         const { product } = await res.json();
+
+//         setForm({
+//           modelName: product.modelName || '',
+//           sku: product.sku || '',
+//           brand: product.brand || '',
+//           modelNumber: product.modelNumber || '',
+//           category: product.category || 'Luxury Watch',
+//           productFor: product.productFor || 'Men',
+//           price: product.price ?? '',
+//           stock: product.stock ?? 1,
+//           description: product.description || '',
+//           caseMaterial: product.caseMaterial || '',
+//           glassType: product.glassType || '',
+//           strapBracelet: product.strapBracelet || '',
+//         });
+
+//         setExistingMainImage(product.mainImage || null);
+//         setExistingImages([
+//           product.images?.[0] || null,
+//           product.images?.[1] || null,
+//           product.images?.[2] || null,
+//         ]);
+//       } catch (err) {
+//         setError(err.message);
+//       } finally {
+//         setLoadingProduct(false);
+//       }
+//     };
+
+//     if (id) fetchProduct();
+//   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setError(null);
+//     setSubmitting(true);
+
+//     try {
+//       const res = await fetch(`${BASE_URL}/apiproduct/updateproduct/${id}`, {
+//         method: 'PUT',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+//         },
+//         body: JSON.stringify(form),
+//       });
+
+//       if (!res.ok) {
+//         const data = await res.json().catch(() => null);
+//         throw new Error(data?.message || `Request failed: ${res.status}`);
+//       }
+
+//       navigate('/admin/products');
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   if (loadingProduct) {
+//     return (
+//       <main className="min-h-screen flex items-center justify-center bg-[#F9F9F9] px-4 text-center">
+//         <p className="text-sm text-[#5E5E5E]">Loading product...</p>
+//       </main>
+//     );
+//   }
+
+//   return (
+//     <main className="min-h-screen flex flex-col items-center py-10 px-4 sm:py-16 sm:px-6 lg:py-24 bg-[#F9F9F9]">
+//       <div className="w-full max-w-[800px] mx-auto">
+//         {/* Page Header */}
+//         <header className="mb-12 sm:mb-16 lg:mb-20 text-center">
+//           <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5E5E5E] mb-4">
+//             Product Registration
+//           </p>
+//           <h1
+//             className="text-[24px] leading-8 sm:text-[28px] sm:leading-9 lg:text-[32px] lg:leading-10 font-normal uppercase tracking-wide text-black mb-4"
+//             style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//           >
+//             Edit Product
+//           </h1>
+//           <p className="text-sm text-[#5E5E5E] max-w-[448px] mx-auto">
+//             Update this timepiece's specifications and pricing details.
+//           </p>
+//         </header>
+
+//         <form onSubmit={handleSubmit} className="flex flex-col gap-14 sm:gap-20 lg:gap-24">
+//           {/* Section 01 — General Information */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">01</span>
+//               <h2
+//                 className="text-lg sm:text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 General Information
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Name *</label>
+//                 <input
+//                   type="text"
+//                   name="modelName"
+//                   value={form.modelName}
+//                   onChange={handleChange}
+//                   placeholder="e.g. Meridian Chronograph"
+//                   required
+//                   className={underlineInputStrong}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU *</label>
+//                 <input
+//                   type="text"
+//                   name="sku"
+//                   value={form.sku}
+//                   onChange={handleChange}
+//                   placeholder="e.g. CHR-2024-0142"
+//                   required
+//                   className={underlineInput}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Brand *</label>
+//                 <input
+//                   type="text"
+//                   name="brand"
+//                   value={form.brand}
+//                   onChange={handleChange}
+//                   placeholder="e.g. Chronos"
+//                   required
+//                   className={underlineInput}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Model Number *</label>
+//                 <input
+//                   type="text"
+//                   name="modelNumber"
+//                   value={form.modelNumber}
+//                   onChange={handleChange}
+//                   placeholder="e.g. MC-450"
+//                   required
+//                   className={underlineInput}
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 02 — Classification */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">02</span>
+//               <h2
+//                 className="text-lg sm:text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Classification
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Category</label>
+//                 <select
+//                   name="category"
+//                   value={form.category}
+//                   onChange={handleChange}
+//                   className={boxInput}
+//                 >
+//                   {CATEGORIES.map((c) => (
+//                     <option key={c} value={c}>{c}</option>
+//                   ))}
+//                 </select>
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Product For</label>
+//                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 min-h-10">
+//                   {PRODUCT_FOR_OPTIONS.map((option) => (
+//                     <label key={option} className="flex items-center gap-2 cursor-pointer">
+//                       <input
+//                         type="radio"
+//                         name="productFor"
+//                         value={option}
+//                         checked={form.productFor === option}
+//                         onChange={handleChange}
+//                         className="accent-black w-3.5 h-3.5"
+//                       />
+//                       <span className="text-sm text-[#1A1C1C]">{option}</span>
+//                     </label>
+//                   ))}
+//                 </div>
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 03 — Inventory & Pricing */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">03</span>
+//               <h2
+//                 className="text-lg sm:text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Inventory &amp; Pricing
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
+//                 <input
+//                   type="number"
+//                   name="price"
+//                   value={form.price}
+//                   onChange={handleChange}
+//                   placeholder="0.00"
+//                   min="99"
+//                   step="0.01"
+//                   required
+//                   className={underlineInput}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity</label>
+//                 <input
+//                   type="number"
+//                   name="stock"
+//                   value={form.stock}
+//                   onChange={handleChange}
+//                   placeholder="1"
+//                   min="1"
+//                   step="1"
+//                   required
+//                   className={underlineInput}
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Section 04 — Content */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">04</span>
+//               <h2
+//                 className="text-lg sm:text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Content
+//               </h2>
+//             </div>
+
+//             <div>
+//               <label className="block text-[11px] text-[#5E5E5E] mb-2">Description</label>
+//               <textarea
+//                 name="description"
+//                 value={form.description}
+//                 onChange={handleChange}
+//                 rows={4}
+//                 required
+//                  maxLength={1000}
+//                 placeholder="Describe the heritage, craftsmanship, and character of this timepiece..."
+//                 className={textareaClass}
+//               />
+//             </div>
+//           </section>
+
+//           {/* Section 05 — Technical Specifications */}
+//           <section>
+//             <div className="flex items-baseline gap-3 pb-4 border-b border-[#CFC4C5] mb-8 sm:mb-10">
+//               <span className="text-[11px] font-semibold tracking-wide text-[#5E5E5E]">05</span>
+//               <h2
+//                 className="text-lg sm:text-xl text-black"
+//                 style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//               >
+//                 Technical Specifications
+//               </h2>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 lg:gap-x-8 gap-y-8 lg:gap-y-10">
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Case Material</label>
+//                 <input
+//                   type="text"
+//                   name="caseMaterial"
+//                   value={form.caseMaterial}
+//                   onChange={handleChange}
+//                   placeholder="18K Rose Gold"
+//                   className={underlineInput}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Glass Type</label>
+//                 <input
+//                   type="text"
+//                   name="glassType"
+//                   value={form.glassType}
+//                   onChange={handleChange}
+//                   placeholder="Anti-Reflective Sapphire"
+//                   className={underlineInput}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-[11px] text-[#5E5E5E] mb-2">Strap / Bracelet</label>
+//                 <input
+//                   type="text"
+//                   name="strapBracelet"
+//                   value={form.strapBracelet}
+//                   onChange={handleChange}
+//                   placeholder="Hand-stitched Alligator"
+//                   className={underlineInput}
+//                 />
+//               </div>
+//             </div>
+//           </section>
+
+//           {/* Media Assets — read only, images are not editable on this page */}
+//           <section>
+//             <h2
+//               className="text-lg sm:text-xl text-black mb-6"
+//               style={{ fontFamily: "'Libre Caslon Text', serif" }}
+//             >
+//               Media Assets
+//             </h2>
+//             <p className="text-[11px] text-[#5E5E5E] mb-4">
+//               Images can't be changed from this page.
+//             </p>
+
+//             <ImagePreview label="Main image" src={existingMainImage} />
+
+//             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+//               {[0, 1, 2].map((i) => (
+//                 <ImagePreview key={i} label={`Pose ${i + 1}`} src={existingImages[i]} />
+//               ))}
+//             </div>
+//           </section>
+
+//           {error && (
+//             <p className="text-sm text-[#A32D2D] text-center -mt-10 sm:-mt-16 lg:-mt-20">{error}</p>
+//           )}
+
+//           {/* Buttons */}
+//           <footer className="pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32 flex flex-col sm:flex-row gap-4 justify-center items-center">
+//             <button
+//               type="submit"
+//               disabled={submitting}
+//               className="w-full sm:w-[256px] bg-black text-white py-3 text-sm font-medium uppercase tracking-wide transition-opacity duration-300 hover:opacity-90 active:scale-95 disabled:opacity-50"
+//             >
+//               {submitting ? 'Saving...' : 'Save Changes'}
+//             </button>
+//             <button
+//               type="button"
+//               onClick={() => navigate('/admin/products')}
+//               className="w-full sm:w-[256px] border border-black text-black py-3 text-sm font-medium uppercase tracking-wide transition-colors duration-300 hover:bg-black hover:text-white active:scale-95"
+//             >
+//               Cancel
+//             </button>
+//           </footer>
+//         </form>
+//       </div>
+//     </main>
+//   );
+// }
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -12,6 +454,8 @@ const underlineInput =
   "w-full border-0 border-b border-[#CFC4C5] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
 const underlineInputStrong =
   "w-full border-0 border-b border-[#1A1C1C] bg-transparent py-2 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
+const underlineInputDisabled =
+  "w-full border-0 border-b border-[#CFC4C5] bg-[#F3F3F1] py-2 text-sm text-[#5E5E5E] placeholder-[#9C9C9C] cursor-not-allowed focus:outline-none";
 const boxInput =
   "w-full border border-[#CFC4C5] bg-white py-2 px-3 text-sm text-[#1A1C1C] placeholder-[#9C9C9C] focus:outline-none focus:border-black";
 const textareaClass =
@@ -50,6 +494,7 @@ export default function EditProduct() {
   const token = useSelector((state) => state.auth.token);
 
   const [form, setForm] = useState(initialFormState);
+  const [fieldErrors, setFieldErrors] = useState({ price: '', stock: '' });
 
   // Existing images — display only, not editable on this page
   const [existingMainImage, setExistingMainImage] = useState(null);
@@ -102,24 +547,89 @@ export default function EditProduct() {
     if (id) fetchProduct();
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Field-level validator for Price and Stock (mirrors AddProduct)
+  const validateField = (name, value) => {
+    let errorMsg = '';
+
+    if (name === 'price') {
+      const num = parseFloat(value);
+      if (!value) {
+        errorMsg = 'Price is required.';
+      } else if (isNaN(num)) {
+        errorMsg = 'Price must be a valid number.';
+      } else if (num < 99) {
+        errorMsg = 'Price must be at least ₹99.00.';
+      }
+    }
+
+    if (name === 'stock') {
+      const num = Number(value);
+      if (value === '' || value === null || value === undefined) {
+        errorMsg = 'Stock quantity is required.';
+      } else if (!Number.isInteger(num)) {
+        errorMsg = 'Stock must be a whole integer.';
+      } else if (num < 1) {
+        errorMsg = 'Stock must be at least 1.';
+      } else if (num > 100000) {
+        errorMsg = 'Stock cannot exceed 100,000.';
+      }
+    }
+
+    setFieldErrors((prev) => ({ ...prev, [name]: errorMsg }));
+    return errorMsg;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // SKU is immutable once a product exists — ignore any attempt to change it
+    if (name === 'sku') return;
+
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'price' || name === 'stock') {
+      validateField(name, value);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setSubmitting(true);
 
+    // Validate Price and Stock before submission
+    const priceErr = validateField('price', form.price);
+    const stockErr = validateField('stock', form.stock);
+
+    if (priceErr || stockErr) {
+      setError('Please correct the validation errors in the form.');
+      return;
+    }
+
+    const requiredTextFields = [
+      ['modelName', 'Model name'],
+      ['brand', 'Brand'],
+      ['modelNumber', 'Model number'],
+      ['description', 'Description'],
+    ];
+    for (const [field, label] of requiredTextFields) {
+      if (!form[field] || !form[field].trim()) {
+        setError(`${label} cannot be empty or just whitespace.`);
+        return;
+      }
+    }
+
+    setSubmitting(true);
     try {
+      // SKU is never sent for update — it's immutable, keep the payload explicit about that
+      const { sku, ...updatableFields } = form;
+
       const res = await fetch(`${BASE_URL}/apiproduct/updateproduct/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(updatableFields),
       });
 
       if (!res.ok) {
@@ -189,15 +699,18 @@ export default function EditProduct() {
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">SKU *</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">
+                  SKU <span className="normal-case text-[#9C9C9C]">(cannot be changed)</span>
+                </label>
                 <input
                   type="text"
                   name="sku"
                   value={form.sku}
-                  onChange={handleChange}
-                  placeholder="e.g. CHR-2024-0142"
-                  required
-                  className={underlineInput}
+                  readOnly
+                  disabled
+                  aria-readonly="true"
+                  title="SKU is permanent and cannot be edited after a product is created."
+                  className={underlineInputDisabled}
                 />
               </div>
               <div>
@@ -287,8 +800,9 @@ export default function EditProduct() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10">
+              {/* PRICE FIELD WITH VALIDATION */}
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Price</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Price *</label>
                 <input
                   type="number"
                   name="price"
@@ -298,11 +812,20 @@ export default function EditProduct() {
                   min="99"
                   step="0.01"
                   required
-                  className={underlineInput}
+                  className={`${underlineInput} ${
+                    fieldErrors.price ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
+                {fieldErrors.price && (
+                  <p className="text-[11px] text-[#A32D2D] mt-1.5 font-medium">
+                    {fieldErrors.price}
+                  </p>
+                )}
               </div>
+
+              {/* STOCK QUANTITY FIELD WITH VALIDATION */}
               <div>
-                <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity</label>
+                <label className="block text-[11px] text-[#5E5E5E] mb-2">Stock Quantity *</label>
                 <input
                   type="number"
                   name="stock"
@@ -310,10 +833,18 @@ export default function EditProduct() {
                   onChange={handleChange}
                   placeholder="1"
                   min="1"
+                  max="100000"
                   step="1"
                   required
-                  className={underlineInput}
+                  className={`${underlineInput} ${
+                    fieldErrors.stock ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
+                {fieldErrors.stock && (
+                  <p className="text-[11px] text-[#A32D2D] mt-1.5 font-medium">
+                    {fieldErrors.stock}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -338,7 +869,7 @@ export default function EditProduct() {
                 onChange={handleChange}
                 rows={4}
                 required
-                 maxLength={1000}
+                maxLength={1000}
                 placeholder="Describe the heritage, craftsmanship, and character of this timepiece..."
                 className={textareaClass}
               />
