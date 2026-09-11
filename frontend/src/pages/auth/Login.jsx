@@ -9,7 +9,7 @@ import { useApi } from '../../hooks/useApi';
 import loginWatchImage from '../../assets/classic-watch.jpg';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_REGEX =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
 
 const validationSchema = Yup.object({
   email: Yup.string()

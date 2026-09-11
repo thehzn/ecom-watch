@@ -230,7 +230,7 @@ export default function EditProfile() {
       setEmailError('Please enter your new email address.');
       return;
     }
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailRegex =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
 
     if (!emailRegex.test(cleanEmail)) {
       setEmailError('Please enter a valid email address.');

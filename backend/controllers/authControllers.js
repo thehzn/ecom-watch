@@ -12,7 +12,7 @@ export const register = async (req, res) => {
       return res.status(400).json({ status: false, message: "Must Fill all Fields" });
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
     const cleanEmail = email.toLowerCase().trim();
 
     if (!emailRegex.test(cleanEmail)) {
