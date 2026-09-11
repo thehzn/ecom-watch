@@ -133,7 +133,7 @@ export const resetAdminPassword = async (req, res) => {
       return res.status(400).json({status: false,message: "Passwords do not match" });
     }
 
-    const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+    const passwordRegex =  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
       return res.status(400).json({status: false,message:  "Password must be at least 8 characters and contain uppercase, lowercase, number and special character."});
@@ -160,55 +160,28 @@ export const resetAdminPassword = async (req, res) => {
   } catch (error) {
     return res.status(500).json({status: false, message: error.message });
   }
-};
+}
 
 
 
 export const sendAdminEmailChangeOTP = async (req, res) => {
   try {
-    const { newEmail } = req.body;
-
-    if (!newEmail) {
-      return res.status(400).json({
-        status: false,
-        message: "New email is required",
-      });
-    }
-
     if (
       !process.env.BREVO_API_KEY ||
       !process.env.BREVO_SENDER_EMAIL
     ) {
-      console.error("Brevo API configuration is missing");
-
       return res.status(500).json({
         status: false,
         message: "Email configuration is missing on server",
       });
     }
 
-    const cleanEmail = newEmail.toLowerCase().trim();
+    const admin = await Admin.findById(req.user.id);
 
-    // Check whether this email is already used
-    const existingAdmin = await Admin.findOne({
-      email: cleanEmail,
-    });
-
-    if (existingAdmin) {
-      return res.status(400).json({
+    if (!admin) {
+      return res.status(404).json({
         status: false,
-        message: "This email is already registered",
-      });
-    }
-
-    const existingUser = await User.findOne({
-      email: cleanEmail,
-    });
-
-    if (existingUser) {
-      return res.status(400).json({
-        status: false,
-        message: "This email is already registered",
+        message: "Admin not found",
       });
     }
 
@@ -218,7 +191,6 @@ export const sendAdminEmailChangeOTP = async (req, res) => {
       Date.now() + 5 * 60 * 1000
     );
 
-    // Send OTP to the NEW email using Brevo
     const response = await fetch(
       "https://api.brevo.com/v3/smtp/email",
       {
@@ -235,17 +207,14 @@ export const sendAdminEmailChangeOTP = async (req, res) => {
           },
           to: [
             {
-              email: cleanEmail,
+              email: admin.email,
             },
           ],
           subject: "Chronos - Email Change Verification",
           htmlContent: `
-            <h2>Your Email Change OTP</h2>
-
+            <h2>Admin Email Change Verification</h2>
             <h1>${adminOTP}</h1>
-
             <p>This OTP is valid for 5 minutes.</p>
-
             <p>
               If you did not request an email change,
               please ignore this email.
@@ -268,45 +237,33 @@ export const sendAdminEmailChangeOTP = async (req, res) => {
       });
     }
 
-    console.log("Admin email change OTP sent successfully");
-    console.log("Brevo message ID:", data.messageId);
+    admin.otp = adminOTP;
+    admin.otpExpiresAt = otpExpiresAt;
 
-    // Store OTP temporarily on the logged-in admin
-    const admin = await Admin.findById(req.user.id);
+    await admin.save();
 
-    if (!admin) {
-      return res.status(404).json({
-        status: false,
-        message: "Admin not found",
-      });
-    }
-
-    await Admin.collection.updateOne(
-      { _id: admin._id },
-      {
-        $set: {
-          otp: adminOTP,
-          otpExpiresAt,
-          pendingEmail: cleanEmail,
-        },
-      }
+    console.log(
+      "Admin email change OTP sent to:",
+      admin.email
     );
 
     return res.status(200).json({
       status: true,
-      message: "OTP sent successfully to the new email",
+      message: "OTP sent successfully to your current email",
     });
 
   } catch (error) {
-    console.error("sendAdminEmailChangeOTP Error:", error);
+    console.error(
+      "sendAdminEmailChangeOTP Error:",
+      error
+    );
 
     return res.status(500).json({
       status: false,
       message: "Something went wrong. Please try again.",
     });
   }
-};
-
+}
 
 
 export const verifyAdminEmailChangeOTP = async (req, res) => {
@@ -329,13 +286,6 @@ export const verifyAdminEmailChangeOTP = async (req, res) => {
       });
     }
 
-    if (!admin.pendingEmail) {
-      return res.status(400).json({
-        status: false,
-        message: "No email change request found",
-      });
-    }
-
     if (!admin.otp) {
       return res.status(400).json({
         status: false,
@@ -343,7 +293,10 @@ export const verifyAdminEmailChangeOTP = async (req, res) => {
       });
     }
 
-    if (admin.otpExpiresAt < Date.now()) {
+    if (
+      !admin.otpExpiresAt ||
+      admin.otpExpiresAt < Date.now()
+    ) {
       return res.status(400).json({
         status: false,
         message: "OTP is expired",
@@ -357,13 +310,80 @@ export const verifyAdminEmailChangeOTP = async (req, res) => {
       });
     }
 
-    // Change email only after successful OTP verification
-    admin.email = admin.pendingEmail;
-
-    // Clear temporary OTP data
+    // OTP verified successfully.
+    // Do NOT change the email here.
     admin.otp = null;
     admin.otpExpiresAt = null;
-    admin.pendingEmail = null;
+
+    await admin.save();
+
+    return res.status(200).json({status: true,message: "OTP verified successfully"});
+
+  } catch (error) {
+    return res.status(500).json({status: false,message: "Something went wrong. Please try again.",});
+  }
+}
+
+
+
+export const changeAdminEmail = async (req, res) => {
+  try {
+    const { newEmail } = req.body;
+
+    if (!newEmail) {
+      return res.status(400).json({
+        status: false,
+        message: "New email is required",
+      });
+    }
+
+    const cleanNewEmail = newEmail.toLowerCase().trim();
+
+    // Basic email validation
+    const emailRegex =
+       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(cleanNewEmail)) {
+      return res.status(400).json({
+        status: false,
+        message: "Please enter a valid email address",
+      });
+    }
+
+    const admin = await Admin.findById(req.user.id);
+
+    if (!admin) {
+      return res.status(404).json({
+        status: false,
+        message: "Admin not found",
+      });
+    }
+
+    if (cleanNewEmail === admin.email.toLowerCase()) {
+      return res.status(400).json({status: false,message:"New email must be different from your current email"});
+    }
+
+    // Check another admin
+    const existingAdmin = await Admin.findOne({email: cleanNewEmail,_id: { $ne: admin._id } });
+
+    if (existingAdmin) {
+      return res.status(400).json({
+        status: false,
+        message: "This email is already registered",
+      });
+    }
+
+    // Check normal users
+    const existingUser = await User.findOne({email: cleanNewEmail});
+
+    if (existingUser) {
+      return res.status(400).json({
+        status: false,
+        message: "This email is already registered",
+      });
+    }
+
+    admin.email = cleanNewEmail;
 
     await admin.save();
 
@@ -374,11 +394,6 @@ export const verifyAdminEmailChangeOTP = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("verifyAdminEmailChangeOTP Error:", error);
-
-    return res.status(500).json({
-      status: false,
-      message: error.message,
-    });
+    return res.status(500).json({status: false, message: "Something went wrong. Please try again.",});
   }
-};
+}

@@ -1,6 +1,6 @@
 import express from "express";
 import { cancelMyOrder, cancelOrder, createOrder, getAllOrders, getMyOrders, getSingleOrder, getsingleOrderDetails,
-  getTrendingProducts, markAsShipped, markPaymentFailed, retryPayment, verifyPayment } from "../controllers/orderCotrollers.js";
+  getTrendingProducts, markAsDelivered, markAsShipped, markPaymentFailed, retryPayment, verifyPayment } from "../controllers/orderCotrollers.js";
 import { verifyUser } from "../middleware/authVerify.js";
 import { verifyAdmin } from "../middleware/AdminVerify.js";
 
@@ -24,6 +24,8 @@ router.get("/getallorders", verifyAdmin, getAllOrders);
 router.get("/getsingleorder/:id", verifyAdmin, getsingleOrderDetails);
 router.patch("/markasshipped/:id", verifyAdmin, markAsShipped);
 router.delete("/cancelorder/:id", verifyAdmin, cancelOrder);
+router.patch("/markasdelivered/:id", verifyAdmin, markAsDelivered)
+
 
 router.get("/trending", getTrendingProducts);
 

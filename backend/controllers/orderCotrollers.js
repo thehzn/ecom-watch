@@ -212,6 +212,7 @@ export const verifyPayment = async (req, res) => {
 
     // 5. Update payment details
     order.paymentStatus = "Paid";
+    order.paidAt = new Date();
     order.razorpayPaymentId = razorpay_payment_id;
     order.razorpaySignature = razorpay_signature;
 
@@ -451,6 +452,132 @@ export const markAsShipped = async (req, res) => {
 }
 
 
+export const markAsDelivered = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ status: false, message: "Order not found" });
+    }
+
+    // Only shipped orders can be delivered
+    if (order.orderStatus !== "Shipped") {
+      return res.status(400).json({
+        status: false,
+        message: "Only shipped orders can be marked as delivered",
+      });
+    }
+
+    order.orderStatus = "Delivered";
+    order.deliveredAt = new Date();
+
+    await order.save();
+
+    const expectedDeliveryDate = new Date(order.paidAt);
+
+    expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + 10);
+   
+     // Send delivery email
+    if (order.customerEmail) {
+      try {
+        if (
+          process.env.BREVO_API_KEY &&
+          process.env.BREVO_SENDER_EMAIL
+        ) {
+          const response = await fetch(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+              method: "POST",
+              headers: {
+                accept: "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                sender: {
+                  name: "Chronos Haute Horlogerie",
+                  email: process.env.BREVO_SENDER_EMAIL,
+                },
+                to: [
+                  {
+                    email: order.customerEmail,
+                  },
+                ],
+                subject:
+                  "Chronos Haute Horlogerie - Your Order Has Been Delivered",
+                htmlContent: `
+                  <h2>Your Order Has Been Delivered</h2>
+
+                  <p>Dear Customer,</p>
+
+                  <p>
+                    Your order from
+                    <strong>Chronos Haute Horlogerie</strong>
+                    has been successfully delivered.
+                  </p>
+
+                  <p>
+                    <strong>Order ID:</strong> ${order._id}
+                  </p>
+
+                  <p>
+                    <strong>Delivered On:</strong>
+                    ${expectedDeliveryDate.toLocaleDateString("en-IN")}
+                  </p>
+
+                  <p>
+                    We hope you enjoy your purchase.
+                  </p>
+
+                  <p>
+                    Thank you for choosing Chronos Haute Horlogerie.
+                  </p>
+
+                  <p>
+                    Best regards,<br />
+                    Chronos Customer Service
+                  </p>
+                `,
+              }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error(
+              "========== BREVO DELIVERY EMAIL ERROR =========="
+            );
+            console.error(data);
+            console.error(
+              "================================================"
+            );
+          } else {
+            console.log(
+              "Customer delivery email sent successfully"
+            );
+            console.log("Brevo message ID:", data.messageId);
+          }
+        }
+      } catch (emailError) {
+        console.error(
+          "Delivery email error:",
+          emailError.message
+        );
+      }
+    }
+
+    return res.status(200).json({status: true,message: "Order marked as delivered successfully",order});
+  } catch (error) {
+    console.error("MARK AS DELIVERED ERROR:", error);
+
+    return res.status(500).json({status: false,message: error.message});
+  }
+}
+
+
 export const cancelOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -490,10 +617,7 @@ export const cancelOrder = async (req, res) => {
       order: updatedOrder,
     });
   } catch (error) {    
-    return res.status(500).json({
-      status: false,
-      message: error.message,
-    });
+    return res.status(500).json({status: false,message: error.message});
   }
 }
 
@@ -686,9 +810,6 @@ export const cancelMyOrder = async (req, res) => {
   } catch (error) {
     console.error("CANCEL ORDER ERROR:", error);
 
-    return res.status(500).json({
-      status: false,
-      message: error.message,
-    });
+    return res.status(500).json({status: false,message: error.message});
   }
 }
