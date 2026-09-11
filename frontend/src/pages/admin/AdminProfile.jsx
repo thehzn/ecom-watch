@@ -211,7 +211,7 @@ export default function AdminProfile() {
     }
 
     const emailRegex =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
 
     if (!emailRegex.test(cleanNewEmail)) {
       setEmailChangeError(

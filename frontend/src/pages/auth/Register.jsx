@@ -9,8 +9,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 const NAME_REGEX = /^[A-Za-z]+$/;
 const MOBILE_REGEX = /^[0-9]{10}$/;
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
 const PASSWORD_ERROR =
   'Must be 8+ characters with uppercase, lowercase, number & symbol.';
 

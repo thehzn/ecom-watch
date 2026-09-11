@@ -428,7 +428,7 @@ export const changeUserEmail = async (req, res) => {
 
     const cleanNewEmail = newEmail.trim().toLowerCase();
 
-    const emailRegex =/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
 
     if (!emailRegex.test(cleanNewEmail)) {
       return res.status(400).json({
