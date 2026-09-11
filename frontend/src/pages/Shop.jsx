@@ -52,13 +52,13 @@ function ProductCard({ product }) {
   return (
     <Link
       to={`/product/${product._id}`}
-      className="group relative block bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(255,255,255,0.06)]"
+      className="group relative block bg-[#0E1017] border border-white/10 hover:border-[#C5A880]/50 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.08)]"
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#141720] p-8 flex items-center justify-center">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#131722] p-8 flex items-center justify-center">
         <img
           src={product.mainImage}
           alt={product.modelName}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
 
         <button
@@ -67,13 +67,13 @@ function ProductCard({ product }) {
           aria-label={
             wishlisted ? 'Added to wishlist' : 'Add to wishlist'
           }
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-black transition-all disabled:opacity-60"
+          className="absolute right-3.5 top-3.5 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white hover:bg-[#C5A880] hover:text-black transition-all disabled:opacity-60"
         >
           <Heart
-            size={16}
+            size={14}
             className={
               wishlisted
-                ? 'fill-white text-white'
+                ? 'fill-[#C5A880] text-[#C5A880]'
                 : 'text-white'
             }
           />
@@ -82,7 +82,7 @@ function ProductCard({ product }) {
 
       <div className="p-5 flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C5A880]">
             {product.category || 'Haute Horlogerie'}
           </span>
 
@@ -91,7 +91,7 @@ function ProductCard({ product }) {
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-white group-hover:text-gray-200 transition-colors line-clamp-1">
+        <h3 className="font-caslon text-lg font-normal text-white group-hover:text-[#E4CA99] transition-colors line-clamp-1">
           {product.modelName}
         </h3>
 
@@ -102,11 +102,11 @@ function ProductCard({ product }) {
         )}
 
         <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
-          <p className="text-base font-bold text-white">
+          <p className="text-base font-semibold text-white">
             ₹{Number(product.price).toLocaleString()}
           </p>
 
-          <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+          <span className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
             In Stock
           </span>
         </div>
@@ -324,14 +324,14 @@ export default function Shop() {
     <div className="min-h-screen w-full bg-[#08090C] text-white font-['Plus_Jakarta_Sans']">
 
       {/* HERO */}
-      <section className="w-full bg-[#0B0D12] border-b border-white/10 px-5 py-14 sm:py-20 text-center relative overflow-hidden">
+      <section className="w-full bg-[#0B0D12] border-b border-white/10 px-6 py-14 sm:py-20 text-center relative overflow-hidden">
         <div className="relative mx-auto flex max-w-3xl flex-col items-center">
 
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-3">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#C5A880] mb-3">
             Limited Release
           </span>
 
-          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+          <h1 className="font-caslon text-3xl sm:text-5xl font-normal text-white tracking-tight">
             {search
               ? 'Search Results'
               : 'Fine Timepiece Collection'}
@@ -352,13 +352,13 @@ export default function Shop() {
 
           <div className="flex items-center gap-2">
             <Search
-              size={16}
-              className="text-gray-400"
+              size={15}
+              className="text-[#C5A880]"
             />
 
             <p className="text-sm text-gray-300">
               Search results for{' '}
-              <span className="font-bold text-white">
+              <span className="font-semibold text-white">
                 "{search}"
               </span>
             </p>
@@ -366,7 +366,7 @@ export default function Shop() {
 
           <button
             onClick={clearSearch}
-            className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
           >
             <X size={14} />
             Clear search
@@ -376,18 +376,17 @@ export default function Shop() {
       )}
 
       {/* FILTER BAR */}
-      <section className="mx-auto flex max-w-[1600px] flex-col gap-4 border-b border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between bg-[#08090C]/90 backdrop-blur-md sticky top-[68px] z-30">
+      <section className="mx-auto flex max-w-[1600px] flex-col gap-4 border-b border-white/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between bg-[#08090C]/90 backdrop-blur-md sticky top-[60px] z-30">
 
         <div className="flex flex-wrap items-center gap-6 sm:gap-8">
 
           {/* MATERIAL */}
-          <div className="flex flex-col">
-
+          <div className="flex items-center gap-2.5">
             <label
               htmlFor="material"
-              className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1"
+              className="text-[10px] font-semibold uppercase tracking-widest text-[#C5A880]"
             >
-              Material
+              Material:
             </label>
 
             <select
@@ -396,29 +395,27 @@ export default function Shop() {
               onChange={(e) =>
                 handleMaterialChange(e.target.value)
               }
-              className="bg-[#141720] border border-white/15 text-white text-xs font-semibold rounded-lg px-3 py-2 outline-none focus:border-white transition-colors cursor-pointer"
+              className="bg-[#141722] border border-white/15 text-white text-xs font-medium rounded-lg px-3 py-1.5 outline-none focus:border-[#C5A880] transition-colors cursor-pointer"
             >
               {MATERIAL_OPTIONS.map((m) => (
                 <option
                   key={m}
                   value={m}
-                  className="bg-[#141720] text-white"
+                  className="bg-[#141722] text-white"
                 >
                   {m}
                 </option>
               ))}
             </select>
-
           </div>
 
           {/* FOR */}
-          <div className="flex flex-col">
-
+          <div className="flex items-center gap-2.5">
             <label
               htmlFor="for"
-              className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1"
+              className="text-[10px] font-semibold uppercase tracking-widest text-[#C5A880]"
             >
-              For
+              Edition:
             </label>
 
             <select
@@ -427,13 +424,13 @@ export default function Shop() {
               onChange={(e) =>
                 handleProductForChange(e.target.value)
               }
-              className="bg-[#141720] border border-white/15 text-white text-xs font-semibold rounded-lg px-3 py-2 outline-none focus:border-white transition-colors cursor-pointer"
+              className="bg-[#141722] border border-white/15 text-white text-xs font-medium rounded-lg px-3 py-1.5 outline-none focus:border-[#C5A880] transition-colors cursor-pointer"
             >
               {FOR_OPTIONS.map((f) => (
                 <option
                   key={f}
                   value={f}
-                  className="bg-[#141720] text-white"
+                  className="bg-[#141722] text-white"
                 >
                   {f === 'All'
                     ? 'All Editions'
@@ -441,14 +438,13 @@ export default function Shop() {
                 </option>
               ))}
             </select>
-
           </div>
 
         </div>
 
         {/* PRODUCT COUNT */}
-        <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
-          Showing {pagedProducts.length} of {totalProducts} timepieces
+        <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
+          Showing <span className="text-white font-semibold">{pagedProducts.length}</span> of <span className="text-white font-semibold">{totalProducts}</span> timepieces
         </p>
 
       </section>
@@ -459,13 +455,10 @@ export default function Shop() {
         {/* LOADING */}
         {loading && (
           <div className="py-24 text-center">
-
-            <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-
+            <div className="w-10 h-10 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-sm text-gray-400">
-              Loading timepieces…
+              Curating timepieces…
             </p>
-
           </div>
         )}
 
@@ -481,8 +474,7 @@ export default function Shop() {
           !fetchError &&
           filteredProducts.length === 0 && (
             <div className="py-24 text-center flex flex-col items-center">
-
-              <p className="text-base text-gray-400">
+              <p className="text-base text-gray-300">
                 {search
                   ? `No timepieces match "${search}" with the selected filters.`
                   : 'No timepieces match these filters.'}
@@ -490,11 +482,10 @@ export default function Shop() {
 
               <button
                 onClick={resetFilters}
-                className="mt-4 text-white underline text-xs uppercase tracking-wider font-bold"
+                className="mt-6 bg-white hover:bg-[#F3F3F4] text-black px-6 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all shadow-sm"
               >
                 Reset Filters
               </button>
-
             </div>
           )}
 
@@ -503,14 +494,12 @@ export default function Shop() {
           !fetchError &&
           pagedProducts.length > 0 && (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-8">
-
               {pagedProducts.map((p) => (
                 <ProductCard
                   key={p._id}
                   product={p}
                 />
               ))}
-
             </div>
           )}
 
@@ -520,19 +509,17 @@ export default function Shop() {
       {!loading &&
         !fetchError &&
         totalPages > 1 && (
-          <section className="flex flex-col items-center gap-6 border-t border-white/10 px-5 py-16">
-
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          <section className="flex flex-col items-center gap-4 border-t border-white/10 px-5 py-14">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
               Page {page} of {totalPages}
             </p>
 
             <div className="flex items-center gap-3">
-
               {/* PREVIOUS */}
               <button
                 onClick={handlePrev}
                 disabled={page === 1}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white hover:border-white transition-colors disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 text-white hover:border-[#C5A880] hover:text-[#C5A880] transition-colors disabled:opacity-30"
                 aria-label="Previous page"
               >
                 <ChevronLeft size={16} />
@@ -542,14 +529,12 @@ export default function Shop() {
               <button
                 onClick={handleNext}
                 disabled={page === totalPages}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white hover:border-white transition-colors disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 text-white hover:border-[#C5A880] hover:text-[#C5A880] transition-colors disabled:opacity-30"
                 aria-label="Next page"
               >
                 <ChevronRight size={16} />
               </button>
-
             </div>
-
           </section>
         )}
 

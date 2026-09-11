@@ -427,7 +427,7 @@ export default function ProductDetails() {
           <div className="lg:col-span-7 flex flex-col gap-4">
             
             {/* Main Stage Image */}
-            <div className="relative aspect-[4/5] sm:aspect-square w-full rounded-3xl overflow-hidden bg-[#0E1015] border border-white/10 flex items-center justify-center p-8">
+            <div className="relative aspect-[4/5] sm:aspect-square w-full rounded-2xl overflow-hidden bg-[#0E1017] border border-white/10 flex items-center justify-center p-8 shadow-2xl">
               <img
                 src={selectedImage || product.mainImage}
                 alt={product.modelName}
@@ -437,21 +437,21 @@ export default function ProductDetails() {
                 onClick={handleWishlist}
                 disabled={wishlistSaving}
                 aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute top-6 right-6 w-11 h-11 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all disabled:opacity-60"
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-[#C5A880] hover:text-black transition-all disabled:opacity-60"
               >
-                <Heart size={18} className={isWishlisted ? 'fill-white text-white' : ''} />
+                <Heart size={16} className={isWishlisted ? 'fill-[#C5A880] text-[#C5A880]' : ''} />
               </button>
             </div>
 
             {/* Thumbnails */}
             {allImages.length > 1 && (
-              <div className="flex gap-4 overflow-x-auto pb-2">
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {allImages.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(img)}
-                    className={`w-24 h-24 rounded-2xl overflow-hidden bg-[#0E1015] border p-2 shrink-0 transition-all ${
-                      selectedImage === img ? 'border-white shadow-lg' : 'border-white/10 opacity-70 hover:opacity-100'
+                    className={`w-20 h-20 rounded-lg overflow-hidden bg-[#0E1017] border p-2 shrink-0 transition-all ${
+                      selectedImage === img ? 'border-[#C5A880] shadow-md' : 'border-white/10 opacity-70 hover:opacity-100 hover:border-white/30'
                     }`}
                   >
                     <img src={img} alt="thumbnail" className="w-full h-full object-contain" />
@@ -464,21 +464,21 @@ export default function ProductDetails() {
           {/* Details & Acquisition Column */}
           <div className="lg:col-span-5 flex flex-col">
             
-            <div className="inline-flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-[0.25em] mb-2">
+            <div className="inline-flex items-center gap-2 text-[#C5A880] text-xs font-semibold uppercase tracking-[0.25em] mb-2">
               <Sparkles size={14} />
               {product.brand || 'Chronos Haute Horlogerie'}
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight tracking-tight">
+            <h1 className="font-caslon text-3xl sm:text-5xl font-normal text-white leading-tight tracking-tight">
               {product.modelName}
             </h1>
 
             <div className="mt-4 flex items-baseline gap-4">
-              <span className="text-3xl font-bold text-white">
+              <span className="font-caslon text-3xl font-normal text-white">
                 ₹{Number(product.price).toLocaleString()}
               </span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
-                In Stock & Verified
+              <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">
+                In Stock &amp; Verified
               </span>
             </div>
 
@@ -491,7 +491,7 @@ export default function ProductDetails() {
               <button
                 onClick={handleAddToCart}
                 disabled={adding}
-                className="w-full bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full shadow-lg transition-all disabled:opacity-60"
+                className="w-full bg-white hover:bg-[#F3F3F4] text-black text-xs font-semibold uppercase tracking-[0.2em] py-4 rounded-lg shadow-md transition-all disabled:opacity-60 active:scale-[0.98]"
               >
                 {adding ? "Securing Timepiece..." : "Acquire Timepiece"}
               </button>
@@ -499,14 +499,14 @@ export default function ProductDetails() {
               <button
                 onClick={handleWishlist}
                 disabled={wishlistSaving}
-                className="w-full border border-white/20 hover:border-white text-white text-xs font-bold uppercase tracking-[0.2em] py-4 rounded-full transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full border border-white/20 hover:border-[#C5A880] text-white hover:text-[#E4CA99] text-xs font-semibold uppercase tracking-[0.2em] py-4 rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                <Heart size={14} className={isWishlisted ? 'fill-white text-white' : ''} />
+                <Heart size={14} className={isWishlisted ? 'fill-[#C5A880] text-[#C5A880]' : ''} />
                 {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
               </button>
 
               {addedMessage && (
-                <div className="p-3 bg-white/10 border border-white/20 rounded-xl text-center text-xs text-white">
+                <div className="p-3 bg-white/10 border border-[#C5A880]/30 rounded-lg text-center text-xs text-[#E4CA99]">
                   {addedMessage}
                 </div>
               )}
@@ -514,18 +514,18 @@ export default function ProductDetails() {
 
             {/* Specifications Table */}
             <div className="mt-10 pt-8 border-t border-white/10">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white mb-4">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A880] mb-4">
                 Horology Specifications
               </h3>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3.5">
                 {SPEC_FIELDS.map(({ key, label }) => {
                   const val = product[key];
                   if (!val) return null;
                   return (
-                    <div key={key} className="bg-[#0E1015] border border-white/5 p-3.5 rounded-xl">
-                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">{label}</p>
-                      <p className="text-xs font-bold text-white mt-0.5">{val}</p>
+                    <div key={key} className="bg-[#0E1017] border border-white/10 p-3.5 rounded-lg">
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">{label}</p>
+                      <p className="text-xs font-semibold text-white mt-0.5">{val}</p>
                     </div>
                   );
                 })}
@@ -533,17 +533,17 @@ export default function ProductDetails() {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-8 p-4 rounded-2xl bg-[#0E1015] border border-white/5 flex items-center justify-between text-center">
+            <div className="mt-8 p-4 rounded-xl bg-[#0E1017] border border-white/10 flex items-center justify-between text-center">
               <div className="flex flex-col items-center gap-1">
-                <ShieldCheck size={18} className="text-white" />
+                <ShieldCheck size={18} className="text-[#C5A880]" />
                 <span className="text-[10px] text-gray-300">5-Yr Warranty</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <Award size={18} className="text-white" />
+                <Award size={18} className="text-[#C5A880]" />
                 <span className="text-[10px] text-gray-300">Certified Swiss</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <Sparkles size={18} className="text-white" />
+                <Sparkles size={18} className="text-[#C5A880]" />
                 <span className="text-[10px] text-gray-300">Free Courier</span>
               </div>
             </div>
@@ -557,7 +557,7 @@ export default function ProductDetails() {
       {related.length > 0 && (
         <section className="w-full border-t border-white/10 bg-[#0B0D12] py-16 px-6">
           <div className="max-w-[1600px] mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8">
+            <h2 className="font-caslon text-2xl sm:text-3xl font-normal text-white mb-8">
               Complementary Timepieces
             </h2>
 
@@ -566,13 +566,13 @@ export default function ProductDetails() {
                 <Link
                   key={rel._id}
                   to={`/product/${rel._id}`}
-                  className="group bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-2xl p-5 block transition-all"
+                  className="group bg-[#0E1017] border border-white/10 hover:border-[#C5A880]/50 rounded-xl p-5 block transition-all"
                 >
-                  <div className="aspect-square w-full overflow-hidden bg-[#141720] rounded-xl p-4 mb-4">
+                  <div className="aspect-square w-full overflow-hidden bg-[#131722] rounded-lg p-4 mb-4">
                     <img src={rel.mainImage} alt={rel.modelName} className="h-full w-full object-contain group-hover:scale-105 transition-transform" />
                   </div>
-                  <h4 className="text-base font-bold text-white group-hover:text-gray-200 transition-colors">{rel.modelName}</h4>
-                  <p className="text-sm font-bold text-white mt-1">₹{Number(rel.price).toLocaleString()}</p>
+                  <h4 className="font-caslon text-base font-normal text-white group-hover:text-[#E4CA99] transition-colors">{rel.modelName}</h4>
+                  <p className="text-sm font-semibold text-white mt-1">₹{Number(rel.price).toLocaleString()}</p>
                 </Link>
               ))}
             </div>

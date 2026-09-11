@@ -9,15 +9,15 @@ export default function OrderConfirmed() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9F9F9] px-5">
+      <div className="min-h-screen flex items-center justify-center bg-[#08090C] text-white px-5">
         <div className="text-center">
-          <h1 className="font-['Libre_Caslon_Text'] text-3xl text-black">
+          <h1 className="font-caslon text-3xl text-white">
             Order details not found
           </h1>
 
           <button
             onClick={() => navigate("/shop")}
-            className="mt-6 bg-black text-white px-8 py-4 text-xs font-semibold uppercase tracking-wide"
+            className="mt-6 bg-[#C5A880] hover:bg-[#d8bd95] text-black px-8 py-3.5 rounded-lg text-xs font-bold uppercase tracking-[0.2em] transition-all"
           >
             Continue Shopping
           </button>
@@ -27,37 +27,37 @@ export default function OrderConfirmed() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] px-5 py-16">
+    <div className="min-h-screen bg-[#08090C] text-white px-5 py-16">
       <div className="max-w-[1200px] mx-auto text-center">
 
         <div className="text-4xl mb-2">✓</div>
 
-        <h1 className="font-['Libre_Caslon_Text'] text-[40px] font-normal text-black tracking-[2px]">
+        <h1 className="font-caslon text-3xl sm:text-5xl text-white tracking-wide">
           THANK YOU
         </h1>
 
-        <p className="mt-4 font-['Inter'] text-lg text-[#5D5E63]">
+        <p className="mt-4 text-base text-white/60 mt-3">
           Your order has been placed successfully
         </p>
 
         <div className="max-w-[700px] mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <div className="bg-[#F3F3F4] border border-[#E2E2E2] p-8">
-            <p className="font-['Inter'] text-[10px] font-medium uppercase text-[#5D5E63]">
+          <div className="bg-[#0E1015] border border-white/10 rounded-xl p-6">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C5A880]">
               Order Number
             </p>
 
-            <p className="mt-2 font-['Libre_Caslon_Text'] text-2xl text-black">
+            <p className="mt-2 font-caslon text-xl sm:text-2xl text-white break-all">
               {order._id}
             </p>
           </div>
 
-          <div className="bg-[#F3F3F4] border border-[#E2E2E2] p-8">
-            <p className="font-['Inter'] text-[10px] font-medium uppercase text-[#5D5E63]">
+          <div className="bg-[#0E1015] border border-white/10 rounded-xl p-6">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C5A880]">
               Payment Status
             </p>
 
-            <p className="mt-2 font-['Libre_Caslon_Text'] text-2xl text-black">
+            <p className="mt-2 font-caslon text-xl sm:text-2xl text-white break-all">
               {order.paymentStatus}
             </p>
           </div>
@@ -66,18 +66,18 @@ export default function OrderConfirmed() {
 
         <div className="max-w-[700px] mx-auto mt-10 text-left">
 
-          <h2 className="font-['Inter'] text-xs font-semibold uppercase tracking-[1px]">
+          <h2 className="font-caslon text-xl text-white">
             Order Summary
           </h2>
 
-          <div className="mt-6 space-y-4 font-['Inter'] text-base">
+          <div className="mt-6 space-y-3 text-sm bg-[#0E1015] border border-white/10 rounded-xl p-6 sm:p-8">
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Subtotal</span>
               <span>₹{order.subtotal}</span>
             </div>
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Shipping</span>
               <span>
                 {order.shipping === 0
@@ -86,7 +86,7 @@ export default function OrderConfirmed() {
               </span>
             </div>
 
-            <div className="flex justify-between border-t border-[#E2E2E2] pt-4 font-bold text-black">
+            <div className="flex justify-between border-t border-white/10 pt-4 font-caslon text-lg text-white font-normal">
               <span>Total</span>
               <span>₹{order.total}</span>
             </div>
@@ -99,14 +99,14 @@ export default function OrderConfirmed() {
 
           <button
             onClick={() => navigate("/my-orders")}
-            className="bg-black text-white rounded px-8 py-4 font-['Inter'] text-xs font-semibold uppercase tracking-[1px]"
+            className="bg-black text-white rounded px-8 py-4 font-caslon text-xl text-white"
           >
             View Order Details
           </button>
 
           <button
             onClick={() => navigate("/shop")}
-            className="bg-white text-black border border-black rounded px-8 py-4 font-['Inter'] text-xs font-semibold uppercase tracking-[1px]"
+            className="bg-black text-black border border-black rounded px-8 py-4 font-caslon text-xl text-white"
           >
             Continue Shopping
           </button>

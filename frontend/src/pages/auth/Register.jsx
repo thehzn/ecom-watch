@@ -240,17 +240,10 @@ export default function Register() {
         <div className="hidden lg:flex absolute top-8 left-10 lg:left-16 items-center gap-4 z-20">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors group"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black transition-colors group"
           >
             <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
             <span>Return to Catalog</span>
-          </Link>
-          <span className="text-black/20">•</span>
-          <Link
-            to="/shop"
-            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black transition-colors"
-          >
-            Browse Timepieces
           </Link>
         </div>
 
@@ -268,10 +261,6 @@ export default function Register() {
 
           {/* HEADER */}
           <div className="mb-8">
-
-            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-3">
-              Registration
-            </p>
 
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
               Create Account

@@ -9,12 +9,12 @@ export default function AdminLayout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-sidebar-bg">
+    <div className="min-h-screen bg-[#F8F9FA]">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="lg:ml-[260px] min-h-screen bg-sidebar-bg">
+      <div className="lg:ml-[260px] min-h-screen flex flex-col bg-[#F8F9FA]">
         <AdminNavbar onMenuClick={() => setSidebarOpen(true)} />
-        <div className="">
+        <div className="flex-1">
           <Outlet />
         </div>
       </div>
