@@ -51,7 +51,6 @@ app.use("/dashboard", dashboardRoutes)
 app.use("/enquiry",enquiryRoutes)
 
 
-
 app.listen(PORT, async()=>{
    await createAdmin()
     console.log(`Server is running on PORT ${PORT}`);   
