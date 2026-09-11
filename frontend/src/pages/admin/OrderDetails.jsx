@@ -67,19 +67,26 @@ export default function OrderDetails() {
 
   // Fetch all orders
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const data = await get('/apiorders/getallorders');
-        setOrders(data?.orders || []);
-      } catch (err) {
-        console.error('Failed to fetch orders:', err);
-        setOrders([]);
-      }
-    };
+  console.log("ORDER DETAILS PAGE LOADED");
 
-    fetchOrders();
-  }, []);
+  const fetchOrders = async () => {
+    console.log("FETCH ORDERS FUNCTION RUNNING");
 
+    try {
+      const data = await get('/apiorders/getallorders');
+
+      console.log("GET ALL ORDERS RESPONSE:", data);
+      console.log("ORDERS FROM API:", data?.orders);
+
+      setOrders(data?.orders || []);
+    } catch (err) {
+      console.error("FAILED TO FETCH ORDERS:", err);
+      setOrders([]);
+    }
+  };
+
+  fetchOrders();
+}, []);
   // Filter and search orders
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -391,7 +398,8 @@ export default function OrderDetails() {
                         </p>
 
                         <p className="text-[10px] uppercase text-[#5E5E5E] mt-1 break-all">
-                          {o.user?.email || ''}
+                         {o.customerEmail || o.user?.email || ''}
+
                         </p>
                       </td>
 
