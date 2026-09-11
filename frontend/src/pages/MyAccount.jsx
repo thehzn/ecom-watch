@@ -52,7 +52,7 @@ const QUICK_ACCESS_CARDS = [
     title: "Enquiry", 
     subtitle: "Submit personal inquiries & bespoke service requests",
     icon: MessageSquare, 
-    route: "/enquiry" 
+    route: "/contact" 
   },
 ];
 

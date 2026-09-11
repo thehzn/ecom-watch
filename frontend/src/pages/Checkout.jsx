@@ -454,17 +454,17 @@ export default function Checkout() {
   // ============================================================
 
   const inputClass =
-    "w-full border-b border-[#C4C7C7] py-4 bg-transparent font-['Inter'] text-[15px] text-black placeholder:text-[#5D5E63] focus:outline-none focus:border-black transition-colors";
+    "w-full bg-[#0E1015] border border-white/15 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] rounded-lg px-4 py-3.5 text-sm text-white placeholder:text-white/30 transition-all outline-none";
 
-  const lockedInputClass = "cursor-not-allowed opacity-70";
+  const lockedInputClass = "cursor-not-allowed opacity-50 bg-[#12141A]";
 
   // ============================================================
   // UI
   // ============================================================
 
   return (
-    <div className="w-full bg-[#F9F9F9] font-['Inter']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-5 py-8 sm:py-16 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 sm:gap-8">
+    <div className="w-full min-h-screen bg-[#08090C] text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 sm:gap-12">
         {/* ====================================================
             LEFT COLUMN
         ==================================================== */}
@@ -473,14 +473,14 @@ export default function Checkout() {
           {/* ================= SHIPPING ADDRESS ================= */}
 
           <section>
-            <h2 className="font-['Libre_Caslon_Text'] text-xl sm:text-2xl md:text-[32px] font-normal text-black mb-5 sm:mb-8">
+            <h2 className="font-caslon text-2xl sm:text-3xl text-white mb-6">
               Shipping Address
             </h2>
 
             {/* ===== Saved address picker ===== */}
 
             {addressesLoading && (
-              <p className="text-sm text-[#5D5E63] mb-6">
+              <p className="text-sm text-white/50 mb-6">
                 Loading your saved addresses…
               </p>
             )}
@@ -490,39 +490,35 @@ export default function Checkout() {
                 {addresses.map((addr) => (
                   <label
                     key={addr._id}
-                    className={`flex items-start gap-3 bg-white border p-3.5 sm:p-4 cursor-pointer transition-colors ${
-                      selectedAddressId === addr._id
-                        ? "border-black"
-                        : "border-[#E2E2E2]"
-                    }`}
+                    className={`flex items-start gap-3 bg-[#0E1015] border rounded-xl p-4 cursor-pointer transition-all `}
                   >
                     <input
                       type="radio"
                       name="savedAddress"
                       checked={selectedAddressId === addr._id}
                       onChange={() => handleSelectAddress(addr._id)}
-                      className="accent-black mt-1 shrink-0"
+                      className="accent-[#C5A880] mt-1 shrink-0"
                     />
 
                     <span className="flex-1 min-w-0">
                       <span className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-black break-words">
+                        <span className="text-sm font-semibold text-white break-words">
                           {addr.firstName} {addr.lastName}
                         </span>
 
                         {addr.isDefault && (
-                          <span className="shrink-0 text-[10px] uppercase tracking-wide font-semibold bg-black text-white px-2 py-0.5">
+                          <span className="shrink-0 text-[10px] uppercase tracking-wide font-semibold bg-[#C5A880]/15 text-[#E4CA99] border border-[#C5A880]/30 rounded px-2 py-0.5">
                             Default
                           </span>
                         )}
                       </span>
 
-                      <span className="block text-sm text-[#5D5E63] mt-1 break-words">
+                      <span className="block text-sm text-white/60 mt-1 break-words">
                         {addr.address}, {addr.city}, {addr.state} —{" "}
                         {addr.pincode}
                       </span>
 
-                      <span className="block text-sm text-[#5D5E63]">
+                      <span className="block text-sm text-white/50">
                         {addr.phone}
                       </span>
                     </span>
@@ -530,11 +526,7 @@ export default function Checkout() {
                 ))}
 
                 <label
-                  className={`flex items-center gap-3 bg-white border p-3.5 sm:p-4 cursor-pointer transition-colors ${
-                    selectedAddressId === "new"
-                      ? "border-black"
-                      : "border-[#E2E2E2]"
-                  }`}
+                  className={`flex items-center gap-3 bg-[#0E1015] border rounded-xl p-4 cursor-pointer transition-all `}
                 >
                   <input
                     type="radio"
@@ -544,7 +536,7 @@ export default function Checkout() {
                     className="accent-black"
                   />
 
-                  <span className="text-sm font-semibold text-black">
+                  <span className="text-sm font-semibold text-white">
                     Use a different address
                   </span>
                 </label>
@@ -574,7 +566,7 @@ export default function Checkout() {
                   />
 
                   {formik.touched.firstName && formik.errors.firstName && (
-                    <p className="text-red-600 text-xs mt-1">
+                    <p className="text-rose-400 text-xs mt-1">
                       {formik.errors.firstName}
                     </p>
                   )}
@@ -596,7 +588,7 @@ export default function Checkout() {
                   />
 
                   {formik.touched.lastName && formik.errors.lastName && (
-                    <p className="text-red-600 text-xs mt-1">
+                    <p className="text-rose-400 text-xs mt-1">
                       {formik.errors.lastName}
                     </p>
                   )}
@@ -621,7 +613,7 @@ export default function Checkout() {
                 />
 
                 {formik.touched.address && formik.errors.address && (
-                  <p className="text-red-600 text-xs mt-1">
+                  <p className="text-rose-400 text-xs mt-1">
                     {formik.errors.address}
                   </p>
                 )}
@@ -646,7 +638,7 @@ export default function Checkout() {
                   />
 
                   {formik.touched.city && formik.errors.city && (
-                    <p className="text-red-600 text-xs mt-1">
+                    <p className="text-rose-400 text-xs mt-1">
                       {formik.errors.city}
                     </p>
                   )}
@@ -668,7 +660,7 @@ export default function Checkout() {
                   />
 
                   {formik.touched.state && formik.errors.state && (
-                    <p className="text-red-600 text-xs mt-1">
+                    <p className="text-rose-400 text-xs mt-1">
                       {formik.errors.state}
                     </p>
                   )}
@@ -693,7 +685,7 @@ export default function Checkout() {
                 />
 
                 {formik.touched.pincode && formik.errors.pincode && (
-                  <p className="text-red-600 text-xs mt-1">
+                  <p className="text-rose-400 text-xs mt-1">
                     {formik.errors.pincode}
                   </p>
                 )}
@@ -717,14 +709,14 @@ export default function Checkout() {
                 />
 
                 {formik.touched.phone && formik.errors.phone && (
-                  <p className="text-red-600 text-xs mt-1">
+                  <p className="text-rose-400 text-xs mt-1">
                     {formik.errors.phone}
                   </p>
                 )}
               </div>
 
               {isUsingSavedAddress && (
-                <p className="text-xs text-[#5D5E63]">
+                <p className="text-xs text-white/50">
                   This address is locked to your saved details. Choose "Use a
                   different address" above to enter a new one, or edit it
                   permanently from your account page.
@@ -736,7 +728,7 @@ export default function Checkout() {
           {/* ================= SHIPPING METHOD ================= */}
 
           <section className="mt-8">
-            <h2 className="font-['Libre_Caslon_Text'] text-xl sm:text-2xl font-normal text-black mb-4">
+            <h2 className="font-caslon text-xl sm:text-2xl text-white mb-4">
               Shipping Method
             </h2>
 
@@ -744,11 +736,7 @@ export default function Checkout() {
               {SHIPPING_METHODS.map((method) => (
                 <label
                   key={method.value}
-                  className={`flex flex-wrap items-center justify-between gap-2 bg-white border p-3.5 sm:p-4 cursor-pointer transition-colors ${
-                    formik.values.shippingMethod === method.value
-                      ? "border-black"
-                      : "border-[#E2E2E2]"
-                  }`}
+                  className={`flex flex-wrap items-center justify-between gap-2 bg-[#0E1015] border rounded-xl p-4 cursor-pointer transition-all `}
                 >
                   <span className="flex items-center gap-3 min-w-0">
                     <input
@@ -759,21 +747,21 @@ export default function Checkout() {
                         formik.values.shippingMethod === method.value
                       }
                       onChange={formik.handleChange}
-                      className="accent-black shrink-0"
+                      className="accent-[#C5A880] shrink-0"
                     />
 
                     <span className="min-w-0">
-                      <span className="block text-sm text-black">
+                      <span className="block text-sm text-white">
                         {method.label}
                       </span>
 
-                      <span className="block text-xs text-[#5D5E63]">
+                      <span className="block text-xs text-white/50">
                         {method.detail}
                       </span>
                     </span>
                   </span>
 
-                  <span className="shrink-0 text-sm text-black">
+                  <span className="shrink-0 text-sm text-white">
                     ₹{method.charge.toFixed(2)}
                   </span>
                 </label>
@@ -784,7 +772,7 @@ export default function Checkout() {
           {/* ================= PAYMENT ================= */}
 
           <section className="mt-8">
-            <h2 className="font-['Libre_Caslon_Text'] text-xl sm:text-2xl font-normal text-black mb-4">
+            <h2 className="font-caslon text-xl sm:text-2xl text-white mb-4">
               Payment
             </h2>
 
@@ -792,11 +780,7 @@ export default function Checkout() {
               {PAYMENT_METHODS.map((method) => (
                 <label
                   key={method.value}
-                  className={`flex items-center gap-3 bg-white border p-3.5 sm:p-4 cursor-pointer ${
-                    formik.values.paymentMethod === method.value
-                      ? "border-black"
-                      : "border-[#E2E2E2]"
-                  }`}
+                  className={`flex items-center gap-3 bg-[#0E1015] border rounded-xl p-4 cursor-pointer transition-all `}
                 >
                   <input
                     type="radio"
@@ -806,10 +790,10 @@ export default function Checkout() {
                       formik.values.paymentMethod === method.value
                     }
                     onChange={formik.handleChange}
-                    className="accent-black shrink-0"
+                    className="accent-[#C5A880] shrink-0"
                   />
 
-                  <span className="text-sm text-black">{method.label}</span>
+                  <span className="text-sm text-white">{method.label}</span>
                 </label>
               ))}
             </div>
@@ -825,16 +809,16 @@ export default function Checkout() {
                 checked={formik.values.privacyConsent}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className="accent-black mt-1 shrink-0"
+                className="accent-[#C5A880] mt-1 shrink-0"
               />
 
-              <span className="text-sm text-[#5D5E63] leading-6">
+              <span className="text-sm text-white/50 leading-6">
                 I agree to the{" "}
                 <a
                   href="/privacy-policy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-black underline hover:opacity-70"
+                  className="text-[#E4CA99] underline hover:text-[#C5A880]"
                 >
                   Privacy Policy
                 </a>
@@ -844,7 +828,7 @@ export default function Checkout() {
 
             {formik.touched.privacyConsent &&
               formik.errors.privacyConsent && (
-                <p className="text-red-600 text-xs mt-1 ml-6">
+                <p className="text-rose-400 text-xs mt-1 ml-6">
                   {formik.errors.privacyConsent}
                 </p>
               )}
@@ -853,7 +837,7 @@ export default function Checkout() {
           {/* ================= ERROR ================= */}
 
           {submitError && (
-            <p className="text-red-600 text-sm mt-6">{submitError}</p>
+            <p className="text-rose-400 text-sm mt-6">{submitError}</p>
           )}
 
           {/* ================= PLACE ORDER ================= */}
@@ -865,7 +849,7 @@ export default function Checkout() {
               cartLoading ||
               cartItems.length === 0
             }
-            className="mt-8 w-full sm:w-auto bg-black text-white font-['Inter'] text-xs font-semibold uppercase tracking-wide py-4 px-8 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+            className="mt-8 w-full sm:w-auto bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-[0.2em] py-4 px-8 rounded-lg shadow-lg shadow-[#C5A880]/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {formik.isSubmitting
               ? "Opening Payment..."
@@ -879,8 +863,8 @@ export default function Checkout() {
             RIGHT COLUMN
         ==================================================== */}
 
-        <aside className="h-fit lg:sticky lg:top-8">
-          <h2 className="font-['Libre_Caslon_Text'] text-xl sm:text-2xl font-normal text-black mb-5 sm:mb-6">
+        <aside className="h-fit lg:sticky lg:top-24 bg-[#0E1015] border border-white/10 rounded-xl p-6 sm:p-8 shadow-xl">
+          <h2 className="font-caslon text-2xl text-white mb-6">
             Order Summary
           </h2>
 
@@ -888,9 +872,9 @@ export default function Checkout() {
 
           <div className="flex flex-col gap-4 mb-6">
             {cartLoading ? (
-              <p className="text-sm text-[#5D5E63]">Loading cart...</p>
+              <p className="text-sm text-white/50">Loading cart...</p>
             ) : cartItems.length === 0 ? (
-              <p className="text-sm text-[#5D5E63]">
+              <p className="text-sm text-white/50">
                 Your cart is empty.
               </p>
             ) : (
@@ -902,20 +886,20 @@ export default function Checkout() {
                   <img
                     src={item.product?.mainImage}
                     alt={item.product?.modelName}
-                    className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 object-cover bg-white"
+                    className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 object-contain bg-[#141720] rounded-lg p-1.5 border border-white/10"
                   />
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-black truncate">
+                    <p className="text-sm text-white truncate">
                       {item.product?.modelName}
                     </p>
 
-                    <p className="text-xs text-[#5D5E63]">
+                    <p className="text-xs text-white/50">
                       Qty: {item.quantity}
                     </p>
                   </div>
 
-                  <p className="shrink-0 text-sm text-black">
+                  <p className="shrink-0 text-sm text-white">
                     ₹
                     {(
                       (item.product?.price || 0) *
@@ -929,10 +913,10 @@ export default function Checkout() {
 
           {/* ================= ORDER CALCULATION ================= */}
 
-          <div className="flex flex-col gap-3 font-['Inter'] text-base">
+          <div className="flex flex-col gap-3 text-sm space-y-3">
             {/* SUBTOTAL */}
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Subtotal</span>
 
               <span>₹{subtotal.toFixed(2)}</span>
@@ -940,10 +924,10 @@ export default function Checkout() {
 
             {/* SUBSCRIPTION DISCOUNT */}
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Subscription Discount</span>
 
-              <span className="text-green-600">
+              <span className="text-emerald-400">
                 {discount > 0
                   ? `-₹${discount.toFixed(2)}`
                   : "₹0.00"}
@@ -952,7 +936,7 @@ export default function Checkout() {
 
             {/* SHIPPING */}
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Shipping Charge</span>
 
               <span>₹{shippingCharge.toFixed(2)}</span>
@@ -960,7 +944,7 @@ export default function Checkout() {
 
             {/* TAX */}
 
-            <div className="flex justify-between text-[#5D5E63]">
+            <div className="flex justify-between text-white/60">
               <span>Tax</span>
 
               <span>₹{tax.toFixed(2)}</span>
@@ -968,7 +952,7 @@ export default function Checkout() {
 
             {/* TOTAL */}
 
-            <div className="flex justify-between font-bold text-black border-t border-[#E2E2E2] pt-4">
+            <div className="flex justify-between font-caslon text-lg text-white border-t border-white/10 pt-4 font-normal">
               <span>Total</span>
 
               <span>₹{total.toFixed(2)}</span>

@@ -36,15 +36,15 @@ export default function Footer() {
 
   return (
     <>
-      {/* Stealth Titanium VIP Membership Strip */}
+      {/* VIP Membership Strip */}
       <section className="w-full relative overflow-hidden bg-gradient-to-b from-[#08090C] to-[#0E1015] border-t border-white/10 py-16 sm:py-20">
         <div className="relative mx-auto w-full max-w-2xl px-5 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-white text-[10px] tracking-[0.25em] uppercase mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-[#C5A880] text-[10px] tracking-[0.25em] uppercase mb-4">
             <Sparkles size={12} />
             Privé Membership
           </div>
 
-          <h3 className="mb-4 text-2xl sm:text-4xl font-bold text-white leading-tight">
+          <h3 className="font-caslon mb-4 text-3xl sm:text-4xl text-white font-normal leading-tight">
             Join the Chronos Private Circle
           </h3>
 
@@ -57,13 +57,10 @@ export default function Footer() {
               type="button"
               onClick={handleSubscribe}
               disabled={status === 'loading'}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.18em] px-8 py-3.5 rounded-full transition-all disabled:opacity-50 shadow-lg"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white hover:bg-[#F3F3F4] text-black text-xs font-semibold uppercase tracking-[0.18em] px-8 py-3.5 rounded-lg transition-all duration-300 disabled:opacity-50 shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
-              {status === 'loading'
-                ? 'Joining Circle...'
-                : 'Request Private Access'}
-
-              {status !== 'loading' && <ArrowRight size={15} />}
+              <span>{status === 'loading' ? 'Joining Circle...' : 'Request Private Access'}</span>
+              {status !== 'loading' && <ArrowRight size={14} />}
             </button>
           </div>
 
@@ -90,15 +87,15 @@ export default function Footer() {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md bg-[#101318] border border-white/20 p-8 sm:p-10 text-center rounded-2xl shadow-2xl"
             >
-              <div className="w-12 h-12 rounded-full border border-white flex items-center justify-center mx-auto mb-4 text-white">
+              <div className="w-12 h-12 rounded-full border border-[#C5A880] flex items-center justify-center mx-auto mb-4 text-[#C5A880]">
                 <Sparkles size={20} />
               </div>
 
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#C5A880]">
                 Privilege Confirmed
               </span>
 
-              <h4 className="mt-3 text-2xl font-bold text-white">
+              <h4 className="font-caslon mt-3 text-2xl text-white font-normal">
                 Welcome to the Circle
               </h4>
 
@@ -108,7 +105,7 @@ export default function Footer() {
 
               <button
                 onClick={() => setStatus('idle')}
-                className="mt-6 w-full bg-white text-black py-3 text-xs font-bold uppercase tracking-[0.15em] rounded-lg hover:bg-gray-200 transition-colors"
+                className="mt-6 w-full bg-white text-black py-3 text-xs font-semibold uppercase tracking-[0.15em] rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Proceed
               </button>
@@ -125,11 +122,11 @@ export default function Footer() {
 
             {/* Brand Manifesto */}
             <div className="lg:col-span-2 flex flex-col gap-3">
-              <span className="text-2xl sm:text-3xl font-bold tracking-[0.2em] text-white">
-                CHRONOS
+              <span className="font-caslon text-2xl sm:text-3xl font-normal tracking-[0.25em] text-white uppercase">
+                Chronos
               </span>
 
-              <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-semibold">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A880] font-medium">
                 Geneva • Le Brassus • Zurich
               </p>
 
@@ -146,28 +143,28 @@ export default function Footer() {
 
               <Link
                 to="/categories?category=Luxury#luxury"
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Luxury
               </Link>
 
               <Link
                 to="/categories?category=Heritage#heritage"
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Heritage
               </Link>
 
               <Link
                 to="/categories?category=Sport#sport"
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Sport
               </Link>
 
               <Link
                 to="/categories?category=Contemporary#contemporary"
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Contemporary
               </Link>
@@ -182,7 +179,7 @@ export default function Footer() {
               <Link
                 to="/about"
                 state={{ scrollTo: 'certificate' }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Certificate of Authenticity
               </Link>
@@ -190,7 +187,7 @@ export default function Footer() {
               <Link
                 to="/faq"
                 state={{ scrollTo: 'restoration' }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Restoration & Care
               </Link>
@@ -205,7 +202,7 @@ export default function Footer() {
               <Link
                 to="/about"
                 state={{ scrollTo: 'manufacture' }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 The Manufacture
               </Link>
@@ -213,7 +210,7 @@ export default function Footer() {
               <Link
                 to="/privacy-policy"
                 state={{ scrollTo: 'privacy' }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Privacy Policy
               </Link>
@@ -221,7 +218,7 @@ export default function Footer() {
               <Link
                 to="/faq"
                 state={{ scrollTo: 'faq' }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-[#E4CA99] transition-colors"
               >
                 Client FAQ
               </Link>

@@ -140,30 +140,30 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090C] text-white selection:bg-white selection:text-black font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen bg-[#08090C] text-white selection:bg-[#C5A880] selection:text-black font-['Plus_Jakarta_Sans']">
       
       {/* 1. CINEMATIC TITANIUM TOURBILLON HERO SECTION */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0B0D12] via-[#08090C] to-[#0B0D12] px-6 sm:px-12 py-16 border-b border-white/10">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0B0D12] via-[#08090C] to-[#0B0D12] px-6 sm:px-12 py-16 sm:py-20 border-b border-white/10">
         
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[700px] sm:h-[1000px] bg-[radial-gradient(circle,_rgba(255,255,255,0.08)_0%,_rgba(8,9,12,0)_70%)] pointer-events-none animate-stealth-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[700px] sm:h-[1000px] bg-[radial-gradient(circle,_rgba(197,168,128,0.06)_0%,_rgba(8,9,12,0)_70%)] pointer-events-none animate-stealth-pulse" />
         
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="w-[35%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent blur-2xl animate-titanium-sweep" />
+          <div className="w-[35%] h-full bg-gradient-to-r from-transparent via-white/5 to-transparent blur-2xl animate-titanium-sweep" />
         </div>
 
         <div className="relative max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-10">
           
           <div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gray-200">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-[#C5A880]/30 backdrop-blur-md mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-ping" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#E4CA99]">
                 Calibre 9820 • Flying Tourbillon Chrono
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl xl:text-7xl font-bold leading-[1.05] tracking-tight text-white">
-              AEROSPACE TITANIUM <br />
-              <span className="platinum-gradient-text font-light">OPEN-WORKED TOURBILLON</span>
+            <h1 className="font-caslon text-4xl sm:text-6xl xl:text-7xl font-normal leading-[1.08] tracking-tight text-white uppercase">
+              Aerospace Titanium <br />
+              <span className="platinum-gradient-text italic font-normal">Open-Worked Tourbillon</span>
             </h1>
 
             <p className="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed max-w-lg font-normal">
@@ -173,7 +173,7 @@ export default function Home() {
             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
               <Link
                 to="/shop"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] px-9 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:scale-105 group"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white hover:bg-[#F3F3F4] text-black text-xs font-semibold uppercase tracking-[0.2em] px-8 py-4 rounded-lg transition-all duration-300 shadow-[0_4px_20px_rgba(255,255,255,0.15)] hover:scale-[1.02] active:scale-[0.98] group"
               >
                 <span>Explore Timepieces</span>
                 <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform text-black" />
@@ -181,7 +181,7 @@ export default function Home() {
 
               <Link
                 to="/about"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/25 hover:border-white text-white text-xs font-semibold uppercase tracking-[0.2em] px-8 py-4 rounded-full bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 hover:border-[#C5A880] text-white hover:text-[#E4CA99] text-xs font-medium uppercase tracking-[0.2em] px-8 py-4 rounded-lg bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300"
               >
                 <span>The Manufacture</span>
               </Link>
@@ -189,16 +189,16 @@ export default function Home() {
 
             <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-3 gap-6 text-left w-full max-w-lg">
               <div>
-                <p className="text-lg sm:text-xl font-bold text-white">72 H</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Twin Power Reserve</p>
+                <p className="font-caslon text-xl sm:text-2xl font-normal text-white">72 H</p>
+                <p className="text-[10px] text-[#C5A880] uppercase tracking-widest mt-0.5">Twin Power Reserve</p>
               </div>
               <div>
-                <p className="text-lg sm:text-xl font-bold text-white">300 M</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Triplock Hermetic</p>
+                <p className="font-caslon text-xl sm:text-2xl font-normal text-white">300 M</p>
+                <p className="text-[10px] text-[#C5A880] uppercase tracking-widest mt-0.5">Triplock Hermetic</p>
               </div>
               <div>
-                <p className="text-lg sm:text-xl font-bold text-white">GRADE 5</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Aerospace Titanium</p>
+                <p className="font-caslon text-xl sm:text-2xl font-normal text-white">Grade 5</p>
+                <p className="text-[10px] text-[#C5A880] uppercase tracking-widest mt-0.5">Aerospace Titanium</p>
               </div>
             </div>
           </div>
@@ -286,17 +286,17 @@ export default function Home() {
       <section className="w-full py-20 sm:py-28 px-6 sm:px-12 max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
           <div>
-            <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.25em] block mb-2">
+            <span className="text-[#C5A880] text-xs font-semibold uppercase tracking-[0.25em] block mb-2">
               Featured Selection
             </span>
-            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            <h2 className="font-caslon text-3xl sm:text-5xl font-normal tracking-tight text-white">
               Trending Timepieces
             </h2>
           </div>
 
           <Link
             to="/shop"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white hover:text-gray-300 transition-colors group"
+            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white hover:text-[#C5A880] transition-colors group"
           >
             <span>View All Configurations</span>
             <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -310,40 +310,40 @@ export default function Home() {
               <div
                 key={product._id}
                 onClick={() => navigate(`/product/${product._id}`)}
-                className="group relative bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col justify-between hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(255,255,255,0.06)]"
+                className="group relative bg-[#0E1017] border border-white/10 hover:border-[#C5A880]/50 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col justify-between hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.08)]"
               >
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#141720] p-8 flex items-center justify-center">
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#131722] p-8 flex items-center justify-center">
                   <img
                     src={product.mainImage}
                     alt={product.modelName}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
 
-                  <span className="absolute top-4 left-4 bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
+                  <span className="absolute top-3.5 left-3.5 bg-black/80 backdrop-blur-md border border-white/15 text-[#E4CA99] text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
                     {product.badge || 'New 2026'}
                   </span>
 
                   <button
                     onClick={(e) => handleWishlist(e, product)}
                     aria-label="Save to Wishlist"
-                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"
+                    className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/70 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-[#C5A880] hover:text-black transition-all"
                   >
-                    <Heart size={15} className={isWishlisted ? 'fill-white text-white' : ''} />
+                    <Heart size={14} className={isWishlisted ? 'fill-[#C5A880] text-[#C5A880]' : ''} />
                   </button>
 
                   <div className="absolute bottom-3 inset-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <span className="w-full block bg-white text-black text-[11px] font-bold uppercase tracking-wider py-2.5 rounded-lg text-center shadow-lg">
+                    <span className="w-full block bg-white text-black text-[11px] font-semibold uppercase tracking-wider py-2.5 rounded-lg text-center shadow-lg hover:bg-[#F3F3F4]">
                       Configure Model
                     </span>
                   </div>
                 </div>
 
                 <div className="p-5 flex flex-col gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C5A880]">
                     {product.category || 'Oyster Perpetual'}
                   </span>
 
-                  <h3 className="text-lg font-bold text-white group-hover:text-gray-200 transition-colors line-clamp-1">
+                  <h3 className="font-caslon text-lg font-normal text-white group-hover:text-[#E4CA99] transition-colors line-clamp-1">
                     {product.modelName}
                   </h3>
 
@@ -352,11 +352,11 @@ export default function Home() {
                   </p>
 
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
-                    <span className="text-base font-bold text-white">
+                    <span className="text-base font-semibold text-white">
                      ₹{Number(product.price).toLocaleString()}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-gray-300 font-bold group-hover:text-white transition-colors">
-                      Details <ArrowUpRight size={14} />
+                    <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-gray-300 font-medium group-hover:text-[#C5A880] transition-colors">
+                      Details <ArrowUpRight size={13} />
                     </span>
                   </div>
                 </div>
@@ -370,10 +370,10 @@ export default function Home() {
       <section className="w-full py-20 bg-[#060709] border-t border-white/10">
         <div className="max-w-[1600px] mx-auto px-6 sm:px-12">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#C5A880]">
               The Configurations
             </span>
-            <h2 className="mt-2 text-3xl sm:text-5xl font-bold text-white tracking-tight">
+            <h2 className="font-caslon mt-2 text-3xl sm:text-5xl font-normal text-white tracking-tight">
               Curated Collections
             </h2>
           </div>
@@ -383,7 +383,7 @@ export default function Home() {
               <Link
                 key={c.title}
                 to={c.to}
-                className="group relative block h-[460px] sm:h-[520px] rounded-2xl overflow-hidden border border-white/15 hover:border-white/50 transition-all duration-500 shadow-2xl"
+                className="group relative block h-[460px] sm:h-[520px] rounded-xl overflow-hidden border border-white/15 hover:border-[#C5A880]/60 transition-all duration-500 shadow-2xl"
               >
                 <img
                   src={c.image}
@@ -394,11 +394,11 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent transition-opacity" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 flex flex-col items-start text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#C5A880]">
                     {c.tag}
                   </span>
 
-                  <h3 className="mt-1 text-2xl sm:text-3xl text-white font-bold group-hover:text-gray-200 transition-colors">
+                  <h3 className="font-caslon mt-1 text-2xl sm:text-3xl text-white font-normal group-hover:text-[#E4CA99] transition-colors">
                     {c.title}
                   </h3>
 
@@ -406,8 +406,8 @@ export default function Home() {
                     {c.desc}
                   </p>
 
-                  <div className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white group-hover:text-gray-300 transition-colors">
-                    <span className="border-b border-white pb-0.5">
+                  <div className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white group-hover:text-[#C5A880] transition-colors">
+                    <span className="border-b border-[#C5A880] pb-0.5">
                       Discover Collection
                     </span>
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -421,16 +421,16 @@ export default function Home() {
 
       {/* 5. CRAFTSMANSHIP SPOTLIGHT */}
       <section className="w-full py-24 px-6 sm:px-12 max-w-[1600px] mx-auto">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0F1116] to-[#08090C] border border-white/15 p-8 sm:p-16 shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0F1116] to-[#08090C] border border-white/15 p-8 sm:p-16 shadow-2xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-[0.25em] text-gray-400">
+              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#C5A880]">
                 Inside the Manufacture
               </span>
 
-              <h2 className="mt-3 text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+              <h2 className="font-caslon mt-3 text-3xl sm:text-5xl font-normal text-white tracking-tight leading-tight">
                 Superlative Precision in <br />
-                <span className="platinum-gradient-text font-light">Every Single Calibre</span>
+                <span className="platinum-gradient-text italic font-normal">Every Single Calibre</span>
               </h2>
 
               <p className="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
@@ -439,25 +439,25 @@ export default function Home() {
 
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black">
+                  <div className="w-5 h-5 rounded-full bg-[#C5A880] flex items-center justify-center text-black">
                     <Check size={12} strokeWidth={3} />
                   </div>
                   <span className="text-xs text-white">Perpetual Self-Winding Rotor</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black">
+                  <div className="w-5 h-5 rounded-full bg-[#C5A880] flex items-center justify-center text-black">
                     <Check size={12} strokeWidth={3} />
                   </div>
                   <span className="text-xs text-white">Silicon Anti-Magnetic Hairspring</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black">
+                  <div className="w-5 h-5 rounded-full bg-[#C5A880] flex items-center justify-center text-black">
                     <Check size={12} strokeWidth={3} />
                   </div>
                   <span className="text-xs text-white">Paraflex Shock Absorbers</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black">
+                  <div className="w-5 h-5 rounded-full bg-[#C5A880] flex items-center justify-center text-black">
                     <Check size={12} strokeWidth={3} />
                   </div>
                   <span className="text-xs text-white">Ceramic Scratchproof Bezel</span>
@@ -467,7 +467,7 @@ export default function Home() {
               <div className="mt-10">
                 <Link
                   to="/about"
-                  className="inline-flex items-center gap-3 bg-white text-black hover:bg-gray-200 text-xs font-bold uppercase tracking-[0.18em] px-8 py-3.5 rounded-full transition-all shadow-lg"
+                  className="inline-flex items-center gap-3 bg-white text-black hover:bg-[#F3F3F4] text-xs font-semibold uppercase tracking-[0.18em] px-8 py-3.5 rounded-lg transition-all shadow-md active:scale-[0.98]"
                 >
                   <span>Our Horology Philosophy</span>
                   <ArrowRight size={15} />
@@ -476,7 +476,7 @@ export default function Home() {
             </div>
 
             <div className="lg:col-span-6 relative flex items-center justify-center">
-              <div className="relative w-full aspect-square max-w-lg rounded-2xl overflow-hidden border border-white/15 shadow-2xl">
+              <div className="relative w-full aspect-square max-w-lg rounded-xl overflow-hidden border border-white/15 shadow-2xl">
                 <img
                   src={categoryHeritageWatch}
                   alt="Manufacture Watch Movement"

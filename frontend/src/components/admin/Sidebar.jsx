@@ -1,6 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Package, Receipt, Users, Mail, LogOut } from 'lucide-react';
 
 const navItems = [
+
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+  { label: 'Product List', icon: Package, path: '/admin/products' },
+  { label: 'Order Details', icon: Receipt, path: '/admin/orders' },
+  { label: 'Customer Details', icon: Users, path: '/admin/users' },
+  { label: 'Enquiries', icon: Mail, path: '/admin/enquiries' },
   { label: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard' },
   { label: 'Product List', icon: 'inventory_2', path: '/admin/products' },
   { label: 'Order Details', icon: 'receipt', path: '/admin/orders' },
@@ -21,91 +28,72 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Mobile backdrop — starts right where the sidebar ends, so it dims the
-          content behind the drawer without ever sitting underneath the drawer itself */}
+      {/* Mobile backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-y-0 right-0 left-[260px] bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity"
           onClick={onClose}
         />
       )}
 
-    <aside
-    className={`
-    fixed top-0 left-0 h-screen w-[260px] bg-black
-    flex flex-col py-6 px-4 border-r border-sidebar-border
-    z-50 overflow-y-auto
-    transition-transform duration-300 ease-in-out
-    shadow-2xl lg:shadow-none
-    lg:translate-x-0
-    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-  `}
- >
+      <aside
+        className={`
+          fixed top-0 left-0 h-screen w-[260px] bg-[#0E1017]
+          flex flex-col py-6 px-4 border-r border-[#1E2230]
+          z-50 overflow-y-auto
+          transition-transform duration-300 ease-in-out
+          shadow-2xl lg:shadow-none
+          lg:translate-x-0
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
         {/* Brand heading */}
-        <div className="flex flex-col mb-12 px-2">
-          <h1
-          onClick = {()=>{
-            console.log("clicked");
-            navigate("/admin/dashboard")}}
-           className="font-caslon text-2xl font-normal leading-8 tracking-[-0.02em] uppercase text-brand-black text-left">
+        <div className="flex flex-col mb-10 px-3 cursor-pointer" onClick={() => navigate('/')}>
+          <h1 className="font-caslon text-2xl font-normal tracking-[0.2em] text-white uppercase text-left">
             Chronos
           </h1>
-          <span className="font-worksans text-[11px] font-semibold leading-4 tracking-[0.1em] uppercase text-subtitle-gray mt-1">
-            Admin
+          <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-[#C5A880] mt-1">
+            Admin Console
           </span>
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col flex-1 gap-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 py-2.5 pl-3 pr-3 relative rounded-r-lg
-                 border-l-2 transition-colors duration-300 ease-in-out
-                 hover:bg-nav-hover
-                 ${isActive
-                   ? 'border-brand-black bg-nav-hover'
-                   : 'border-transparent bg-transparent'}`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <span
-                    className={`material-symbols-outlined text-[20px] leading-none
-                      ${isActive ? 'text-brand-black' : 'text-nav-text'}`}
-                  >
-                    {item.icon}
-                  </span>
-                  <span
-                    className={`font-worksans text-sm leading-5
-                      ${isActive ? 'font-medium text-brand-black' : 'font-normal text-nav-text'}`}
-                  >
-                    {item.label}
-                  </span>
-                </>
-              )}
-            </NavLink>
-          ))}
+        <nav className="flex flex-col flex-1 gap-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 py-2.5 px-3.5 rounded-lg text-xs font-medium tracking-wide
+                   transition-all duration-200 ease-in-out
+                   ${isActive
+                     ? 'bg-[#181C28] text-white shadow-sm border border-white/10'
+                     : 'text-[#8E95A5] hover:bg-[#151822] hover:text-white'}`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon size={18} className={isActive ? 'text-[#C5A880]' : 'text-[#8E95A5]'} />
+                    <span>{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* Footer / Logout */}
-        <div className="mt-auto border-t border-sidebar-border pt-4 flex flex-col gap-1">
+        <div className="mt-auto border-t border-[#1E2230] pt-4 flex flex-col gap-1">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 py-2.5 pl-3 pr-3 rounded-r-lg
-                       border-l-2 border-transparent
-                       text-nav-text bg-transparent transition-colors duration-300 ease-in-out
-                       hover:bg-nav-hover w-full text-left"
+            className="flex items-center gap-3 py-2.5 px-3.5 rounded-lg
+                       text-xs font-medium text-[#8E95A5] hover:bg-[#151822] hover:text-white transition-colors duration-200 w-full text-left"
           >
-            <span className="material-symbols-outlined text-[20px] text-nav-text leading-none">
-              logout
-            </span>
-            <span className="font-worksans text-sm font-normal leading-5 text-nav-text">
-              Logout
-            </span>
+            <LogOut size={18} className="text-[#8E95A5]" />
+            <span>Logout</span>
           </button>
         </div>
       </aside>

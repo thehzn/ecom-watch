@@ -22,13 +22,19 @@
 
   --font-stealth: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 } */
- @theme {
+@theme {
   --color-obsidian-950: #050608;
-  --color-obsidian-900: #090A0E;
-  --color-graphite-850: #0F1116;
-  --color-graphite-800: #151820;
-  --color-graphite-700: #1F2430;
-  --color-graphite-600: #2B3242;
+  --color-obsidian-900: #08090C;
+  --color-obsidian-850: #0C0E14;
+  --color-graphite-850: #0F1117;
+  --color-graphite-800: #141722;
+  --color-graphite-700: #1B202D;
+  --color-graphite-600: #252B3B;
+
+  --color-champagne-300: #F3E6CE;
+  --color-champagne-400: #E4CA99;
+  --color-champagne-500: #C5A880;
+  --color-champagne-600: #A8895E;
 
   --color-platinum-white: #FFFFFF;
   --color-platinum-100: #F8F9FA;
@@ -37,34 +43,34 @@
   --color-platinum-muted: #8E95A5;
 
   --font-stealth: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Admin sidebar tokens — dark theme, matching graphite/obsidian palette */
-  --color-sidebar-bg: #0F1116;       /* solid dark bg, was previously undefined/transparent */
-  --color-sidebar-border: #1F2430;   /* graphite-700, subtle divider on dark bg */
-  --color-nav-text: #8E95A5;         /* platinum-muted, readable on dark */
-  --color-nav-hover: #151820;        /* graphite-800, slightly lighter hover state */
-  --color-brand-black: #FFFFFF;      /* active/emphasis text — needs to be light on dark bg */
-  --color-subtitle-gray: #8E95A5;
-
-  --font-caslon: "Libre Caslon Text", serif;
+  --font-caslon: "Libre Caslon Text", Georgia, serif;
   --font-worksans: "Work Sans", "Plus Jakarta Sans", sans-serif;
+  --font-inter: "Inter", "Plus Jakarta Sans", sans-serif;
+
+  /* Admin sidebar tokens */
+  --color-sidebar-bg: #0F1116;
+  --color-sidebar-border: #1F2430;
+  --color-nav-text: #8E95A5;
+  --color-nav-hover: #151820;
+  --color-brand-black: #FFFFFF;
+  --color-subtitle-gray: #8E95A5;
 }
 
 @keyframes titaniumSweep {
   0% { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
-  20% { opacity: 0.5; }
-  50% { transform: translateX(150%) skewX(-25deg); opacity: 0.75; }
+  20% { opacity: 0.4; }
+  50% { transform: translateX(150%) skewX(-25deg); opacity: 0.6; }
   100% { transform: translateX(250%) skewX(-25deg); opacity: 0; }
 }
 
 @keyframes stealthFloat {
   0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
-  50% { transform: translateY(-14px) rotate(0.6deg) scale(1.02); }
+  50% { transform: translateY(-10px) rotate(0.4deg) scale(1.01); }
 }
 
 @keyframes stealthPulse {
-  0%, 100% { opacity: 0.3; transform: scale(0.96); }
-  50% { opacity: 0.65; transform: scale(1.06); }
+  0%, 100% { opacity: 0.25; transform: scale(0.97); }
+  50% { opacity: 0.55; transform: scale(1.04); }
 }
 
 .animate-titanium-sweep { animation: titaniumSweep 7s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
@@ -72,9 +78,13 @@
 .animate-stealth-pulse { animation: stealthPulse 6s ease-in-out infinite; }
 
 .platinum-gradient-text {
-  background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E6E9EE 45%, #C5A880 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.gold-accent-gradient {
+  background: linear-gradient(135deg, #E4CA99 0%, #C5A880 100%);
 }
 
 body {
@@ -85,7 +95,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #08090C; }
-::-webkit-scrollbar-thumb { background: #1F2430; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+::-webkit-scrollbar-thumb { background: #1B202D; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #C5A880; }

@@ -85,7 +85,7 @@ console.log(response.products);
   if (loading) {
     return (
       <div className="min-h-[70vh] bg-[#08090C] flex flex-col items-center justify-center text-white">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400 mb-4" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#C5A880] mb-4" />
         <p className="text-sm font-medium tracking-wide text-gray-400">Loading your collection...</p>
       </div>
     );
@@ -98,7 +98,7 @@ console.log(response.products);
         <p className="text-red-400 text-sm mb-4">{fetchError}</p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full transition-all"
+          className="bg-[#C5A880]/15 hover:bg-[#C5A880]/25 text-[#E4CA99] border border-[#C5A880]/30 text-xs font-semibold uppercase tracking-wider px-6 py-2.5 rounded-lg transition-all"
         >
           Retry
         </button>
@@ -109,17 +109,17 @@ console.log(response.products);
   // Empty State
   if (items.length === 0) {
     return (
-      <div className="min-h-[70vh] bg-[#08090C] flex flex-col items-center justify-center text-center px-6 font-['Plus_Jakarta_Sans']">
-        <div className="w-16 h-16 rounded-full bg-[#12151B] border border-white/20 flex items-center justify-center text-white mb-6">
+      <div className="min-h-[70vh] bg-[#08090C] flex flex-col items-center justify-center text-center px-6 ">
+        <div className="w-16 h-16 rounded-full bg-[#12151B] border border-white/10 flex items-center justify-center text-[#C5A880] mb-6">
           <Heart size={28} />
         </div>
-        <h2 className="text-3xl font-bold text-white">Your Wishlist is Empty</h2>
-        <p className="mt-3 text-sm text-gray-400 max-w-sm font-normal">
+        <h2 className="font-caslon text-3xl sm:text-4xl text-white">Your Wishlist is Empty</h2>
+        <p className="mt-3 text-sm text-white/60 max-w-sm font-normal">
           Save your favorite master timepieces to curate your personal collection.
         </p>
         <Link
           to="/shop"
-          className="mt-8 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-[0.2em] px-8 py-3.5 rounded-full transition-all shadow-lg"
+          className="mt-8 bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-[0.2em] px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-[#C5A880]/10"
         >
           Explore Timepieces
         </Link>
@@ -129,13 +129,13 @@ console.log(response.products);
 
   // Wishlist Grid
   return (
-    <div className="min-h-screen bg-[#08090C] text-white py-12 px-5 sm:px-8 font-['Plus_Jakarta_Sans']">
-      <div className="max-w-[1600px] mx-auto">
+    <div className="min-h-screen bg-[#08090C] text-white py-12 px-5 sm:px-8 ">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-10">
-          <span className="text-xs font-bold uppercase tracking-[0.25em] text-gray-400">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C5A880]">
             Private Collection
           </span>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mt-1">
+          <h1 className="font-caslon text-3xl sm:text-4xl text-white mt-1">
             Curated Wishlist ({items.length})
           </h1>
         </div>
@@ -144,7 +144,7 @@ console.log(response.products);
           {items.map((product) => (
             <div
               key={product._id}
-              className="group bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300"
+              className="group bg-[#0E1015] border border-white/10 hover:border-white/40 rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#C5A880]/50"
             >
               <div className="relative aspect-[4/5] bg-[#141720] p-6 flex items-center justify-center">
                 <img
@@ -155,33 +155,33 @@ console.log(response.products);
                 <button
                   onClick={() => handleRemove(product._id)}
                   aria-label="Remove from wishlist"
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 backdrop-blur-md border border-white/20 flex items-center justify-center text-gray-400 hover:text-red-400 transition-colors"
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center text-gray-400 hover:text-rose-400 hover:border-rose-400/30 transition-colors"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
 
               <div className="p-5 flex flex-col gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#C5A880] font-semibold">
                   {product.category}
                 </span>
-                <h3 className="text-lg font-bold text-white line-clamp-1">
+                <h3 className="font-caslon text-lg text-white line-clamp-1">
                   {product.modelName}
                 </h3>
-                <p className="text-base font-bold text-white">
+                <p className="font-caslon text-base text-white/90">
                   ₹{Number(product.price).toLocaleString()}
                 </p>
 
                 <div className="mt-4 flex gap-2">
                   <button
                     onClick={() => handleAddToCart(product)}
-                    className="flex-1 bg-white hover:bg-gray-200 text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-all"
+                    className="flex-1 bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-all shadow-sm"
                   >
                     Add to Bag
                   </button>
                   <Link
                     to={`/product/${product._id}`}
-                    className="px-3 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg text-white flex items-center justify-center transition-colors"
+                    className="px-3 py-2.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-lg text-white/80 hover:text-white flex items-center justify-center transition-colors"
                   >
                     <ArrowRight size={16} />
                   </Link>
