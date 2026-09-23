@@ -2,6 +2,8 @@ import User from "../models/UserModel.js";
 import argon from "argon2";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import crypto from "crypto";
+import { parseUserAgent, getClientIp } from "../utils/deviceParser.js";
 dotenv.config();
 
 
@@ -177,9 +179,34 @@ export const login = async (req, res) => {
       });
     }
 
+
     currentUser.failedLoginAttempts = 0;
     currentUser.isLocked = false;
     currentUser.lockUntil = null;
+    const sessionId = crypto.randomUUID();
+    const userAgent = req.headers["user-agent"] || "";
+    const { device, browser, os, deviceType } = parseUserAgent(userAgent);
+    const ipAddress = getClientIp(req);
+
+    const newSession = {
+      sessionId,
+      device,
+      browser,
+      os,
+      deviceType,
+      ipAddress,
+      lastActive: new Date(),
+      createdAt: new Date(),
+    };
+
+    if (!Array.isArray(currentUser.sessions)) {
+      currentUser.sessions = [];
+    }
+
+    currentUser.sessions.unshift(newSession);
+    if (currentUser.sessions.length > 10) {
+      currentUser.sessions = currentUser.sessions.slice(0, 10);
+    }
 
     await currentUser.save();
 
@@ -187,10 +214,11 @@ export const login = async (req, res) => {
       {
         id: currentUser._id,
         role: currentUser.role,
+        sessionId,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1d",
+        expiresIn: "7d",
       }
     );
 

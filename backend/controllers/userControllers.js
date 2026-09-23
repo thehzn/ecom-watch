@@ -29,14 +29,46 @@ export const updateUser = async (req, res) => {
       });
     }
 
-    const allowedFields = ["firstName", "lastName", "password"];
+    const allowedFields = ["firstName", "lastName", "password", "dob", "gender", "countryCode", "mobileNumber"];
     const updates = {};
 
-    allowedFields.forEach((field) => {
-      if (req.body[field]) {
-        updates[field] = req.body[field];
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        if (field === "dob") {
+          if (req.body.dob) {
+            const parsedDate = new Date(req.body.dob);
+            if (isNaN(parsedDate.getTime())) {
+              return res.status(400).json({ status: false, message: "Invalid date of birth" });
+            }
+            const now = new Date();
+            if (parsedDate > now) {
+              return res.status(400).json({ status: false, message: "Date of birth cannot be in the future" });
+            }
+            const thirteenYearsAgo = new Date();
+            thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
+            if (parsedDate > thirteenYearsAgo) {
+              return res.status(400).json({ status: false, message: "You must be at least 13 years old" });
+            }
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 120);
+            if (parsedDate < minDate) {
+              return res.status(400).json({ status: false, message: "Please enter a valid date of birth" });
+            }
+            updates.dob = parsedDate;
+          } else {
+            updates.dob = null;
+          }
+        } else if (field === "gender") {
+          const validGenders = ["Male", "Female", "Other", "Prefer not to say", ""];
+          if (!validGenders.includes(req.body.gender)) {
+            return res.status(400).json({ status: false, message: "Invalid gender selection" });
+          }
+          updates.gender = req.body.gender;
+        } else {
+          updates[field] = req.body[field];
+        }
       }
-    });
+    }
 
     // Password requires OTP verification
     if (updates.password) {
@@ -667,4 +699,129 @@ export const verifyPasswordChangeOTP = async (req, res) => {
       message: "Something went wrong. Please try again.",
     });
   }
-}
+};
+
+// ==========================================
+// USER SESSIONS / ACTIVE DEVICES
+// ==========================================
+export const getUserSessions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const currentSessionId = req.user.sessionId;
+
+    const user = await User.findById(userId).select("sessions");
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    const sessions = (user.sessions || []).map((s) => ({
+      sessionId: s.sessionId,
+      device: s.device,
+      browser: s.browser,
+      os: s.os,
+      deviceType: s.deviceType || "Desktop",
+      ipAddress: s.ipAddress,
+      lastActive: s.lastActive,
+      createdAt: s.createdAt,
+      isCurrent: s.sessionId === currentSessionId,
+    }));
+
+    // Sort so current session is first, then most recently active
+    sessions.sort((a, b) => {
+      if (a.isCurrent) return -1;
+      if (b.isCurrent) return 1;
+      return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: "Sessions fetched successfully",
+      sessions,
+    });
+  } catch (error) {
+    console.error("getUserSessions Error:", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const deleteUserSession = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { sessionId } = req.params;
+    const currentSessionId = req.user.sessionId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    user.sessions = (user.sessions || []).filter(
+      (s) => s.sessionId !== sessionId
+    );
+
+    await user.save();
+
+    const isCurrentDeleted = sessionId === currentSessionId;
+
+    const remainingSessions = user.sessions.map((s) => ({
+      sessionId: s.sessionId,
+      device: s.device,
+      browser: s.browser,
+      os: s.os,
+      deviceType: s.deviceType || "Desktop",
+      ipAddress: s.ipAddress,
+      lastActive: s.lastActive,
+      createdAt: s.createdAt,
+      isCurrent: s.sessionId === currentSessionId,
+    }));
+
+    return res.status(200).json({
+      status: true,
+      message: "Session terminated successfully",
+      isCurrentDeleted,
+      sessions: remainingSessions,
+    });
+  } catch (error) {
+    console.error("deleteUserSession Error:", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const logoutOtherSessions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const currentSessionId = req.user.sessionId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    user.sessions = (user.sessions || []).filter(
+      (s) => s.sessionId === currentSessionId
+    );
+
+    await user.save();
+
+    const remainingSessions = user.sessions.map((s) => ({
+      sessionId: s.sessionId,
+      device: s.device,
+      browser: s.browser,
+      os: s.os,
+      deviceType: s.deviceType || "Desktop",
+      ipAddress: s.ipAddress,
+      lastActive: s.lastActive,
+      createdAt: s.createdAt,
+      isCurrent: true,
+    }));
+
+    return res.status(200).json({
+      status: true,
+      message: "All other sessions signed out successfully",
+      sessions: remainingSessions,
+    });
+  } catch (error) {
+    console.error("logoutOtherSessions Error:", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};

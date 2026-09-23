@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { setAddresses, removeAddressLocal } from "../redux/addressSlice";
-import { logout } from "../redux/authSlice";
+import { logout, updateUser } from "../redux/authSlice";
 
 const QUICK_ACCESS_CARDS = [
   { 
@@ -42,8 +42,8 @@ const QUICK_ACCESS_CARDS = [
   },
   { 
     key: "security", 
-    title: "Security & Keys", 
-    subtitle: "Manage 256-bit encrypted credentials and passcodes",
+    title: "Security & Devices", 
+    subtitle: "Manage 256-bit encrypted keys, passcodes & logged-in devices",
     icon: Shield, 
     route: "/security" 
   },
@@ -295,7 +295,19 @@ export default function MyAccount() {
 
   useEffect(() => {
     fetchAddresses();
+    fetchUserProfile();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const res = await get("/apiuser/user/profile");
+      if (res?.userDetails) {
+        dispatch(updateUser(res.userDetails));
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchAddresses = async () => {
     setAddressesLoading(true);
@@ -395,6 +407,12 @@ export default function MyAccount() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 mt-1.5">
                   <span>{user.email || "client@chronos.com"}</span>
                   {user.mobileNumber && <span>• {user.countryCode || "+91"} {user.mobileNumber}</span>}
+                  {user.gender && <span>• Gender: {user.gender}</span>}
+                  {user.dob && (
+                    <span>
+                      • DOB: {new Date(user.dob).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  )}
                 </div>
               </div>
 
