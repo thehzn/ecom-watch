@@ -2,92 +2,29 @@ import { useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, ArrowRight, ChevronDown, ArrowLeft, Compass } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ChevronDown,
+  ArrowLeft,
+  Compass
+} from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import watchImage from '../../assets/luxury_titanium_watch.jpg';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-const NAME_REGEX = /^[A-Za-z]+$/;
-const MOBILE_REGEX = /^[0-9]{10}$/;
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co|io|me)$/i;
-const PASSWORD_ERROR =
-  'Must be 8+ characters with uppercase, lowercase, number & symbol.';
-
-const COUNTRY_CODES = [
-  { code: '+91', flag: '🇮🇳' },
-  { code: '+1', flag: '🇺🇸' },
-  { code: '+44', flag: '🇬🇧' },
-  { code: '+61', flag: '🇦🇺' },
-  { code: '+971', flag: '🇦🇪' },
-  { code: '+966', flag: '🇸🇦' },
-  { code: '+974', flag: '🇶🇦' },
-  { code: '+65', flag: '🇸🇬' },
-  { code: '+60', flag: '🇲🇾' },
-  { code: '+49', flag: '🇩🇪' },
-  { code: '+33', flag: '🇫🇷' },
-  { code: '+41', flag: '🇨🇭' },
-];
-
-const validationSchema = Yup.object({
-  firstName: Yup.string()
-    .trim()
-    .required('First name is required')
-    .matches(NAME_REGEX, 'Only letters allowed')
-    .min(2, 'Min 2 characters')
-    .max(50, 'Max 50 characters'),
-
-  lastName: Yup.string()
-    .trim()
-    .required('Last name is required')
-    .matches(NAME_REGEX, 'Only letters allowed')
-    .min(2, 'Min 2 characters')
-    .max(50, 'Max 50 characters'),
-
-  email: Yup.string()
-    .transform((value) =>
-      value ? value.trim().toLowerCase() : value
-    )
-    .required('Email address is required')
-    .matches(EMAIL_REGEX, 'Please enter a valid email address (e.g. name@domain.com)'),
-
-  countryCode: Yup.string()
-    .trim()
-    .required('Country code is required'),
-
-  mobileNumber: Yup.string()
-    .trim()
-    .required('Mobile number is required')
-    .matches(MOBILE_REGEX, 'Enter valid 10-digit number'),
-
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, PASSWORD_ERROR)
-    .matches(/^\S*$/, 'Password cannot contain spaces')
-    .matches(/[a-z]/, PASSWORD_ERROR)
-    .matches(/[A-Z]/, PASSWORD_ERROR)
-    .matches(/\d/, PASSWORD_ERROR)
-    .matches(/[^A-Za-z0-9\s]/, PASSWORD_ERROR),
-
-  confirmPassword: Yup.string()
-    .required('Confirm password')
-    .oneOf([Yup.ref('password')], 'Passwords do not match'),
-
-  privacyAccepted: Yup.boolean()
-    .oneOf([true], 'You must accept the Privacy Policy'),
-});
-
-export default function Register() {
+const Register = () => {
   const navigate = useNavigate();
   const { post } = useApi();
-  const recaptchaRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
   const [formError, setFormError] = useState('');
-  const [countryOpen, setCountryOpen] = useState(false);
 
-  // GOOGLE RECAPTCHA
   const [captchaToken, setCaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
 
   const formik = useFormik({
     initialValues: {
@@ -101,17 +38,73 @@ export default function Register() {
       privacyAccepted: false,
     },
 
-    validationSchema,
+    validationSchema: Yup.object({
+      firstName: Yup.string()
+        .min(
+          2,
+          'First name must be at least 2 characters'
+        )
+        .max(
+          50,
+          'First name must be at most 50 characters'
+        )
+        .required('First name is required'),
+
+      lastName: Yup.string()
+        .min(1, 'Last name is required')
+        .max(
+          50,
+          'Last name must be at most 50 characters'
+        )
+        .required('Last name is required'),
+
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+
+      countryCode: Yup.string()
+        .required('Country code is required'),
+
+      mobileNumber: Yup.string()
+        .matches(
+          /^[0-9]{10}$/,
+          'Mobile number must be 10 digits'
+        )
+        .required('Mobile number is required'),
+
+      password: Yup.string()
+        .min(
+          8,
+          'Password must be at least 8 characters'
+        )
+        .required('Password is required'),
+
+      confirmPassword: Yup.string()
+        .oneOf(
+          [Yup.ref('password'), null],
+          'Passwords must match'
+        )
+        .required('Please confirm your password'),
+
+      privacyAccepted: Yup.boolean()
+        .oneOf(
+          [true],
+          'You must accept the privacy policy'
+        ),
+    }),
 
     onSubmit: async (
       values,
-      { setSubmitting, setFieldError }
+      { setSubmitting }
     ) => {
       setFormError('');
 
-      // CHECK RECAPTCHA
       if (!captchaToken) {
-        setFormError('Please complete the reCAPTCHA.');
+        setFormError(
+          'Please complete the reCAPTCHA verification.'
+        );
+
+        setSubmitting(false);
         return;
       }
 
@@ -124,167 +117,138 @@ export default function Register() {
           mobileNumber: values.mobileNumber.trim(),
           password: values.password,
           confirmPassword: values.confirmPassword,
-
-          // CAPTCHA TOKEN
           captchaToken,
         });
 
         navigate('/login');
+
       } catch (error) {
-        const message =
-          error?.message ||
-          'Something went wrong. Please try again.';
-
-        const lowerMessage = message.toLowerCase();
-
-        if (
-          lowerMessage.includes('already exists') ||
-          lowerMessage.includes('email already') ||
-          lowerMessage.includes('user already') ||
-          lowerMessage.includes('already registered')
-        ) {
-          setFieldError(
-            'email',
-            'A client account with this email already exists'
-          );
-        } else {
-          setFormError(message);
-        }
+        setFormError(
+          error.message ||
+            'Registration failed. Please try again.'
+        );
 
         if (recaptchaRef.current) {
           recaptchaRef.current.reset();
         }
+
         setCaptchaToken(null);
+
       } finally {
         setSubmitting(false);
       }
     },
   });
 
-  const selectedCountry = COUNTRY_CODES.find(
-    (item) => item.code === formik.values.countryCode
-  );
-
   return (
     <main className="min-h-screen w-full flex flex-col lg:flex-row bg-white text-black font-['Plus_Jakarta_Sans']">
 
-      {/* =====================================================
-          MOBILE TOP NAVIGATION BAR
-      ====================================================== */}
-      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-black/10 bg-white lg:hidden sticky top-0 z-30">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
-        >
-          <ArrowLeft size={16} />
-          <span>Home</span>
-        </Link>
-
-        <Link to="/" className="text-center">
-          <span className="text-lg font-bold tracking-[0.25em]">CHRONOS</span>
-        </Link>
-
-        <Link
-          to="/shop"
-          className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-black/70 hover:text-black transition-colors"
-        >
-          <Compass size={14} />
-          <span>Shop</span>
-        </Link>
-      </header>
-
-      {/* =====================================================
-          LEFT IMAGE SECTION
-      ====================================================== */}
+      {/* LEFT IMAGE */}
       <section className="relative hidden lg:flex w-1/2 min-h-screen bg-black overflow-hidden">
 
         <img
           src={watchImage}
-          alt="Chronos Watch"
-          className="absolute inset-0 w-full h-full object-cover opacity-70"
+          alt="Luxury watch"
+          className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Image overlay */}
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-black/30" />
 
-        {/* Brand */}
-        <Link
-          to="/"
-          className="absolute top-10 left-12 z-10"
-        >
-          <div className="text-white text-3xl font-semibold tracking-[0.25em]">
-            CHRONOS
+        {/* BRAND */}
+        <div className="absolute top-8 left-8 text-white z-10">
+
+          <div className="flex items-center gap-2">
+
+            <Compass size={20} />
+
+            <span className="text-sm tracking-[0.3em] uppercase">
+              Chronos
+            </span>
+
           </div>
 
-          <div className="text-white/60 text-[9px] uppercase tracking-[0.3em] mt-1">
-            Haute Horlogerie
-          </div>
-        </Link>
+        </div>
 
-        {/* Bottom text */}
-        <div className="absolute bottom-12 left-12 z-10">
-          <p className="text-white text-sm tracking-wide">
-            Timeless design. Precise craftsmanship.
+        {/* IMAGE CONTENT */}
+        <div className="absolute bottom-12 left-12 text-white max-w-md z-10">
+
+          <p className="text-xs uppercase tracking-[0.3em] mb-4">
+            Timeless Elegance
           </p>
-          <div className="w-12 h-px bg-white mt-4" />
+
+          <h1 className="text-4xl xl:text-5xl font-light tracking-tight leading-[1.05]">
+            Create your account
+          </h1>
+
+          <p className="mt-5 text-sm text-white/80 leading-relaxed">
+            Join Chronos and discover a world of refined timepieces,
+            curated collections and exceptional craftsmanship.
+          </p>
+
         </div>
 
       </section>
 
-      {/* =====================================================
-          RIGHT REGISTER SECTION
-      ====================================================== */}
-      <section className="relative flex-1 min-h-[calc(100vh-65px)] lg:min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-12 overflow-y-auto">
-        
-        {/* DESKTOP BACK TO HOME LINK */}
-        <div className="hidden lg:flex absolute top-8 left-10 lg:left-16 items-center gap-4 z-20">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black transition-colors group"
-          >
-            <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Return to Catalog</span>
-          </Link>
-        </div>
 
-        <div className="w-full max-w-[480px]">
+      {/* RIGHT FORM */}
+      <section className="w-full lg:w-1/2 bg-white flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12">
 
-          {/* MOBILE LOGO */}
-          <Link
-            to="/"
-            className="lg:hidden block mb-10"
+        <div className="w-full max-w-[460px]">
+
+          {/* BACK */}
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50 hover:text-black mb-8 transition-colors group"
           >
-            <span className="text-2xl font-semibold tracking-[0.25em]">
-              CHRONOS
+
+            <ArrowLeft
+              size={15}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+
+            <span>
+              Back
             </span>
-          </Link>
 
-          {/* HEADER */}
+          </button>
+
+
+          {/* TITLE */}
           <div className="mb-8">
 
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-black/50 mb-2 font-semibold">
+              Welcome to Chronos
+            </p>
+
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-black">
               Create Account
             </h1>
 
-            <p className="text-sm text-black/50 mt-2">
-              Create your Chronos client account.
+            <p className="text-sm text-black/60 mt-2">
+              Register your account to continue.
             </p>
 
           </div>
 
-          {/* =================================================
-              FORM
-          ================================================== */}
+
+          {/* SERVER ERROR */}
+          {formError && (
+            <div className="border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-600 mb-5">
+              {formError}
+            </div>
+          )}
+
+
+          {/* FORM */}
           <form
             onSubmit={formik.handleSubmit}
             noValidate
             className="flex flex-col gap-5"
           >
 
-            {/* =================================================
-                FIRST NAME + LAST NAME
-            ================================================== */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* FIRST + LAST NAME */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
               {/* FIRST NAME */}
               <div>
@@ -298,14 +262,19 @@ export default function Register() {
 
                 <input
                   id="firstName"
-                  name="firstName"
                   type="text"
+                  name="firstName"
                   placeholder="First name"
                   autoComplete="given-name"
                   value={formik.values.firstName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
+                  className={`w-full bg-white border ${
+                    formik.touched.firstName &&
+                    formik.errors.firstName
+                      ? 'border-red-500'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
                 />
 
                 {formik.touched.firstName &&
@@ -316,6 +285,7 @@ export default function Register() {
                   )}
 
               </div>
+
 
               {/* LAST NAME */}
               <div>
@@ -329,14 +299,19 @@ export default function Register() {
 
                 <input
                   id="lastName"
-                  name="lastName"
                   type="text"
+                  name="lastName"
                   placeholder="Last name"
                   autoComplete="family-name"
                   value={formik.values.lastName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
+                  className={`w-full bg-white border ${
+                    formik.touched.lastName &&
+                    formik.errors.lastName
+                      ? 'border-red-500'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
                 />
 
                 {formik.touched.lastName &&
@@ -350,9 +325,8 @@ export default function Register() {
 
             </div>
 
-            {/* =================================================
-                EMAIL
-            ================================================== */}
+
+            {/* EMAIL */}
             <div>
 
               <label
@@ -364,16 +338,19 @@ export default function Register() {
 
               <input
                 id="email"
-                name="email"
                 type="email"
+                name="email"
                 placeholder="your@email.com"
                 autoComplete="email"
                 value={formik.values.email}
-                onChange={(e) => {
-                  formik.setFieldValue('email', e.target.value.trim());
-                }}
+                onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
+                className={`w-full bg-white border ${
+                  formik.touched.email &&
+                  formik.errors.email
+                    ? 'border-red-500'
+                    : 'border-black/20'
+                } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
               />
 
               {formik.touched.email &&
@@ -385,165 +362,92 @@ export default function Register() {
 
             </div>
 
-            {/* =================================================
-                COUNTRY CODE + MOBILE
-            ================================================== */}
-            <div className="grid grid-cols-[105px_1fr] gap-3">
 
-              {/* COUNTRY CODE */}
-              <div className="relative">
+            {/* MOBILE */}
+            <div>
 
-                <label
-                  htmlFor="countryCode"
-                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
-                >
-                  Code
-                </label>
+              <label
+                htmlFor="mobileNumber"
+                className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
+              >
+                Mobile Number
+              </label>
 
-                {/* SELECTED COUNTRY */}
-                <button
-                  type="button"
-                  id="countryCode"
-                  aria-haspopup="listbox"
-                  aria-expanded={countryOpen}
-                  onClick={() =>
-                    setCountryOpen((open) => !open)
-                  }
-                  className="w-full h-[52px] bg-white border border-black/20 hover:border-black focus:border-black text-black text-sm px-3 outline-none flex items-center justify-between transition-colors"
-                >
+              <div className="flex gap-3">
 
-                  <span className="flex items-center gap-2">
+                {/* COUNTRY CODE */}
+                <div className="relative w-24 shrink-0">
 
-                    <span className="text-lg leading-none">
-                      {selectedCountry?.flag}
-                    </span>
-
-                    <span className="font-medium">
-                      {selectedCountry?.code}
-                    </span>
-
-                  </span>
-
-                  <ChevronDown
-                    size={15}
-                    className={`transition-transform duration-200 ${
-                      countryOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-
-                </button>
-
-                {/* CUSTOM COUNTRY DROPDOWN */}
-                {countryOpen && (
-                  <div
-                    className="absolute left-0 right-0 top-full mt-1 bg-white border border-black/20 shadow-xl z-50 max-h-60 overflow-y-auto"
-                    role="listbox"
+                  <select
+                    name="countryCode"
+                    value={formik.values.countryCode}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full appearance-none bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 pr-8 outline-none transition-colors cursor-pointer"
                   >
 
-                    {COUNTRY_CODES.map((item) => {
+                    <option value="+91">
+                      +91
+                    </option>
 
-                      const isSelected =
-                        formik.values.countryCode === item.code;
+                    <option value="+971">
+                      +971
+                    </option>
 
-                      return (
-                        <button
-                          key={item.code}
-                          type="button"
-                          role="option"
-                          aria-selected={isSelected}
-                          onClick={() => {
-                            formik.setFieldValue(
-                              'countryCode',
-                              item.code
-                            );
+                    <option value="+1">
+                      +1
+                    </option>
 
-                            formik.setFieldTouched(
-                              'countryCode',
-                              true
-                            );
+                    <option value="+44">
+                      +44
+                    </option>
 
-                            setCountryOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-3 text-sm text-left transition-colors ${
-                            isSelected
-                              ? 'bg-black text-white'
-                              : 'bg-white text-black hover:bg-black hover:text-white'
-                          }`}
-                        >
+                    <option value="+81">
+                      +81
+                    </option>
 
-                          <span className="text-lg leading-none">
-                            {item.flag}
-                          </span>
+                  </select>
 
-                          <span className="font-medium">
-                            {item.code}
-                          </span>
+                  <ChevronDown
+                    size={14}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-black/50"
+                  />
 
-                        </button>
-                      );
+                </div>
 
-                    })}
 
-                  </div>
-                )}
-
-                {formik.touched.countryCode &&
-                  formik.errors.countryCode && (
-                    <p className="mt-1.5 text-xs text-red-600">
-                      {formik.errors.countryCode}
-                    </p>
-                  )}
-
-              </div>
-
-              {/* MOBILE NUMBER */}
-              <div>
-
-                <label
-                  htmlFor="mobileNumber"
-                  className="block text-[10px] font-semibold uppercase tracking-wider mb-2"
-                >
-                  Mobile Number
-                </label>
-
+                {/* MOBILE NUMBER */}
                 <input
                   id="mobileNumber"
+                  type="text"
                   name="mobileNumber"
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
-                  placeholder="9876543210"
-                  autoComplete="tel-national"
+                  maxLength="10"
+                  placeholder="10-digit mobile number"
+                  autoComplete="tel"
                   value={formik.values.mobileNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(
-                      /\D/g,
-                      ''
-                    );
-
-                    formik.setFieldValue(
-                      'mobileNumber',
-                      value
-                    );
-                  }}
+                  onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30"
+                  className={`flex-1 bg-white border ${
+                    formik.touched.mobileNumber &&
+                    formik.errors.mobileNumber
+                      ? 'border-red-500'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 outline-none transition-colors placeholder:text-black/30`}
                 />
 
-                {formik.touched.mobileNumber &&
-                  formik.errors.mobileNumber && (
-                    <p className="mt-1.5 text-xs text-red-600">
-                      {formik.errors.mobileNumber}
-                    </p>
-                  )}
-
               </div>
+
+              {formik.touched.mobileNumber &&
+                formik.errors.mobileNumber && (
+                  <p className="mt-1.5 text-xs text-red-600">
+                    {formik.errors.mobileNumber}
+                  </p>
+                )}
 
             </div>
 
-            {/* =================================================
-                PASSWORD
-            ================================================== */}
+
+            {/* PASSWORD */}
             <div>
 
               <label
@@ -554,22 +458,34 @@ export default function Register() {
               </label>
 
               <div className="relative flex items-center">
+
                 <input
                   id="password"
+                  type={
+                    showPassword
+                      ? 'text'
+                      : 'password'
+                  }
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
                   placeholder="Enter password"
                   autoComplete="new-password"
                   value={formik.values.password}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30"
+                  className={`w-full bg-white border ${
+                    formik.touched.password &&
+                    formik.errors.password
+                      ? 'border-red-500'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30`}
                 />
 
                 <button
                   type="button"
                   onClick={() =>
-                    setShowPassword((value) => !value)
+                    setShowPassword(
+                      (value) => !value
+                    )
                   }
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-black/50 hover:text-black focus:outline-none flex items-center justify-center cursor-pointer transition-colors z-10"
                   aria-label={
@@ -578,12 +494,21 @@ export default function Register() {
                       : 'Show password'
                   }
                 >
+
                   {showPassword ? (
-                    <EyeOff size={18} className="text-black/70" />
+                    <EyeOff
+                      size={18}
+                      className="text-black/70"
+                    />
                   ) : (
-                    <Eye size={18} className="text-black/70" />
+                    <Eye
+                      size={18}
+                      className="text-black/70"
+                    />
                   )}
+
                 </button>
+
               </div>
 
               {formik.touched.password &&
@@ -595,9 +520,8 @@ export default function Register() {
 
             </div>
 
-            {/* =================================================
-                CONFIRM PASSWORD
-            ================================================== */}
+
+            {/* CONFIRM PASSWORD */}
             <div>
 
               <label
@@ -608,20 +532,28 @@ export default function Register() {
               </label>
 
               <div className="relative flex items-center">
+
                 <input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type={
                     showConfirmPassword
                       ? 'text'
                       : 'password'
                   }
+                  name="confirmPassword"
                   placeholder="Confirm password"
                   autoComplete="new-password"
-                  value={formik.values.confirmPassword}
+                  value={
+                    formik.values.confirmPassword
+                  }
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full bg-white border border-black/20 focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30"
+                  className={`w-full bg-white border ${
+                    formik.touched.confirmPassword &&
+                    formik.errors.confirmPassword
+                      ? 'border-red-500'
+                      : 'border-black/20'
+                  } focus:border-black text-black text-sm px-4 py-3.5 pr-12 outline-none transition-colors placeholder:text-black/30`}
                 />
 
                 <button
@@ -638,12 +570,21 @@ export default function Register() {
                       : 'Show confirm password'
                   }
                 >
+
                   {showConfirmPassword ? (
-                    <EyeOff size={18} className="text-black/70" />
+                    <EyeOff
+                      size={18}
+                      className="text-black/70"
+                    />
                   ) : (
-                    <Eye size={18} className="text-black/70" />
+                    <Eye
+                      size={18}
+                      className="text-black/70"
+                    />
                   )}
+
                 </button>
+
               </div>
 
               {formik.touched.confirmPassword &&
@@ -655,37 +596,41 @@ export default function Register() {
 
             </div>
 
-            {/* =================================================
-                SERVER ERROR
-            ================================================== */}
-            {formError && (
-              <div className="border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-600">
-                {formError}
-              </div>
-            )}
 
-            {/* PRIVACY CONSENT */}
-            <div className="mt-2">
-              <label className="flex items-start gap-3 cursor-pointer">
+            {/* PRIVACY POLICY */}
+            <div className="pt-1">
+
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+
                 <input
-                  type="checkbox"
+                  id="privacyAccepted"
                   name="privacyAccepted"
-                  checked={formik.values.privacyAccepted}
+                  type="checkbox"
+                  checked={
+                    formik.values.privacyAccepted
+                  }
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="mt-1 w-4 h-4 accent-black cursor-pointer"
+                  className="mt-0.5 h-4 w-4 rounded-none border border-black/30 accent-black cursor-pointer shrink-0"
                 />
 
-                <span className="text-xs text-black/60 leading-relaxed">
-                  I agree to the{" "}
+                <span className="text-xs text-black/70 leading-relaxed">
+
+                  I agree to the{' '}
+
                   <Link
                     to="/privacy-policy"
-                    className="text-black font-semibold hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-black underline hover:text-black/70 transition-colors"
                   >
                     Privacy Policy
-                  </Link>{" "}
-                  and consent to the collection and use of my personal information.
+                  </Link>{' '}
+
+                  and Terms & Conditions.
+
                 </span>
+
               </label>
 
               {formik.touched.privacyAccepted &&
@@ -694,32 +639,58 @@ export default function Register() {
                     {formik.errors.privacyAccepted}
                   </p>
                 )}
+
             </div>
 
-            {/* GOOGLE RECAPTCHA */}
-            <div className="mt-2">
+
+            {/* SERVER ERROR */}
+            {formError && (
+              <div className="border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-600">
+                {formError}
+              </div>
+            )}
+
+
+            {/* CAPTCHA */}
+            <div className="mt-1">
+
               <ReCAPTCHA
                 ref={recaptchaRef}
-                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                onChange={(token) => setCaptchaToken(token)}
+                sitekey={
+                  import.meta.env
+                    .VITE_RECAPTCHA_SITE_KEY
+                }
+                onChange={(token) =>
+                  setCaptchaToken(token)
+                }
                 onExpired={() => {
-                  if (recaptchaRef.current) recaptchaRef.current.reset();
+
+                  if (recaptchaRef.current) {
+                    recaptchaRef.current.reset();
+                  }
+
                   setCaptchaToken(null);
+
                 }}
                 onErrored={() => {
-                  if (recaptchaRef.current) recaptchaRef.current.reset();
+
+                  if (recaptchaRef.current) {
+                    recaptchaRef.current.reset();
+                  }
+
                   setCaptchaToken(null);
+
                 }}
               />
+
             </div>
 
-            {/* =================================================
-                SUBMIT BUTTON
-            ================================================== */}
+
+            {/* CREATE ACCOUNT */}
             <button
               type="submit"
               disabled={formik.isSubmitting}
-              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all"
+              className="mt-2 w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-black/85 disabled:opacity-50 text-xs font-semibold uppercase tracking-[0.2em] py-4 transition-all cursor-pointer shadow-sm"
             >
 
               <span>
@@ -734,10 +705,9 @@ export default function Register() {
 
             </button>
 
-            {/* =================================================
-                LOGIN LINK
-            ================================================== */}
-            <p className="text-center text-xs text-black/50 pt-1">
+
+            {/* LOGIN LINK */}
+            <p className="text-center text-xs text-black/60 pt-2">
 
               Already have an account?{' '}
 
@@ -752,10 +722,78 @@ export default function Register() {
 
           </form>
 
+
+          {/* GOOGLE LOGIN - OUTSIDE FORM */}
+          <div className="mt-6 flex flex-col gap-4">
+
+            {/* HORIZONTAL LINE */}
+            <div className="flex items-center gap-3">
+
+              <div className="h-px flex-1 bg-black/10" />
+
+              <span className="text-[10px] uppercase tracking-wider text-black/40">
+                Or continue with
+              </span>
+
+              <div className="h-px flex-1 bg-black/10" />
+
+            </div>
+
+
+            {/* GOOGLE BUTTON */}
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href =
+                  'http://localhost:3000/apiauth/google';
+              }}
+              className="w-full flex items-center justify-center gap-3 border border-black/20 bg-white text-black hover:bg-black hover:text-white text-xs font-semibold uppercase tracking-[0.15em] py-4 transition-all cursor-pointer"
+            >
+
+              {/* COLORFUL GOOGLE G ICON */}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+
+                <path
+                  fill="#4285F4"
+                  d="M21.35 12.27c0-.71-.06-1.39-.18-2.04H12v3.86h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.21z"
+                />
+
+                <path
+                  fill="#34A853"
+                  d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.5z"
+                />
+
+                <path
+                  fill="#FBBC05"
+                  d="M6.54 13.58A5.85 5.85 0 0 1 6.23 12c0-.55.1-1.08.31-1.58V7.89H3.3A9.5 9.5 0 0 0 2.25 12c0 1.53.37 2.98 1.05 4.11l3.24-2.53z"
+                />
+
+                <path
+                  fill="#EA4335"
+                  d="M12 6.39c1.43 0 2.72.49 3.73 1.46l2.8-2.8C16.83 3.49 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.39l3.24 2.53C7.31 8.11 9.46 6.39 12 6.39z"
+                />
+
+              </svg>
+
+              <span>
+                Continue with Google
+              </span>
+
+            </button>
+
+          </div>
+
         </div>
 
       </section>
 
     </main>
   );
-}
+};
+
+export default Register;
