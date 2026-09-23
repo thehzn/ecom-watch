@@ -1,12 +1,31 @@
 import express from "express"
 import { verifyUser } from "../middleware/authVerify.js"
-import { addAddress, changeUserEmail, deleteAddress, getAddresses, sendEmailChangeOTP, sendPasswordChangeOTP, setDefaultAddress, updateAddress, updateUser, userProfile, verifyEmailChangeOTP, verifyPasswordChangeOTP } from "../controllers/userControllers.js"
-
+import {
+  addAddress,
+  changeUserEmail,
+  deleteAddress,
+  getAddresses,
+  sendEmailChangeOTP,
+  sendPasswordChangeOTP,
+  setDefaultAddress,
+  updateAddress,
+  updateUser,
+  userProfile,
+  verifyEmailChangeOTP,
+  verifyPasswordChangeOTP,
+  getUserSessions,
+  deleteUserSession,
+  logoutOtherSessions,
+} from "../controllers/userControllers.js"
 
 const router = express.Router()
 
-router.get("/user/profile",verifyUser,userProfile)
-router.put("/user/updateprofile",verifyUser,updateUser)
+router.get("/user/profile", verifyUser, userProfile)
+router.put("/user/updateprofile", verifyUser, updateUser)
+
+router.get("/user/sessions", verifyUser, getUserSessions)
+router.delete("/user/sessions/others", verifyUser, logoutOtherSessions)
+router.delete("/user/sessions/:sessionId", verifyUser, deleteUserSession)
 
 
 router.post("/user/address", verifyUser, addAddress)

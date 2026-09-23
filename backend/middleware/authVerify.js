@@ -1,20 +1,53 @@
-import jwt from "jsonwebtoken"
-import dotenv from "dotenv"
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import User from "../models/UserModel.js";
 
-dotenv.config()
+dotenv.config();
 
-export const verifyUser = async ( req,res,next )=>{
+export const verifyUser = async (req, res, next) => {
   try {
-      const userToken = req.headers.authorization;
-    if(!userToken){
-        return res.status(401).json({ status:false, message:"Token not Found"})
+    const userToken = req.headers.authorization;
+    if (!userToken) {
+      return res.status(401).json({ status: false, message: "Token not Found" });
     }
     const token = userToken.split(" ")[1];
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET)
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    // If token has a sessionId, verify session is still active in database
+    if (decodedData.sessionId) {
+      const user = await User.findOne({
+        _id: decodedData.id,
+        "sessions.sessionId": decodedData.sessionId,
+      }).select("sessions role");
+
+      if (!user) {
+        return res.status(401).json({
+          status: false,
+          message: "Session has been terminated or logged out. Please sign in again.",
+        });
+      }
+
+      // Update last active timestamp
+      const currentSession = user.sessions.find(
+        (s) => s.sessionId === decodedData.sessionId
+      );
+      if (
+        currentSession &&
+        (!currentSession.lastActive ||
+          Date.now() - new Date(currentSession.lastActive).getTime() > 5 * 60 * 1000)
+      ) {
+        User.updateOne(
+          { _id: user._id, "sessions.sessionId": decodedData.sessionId },
+          { $set: { "sessions.$.lastActive": new Date() } }
+        ).catch(() => {});
+      }
+    }
+
     req.user = decodedData;
     next();
   } catch (error) {
-    return res.status(401).json({ status:false, message:error.message})
+    return res.status(401).json({ status: false, message: error.message });
   }
-}
+};
+
 
