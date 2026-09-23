@@ -42,6 +42,16 @@ const userSchema = new mongoose.Schema(
     dob: {
       type: Date,
       default: null,
+      validate: {
+        validator: function (value) {
+          if (!value) return true;
+          const now = new Date();
+          const minDate = new Date();
+          minDate.setFullYear(minDate.getFullYear() - 120);
+          return value <= now && value >= minDate;
+        },
+        message: "Please enter a valid date of birth",
+      },
     },
 
     gender: {
