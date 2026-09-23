@@ -32,15 +32,43 @@ export const updateUser = async (req, res) => {
     const allowedFields = ["firstName", "lastName", "password", "dob", "gender", "countryCode", "mobileNumber"];
     const updates = {};
 
-    allowedFields.forEach((field) => {
+    for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
         if (field === "dob") {
-          updates[field] = req.body[field] ? new Date(req.body[field]) : null;
+          if (req.body.dob) {
+            const parsedDate = new Date(req.body.dob);
+            if (isNaN(parsedDate.getTime())) {
+              return res.status(400).json({ status: false, message: "Invalid date of birth" });
+            }
+            const now = new Date();
+            if (parsedDate > now) {
+              return res.status(400).json({ status: false, message: "Date of birth cannot be in the future" });
+            }
+            const thirteenYearsAgo = new Date();
+            thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
+            if (parsedDate > thirteenYearsAgo) {
+              return res.status(400).json({ status: false, message: "You must be at least 13 years old" });
+            }
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 120);
+            if (parsedDate < minDate) {
+              return res.status(400).json({ status: false, message: "Please enter a valid date of birth" });
+            }
+            updates.dob = parsedDate;
+          } else {
+            updates.dob = null;
+          }
+        } else if (field === "gender") {
+          const validGenders = ["Male", "Female", "Other", "Prefer not to say", ""];
+          if (!validGenders.includes(req.body.gender)) {
+            return res.status(400).json({ status: false, message: "Invalid gender selection" });
+          }
+          updates.gender = req.body.gender;
         } else {
           updates[field] = req.body[field];
         }
       }
-    });
+    }
 
     // Password requires OTP verification
     if (updates.password) {

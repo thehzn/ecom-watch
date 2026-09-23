@@ -25,7 +25,20 @@ const validationSchema = Yup.object({
 
   dob: Yup.date()
     .nullable()
-    .max(new Date(), 'Date of birth cannot be in the future'),
+    .transform((curr, orig) => (orig === '' ? null : curr))
+    .max(new Date(), 'Date of birth cannot be in the future')
+    .test('min-age', 'You must be at least 13 years old', function (value) {
+      if (!value) return true;
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 13);
+      return new Date(value) <= cutoff;
+    })
+    .test('max-age', 'Please enter a valid date of birth', function (value) {
+      if (!value) return true;
+      const minDate = new Date();
+      minDate.setFullYear(minDate.getFullYear() - 120);
+      return new Date(value) >= minDate;
+    }),
 
   gender: Yup.string()
     .oneOf(['Male', 'Female', 'Other', 'Prefer not to say', ''], 'Invalid gender selection'),
@@ -407,6 +420,7 @@ export default function EditProfile() {
                       id="dob"
                       name="dob"
                       type="date"
+                      min="1900-01-01"
                       max={new Date().toISOString().split('T')[0]}
                       value={formik.values.dob}
                       onChange={formik.handleChange}
