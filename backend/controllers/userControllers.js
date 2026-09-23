@@ -29,12 +29,16 @@ export const updateUser = async (req, res) => {
       });
     }
 
-    const allowedFields = ["firstName", "lastName", "password"];
+    const allowedFields = ["firstName", "lastName", "password", "dob", "gender", "countryCode", "mobileNumber"];
     const updates = {};
 
     allowedFields.forEach((field) => {
-      if (req.body[field]) {
-        updates[field] = req.body[field];
+      if (req.body[field] !== undefined) {
+        if (field === "dob") {
+          updates[field] = req.body[field] ? new Date(req.body[field]) : null;
+        } else {
+          updates[field] = req.body[field];
+        }
       }
     });
 
