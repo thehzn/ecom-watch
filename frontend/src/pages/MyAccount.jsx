@@ -42,8 +42,8 @@ const QUICK_ACCESS_CARDS = [
   },
   { 
     key: "security", 
-    title: "Security & Keys", 
-    subtitle: "Manage 256-bit encrypted credentials and passcodes",
+    title: "Security & Devices", 
+    subtitle: "Manage 256-bit encrypted keys, passcodes & logged-in devices",
     icon: Shield, 
     route: "/security" 
   },

@@ -92,6 +92,19 @@ const userSchema = new mongoose.Schema(
         isDefault: { type: Boolean, default: false },
       },
     ],
+
+    sessions: [
+      {
+        sessionId: { type: String, required: true },
+        device: { type: String, default: "Unknown Device" },
+        browser: { type: String, default: "Unknown Browser" },
+        os: { type: String, default: "Unknown OS" },
+        deviceType: { type: String, enum: ["Desktop", "Mobile", "Tablet"], default: "Desktop" },
+        ipAddress: { type: String, default: "" },
+        lastActive: { type: Date, default: Date.now },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
