@@ -22,6 +22,13 @@ const validationSchema = Yup.object({
     .matches(NAME_REGEX, 'Only letters are allowed')
     .min(2, 'Must be at least 2 characters')
     .max(50, 'Must be at most 50 characters'),
+
+  dob: Yup.date()
+    .nullable()
+    .max(new Date(), 'Date of birth cannot be in the future'),
+
+  gender: Yup.string()
+    .oneOf(['Male', 'Female', 'Other', 'Prefer not to say', ''], 'Invalid gender selection'),
 });
 
 export default function EditProfile() {
@@ -55,6 +62,8 @@ export default function EditProfile() {
     initialValues: {
       firstName: user.firstName || '',
       lastName: user.lastName || '',
+      dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '',
+      gender: user.gender || '',
     },
 
     validationSchema,
@@ -75,6 +84,8 @@ export default function EditProfile() {
             body: JSON.stringify({
               firstName: values.firstName.trim(),
               lastName: values.lastName.trim(),
+              dob: values.dob || null,
+              gender: values.gender || '',
             }),
           }
         );
@@ -381,6 +392,71 @@ export default function EditProfile() {
                           {formik.errors.lastName}
                         </p>
                       )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Date of Birth */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                      Date of Birth
+                    </label>
+
+                    <input
+                      id="dob"
+                      name="dob"
+                      type="date"
+                      max={new Date().toISOString().split('T')[0]}
+                      value={formik.values.dob}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3 outline-none transition-colors [color-scheme:dark]"
+                    />
+
+                    {formik.touched.dob && formik.errors.dob && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {formik.errors.dob}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Gender */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                      Gender
+                    </label>
+
+                    <select
+                      id="gender"
+                      name="gender"
+                      value={formik.values.gender}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="w-full bg-[#141720] border border-white/15 focus:border-white text-white text-sm rounded-xl px-4 py-3 outline-none transition-colors cursor-pointer"
+                    >
+                      <option value="" className="bg-[#141720] text-gray-400">
+                        Select Gender
+                      </option>
+                      <option value="Male" className="bg-[#141720] text-white">
+                        Male
+                      </option>
+                      <option value="Female" className="bg-[#141720] text-white">
+                        Female
+                      </option>
+                      <option value="Other" className="bg-[#141720] text-white">
+                        Other
+                      </option>
+                      <option value="Prefer not to say" className="bg-[#141720] text-white">
+                        Prefer not to say
+                      </option>
+                    </select>
+
+                    {formik.touched.gender && formik.errors.gender && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {formik.errors.gender}
+                      </p>
+                    )}
                   </div>
                 </div>
 
