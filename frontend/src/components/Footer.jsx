@@ -41,7 +41,7 @@ export default function Footer() {
         <div className="relative mx-auto w-full max-w-2xl px-5 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-[#C5A880] text-[10px] tracking-[0.25em] uppercase mb-4">
             <Sparkles size={12} />
-            Privé Membership
+            Prime Membership
           </div>
 
           <h3 className="font-caslon mb-4 text-3xl sm:text-4xl text-white font-normal leading-tight">
@@ -126,9 +126,9 @@ export default function Footer() {
                 Chronos
               </span>
 
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A880] font-medium">
+              {/* <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A880] font-medium">
                 Geneva • Le Brassus • Zurich
-              </p>
+              </p> */}
 
               <p className="max-w-sm text-sm text-gray-400 leading-relaxed mt-2 font-normal">
                 Pioneering mechanical excellence in aerospace titanium and platinum. Every timepiece is hand-assembled to endure generations.
