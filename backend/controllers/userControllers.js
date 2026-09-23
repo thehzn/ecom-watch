@@ -668,3 +668,338 @@ export const verifyPasswordChangeOTP = async (req, res) => {
     });
   }
 }
+// =============================================
+// MOBILE NUMBER UPDATE WITH OTP VERIFICATION
+// =============================================
+
+export const sendMobileChangeOTP = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newMobileNumber } = req.body;
+
+    // Validation
+    if (!newMobileNumber) {
+      return res.status(400).json({
+        status: false,
+        message: "New mobile number is required",
+      });
+    }
+
+    // Validate 10-digit mobile number
+    if (!/^\d{10}$/.test(newMobileNumber)) {
+      return res.status(400).json({
+        status: false,
+        message: "Mobile number must be exactly 10 digits",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if new mobile is same as current
+    if (newMobileNumber === user.mobileNumber) {
+      return res.status(400).json({
+        status: false,
+        message: "New mobile number cannot be same as current number",
+      });
+    }
+
+    // Check if mobile already exists for another user
+    const existingUser = await User.findOne({
+      mobileNumber: newMobileNumber,
+      _id: { $ne: user._id },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        status: false,
+        message: "This mobile number is already registered to another account",
+      });
+    }
+
+    // Check if Brevo is configured
+    if (
+      !process.env.BREVO_API_KEY ||
+      !process.env.BREVO_SENDER_EMAIL
+    ) {
+      return res.status(500).json({
+        status: false,
+        message: "Email configuration is missing on server",
+      });
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Send email via Brevo
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "Chronos Haute Horlogerie",
+            email: process.env.BREVO_SENDER_EMAIL,
+          },
+          to: [
+            {
+              email: user.email,
+            },
+          ],
+          subject: "Chronos - Mobile Number Verification",
+          htmlContent: `
+            <h2>Mobile Number Verification</h2>
+
+            <p>Hello ${user.firstName},</p>
+
+            <p>
+              Use the OTP below to verify your new mobile number
+              for your Chronos account.
+            </p>
+
+            <h1 style="letter-spacing: 5px; color: #333;">${otp}</h1>
+
+            <p><strong>New Mobile Number:</strong> ${newMobileNumber}</p>
+
+            <p>This OTP is valid for 5 minutes.</p>
+
+            <p>
+              If you did not request a mobile number change,
+              please ignore this email.
+            </p>
+          `,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("MOBILE OTP BREVO STATUS:", response.status, data);
+
+    if (!response.ok) {
+      console.error("MOBILE OTP BREVO ERROR:", data);
+
+      return res.status(502).json({
+        status: false,
+        message: "Failed to send OTP email",
+      });
+    }
+
+    // Save OTP to user
+    user.mobileChangeOtp = otp;
+    user.mobileChangeOtpExpiresAt = otpExpiresAt;
+    user.mobileChangeVerified = false;
+
+    // Store the new mobile temporarily
+    user._tempNewMobileNumber = newMobileNumber;
+
+    await user.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "OTP sent successfully to your registered email",
+    });
+
+  } catch (error) {
+    console.error("sendMobileChangeOTP Error:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
+};
+
+
+export const verifyMobileChangeOTP = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { otp, newMobileNumber } = req.body;
+
+    // Validation
+    if (!otp) {
+      return res.status(400).json({
+        status: false,
+        message: "OTP is required",
+      });
+    }
+
+    if (!newMobileNumber) {
+      return res.status(400).json({
+        status: false,
+        message: "New mobile number is required",
+      });
+    }
+
+    // Validate OTP format (6 digits)
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        status: false,
+        message: "OTP must be 6 digits",
+      });
+    }
+
+    // Validate mobile format (10 digits)
+    if (!/^\d{10}$/.test(newMobileNumber)) {
+      return res.status(400).json({
+        status: false,
+        message: "Mobile number must be 10 digits",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if OTP was requested
+    if (!user.mobileChangeOtp) {
+      return res.status(400).json({
+        status: false,
+        message: "OTP is invalid or not requested",
+      });
+    }
+
+    // Check if OTP is expired
+    if (
+      !user.mobileChangeOtpExpiresAt ||
+      user.mobileChangeOtpExpiresAt < Date.now()
+    ) {
+      return res.status(400).json({
+        status: false,
+        message: "OTP is expired. Please request a new OTP.",
+      });
+    }
+
+    // Verify OTP
+    if (user.mobileChangeOtp !== otp.toString()) {
+      return res.status(400).json({
+        status: false,
+        message: "OTP is incorrect",
+      });
+    }
+
+    // Mark as verified (not consuming yet)
+    user.mobileChangeVerified = true;
+
+    await user.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "OTP verified successfully",
+    });
+
+  } catch (error) {
+    console.error("verifyMobileChangeOTP Error:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
+};
+
+
+export const updateMobileNumber = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newMobileNumber } = req.body;
+
+    if (!newMobileNumber) {
+      return res.status(400).json({
+        status: false,
+        message: "New mobile number is required",
+      });
+    }
+
+    // Validate mobile format
+    if (!/^\d{10}$/.test(newMobileNumber)) {
+      return res.status(400).json({
+        status: false,
+        message: "Mobile number must be 10 digits",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    // OTP verification is mandatory
+    if (!user.mobileChangeVerified) {
+      return res.status(403).json({
+        status: false,
+        message: "Please verify OTP before updating mobile number",
+      });
+    }
+
+    // Double-check mobile is not same
+    if (newMobileNumber === user.mobileNumber) {
+      return res.status(400).json({
+        status: false,
+        message: "New mobile must be different from current mobile",
+      });
+    }
+
+    // Check if mobile already exists
+    const existingUser = await User.findOne({
+      mobileNumber: newMobileNumber,
+      _id: { $ne: user._id },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        status: false,
+        message: "This mobile number is already registered",
+      });
+    }
+
+    // Update mobile number
+    user.mobileNumber = newMobileNumber;
+    user.mobileVerifiedAt = new Date();
+
+    // Consume the verification
+    user.mobileChangeVerified = false;
+    user.mobileChangeOtp = null;
+    user.mobileChangeOtpExpiresAt = null;
+
+    await user.save();
+
+    const { password, ...userData } = user.toObject();
+
+    return res.status(200).json({
+      status: true,
+      message: "Mobile number updated successfully",
+      user: userData,
+    });
+
+  } catch (error) {
+    console.error("updateMobileNumber Error:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
+};
