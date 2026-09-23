@@ -39,6 +39,20 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+
+    password: { type: String, required: function(){
+    return this.authProvider === "local"
+    }},
+
+    googleId: {type: String,unique: true,sparse: true},
+
+    authProvider: {type: String,enum: ["local", "google"],default: "local"},
+    
+    failedLoginAttempts: {type: Number,default: 0},
+
+    lockUntil: {type: Date,default: null},
+
+    isLocked: { type: Boolean, default: false},
     dob: {
       type: Date,
       default: null,

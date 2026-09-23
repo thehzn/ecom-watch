@@ -5,6 +5,7 @@ const adminSchema = new mongoose.Schema({
     password:{ type:String,required:true},
     otp:{type:String}, 
     otpExpiresAt:{type:Date},
+    googleId: { type: String, unique: true, sparse: true, },
     pendingEmail: String
 },
 {timestamps:true})

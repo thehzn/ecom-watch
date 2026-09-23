@@ -70,13 +70,13 @@ export const login = async (req, res) => {
   try {
     const { email, password, captchaToken } = req.body;
 
-    // RECAPTCHA CHECK
     if (!captchaToken) {
       return res.status(400).json({
         status: false,
         message: "Please complete the reCAPTCHA",
       });
     }
+
     const captchaResponse = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
       {
@@ -94,10 +94,17 @@ export const login = async (req, res) => {
     const captchaResult = await captchaResponse.json();
 
     if (!captchaResult.success) {
-      return res.status(400).json({status: false,message: "reCAPTCHA verification failed. Please try again."});
+      return res.status(400).json({
+        status: false,
+        message: "reCAPTCHA verification failed. Please try again.",
+      });
     }
+
     if (!email || !password) {
-      return res.status(400).json({status: false,message: "All fields must be filled"});
+      return res.status(400).json({
+        status: false,
+        message: "All fields must be filled",
+      });
     }
 
     const currentUser = await User.findOne({
@@ -105,19 +112,77 @@ export const login = async (req, res) => {
     });
 
     if (!currentUser) {
-      return res.status(400).json({status: false,message: "Invalid User or Password"});
+      return res.status(400).json({
+        status: false,
+        message: "Invalid User or Password",
+      });
     }
 
     if (currentUser.role !== "user") {
-      return res.status(404).json({status: false,message: "Access Denied"});
+      return res.status(404).json({
+        status: false,
+        message: "Access Denied",
+      });
     }
 
-    const isMatch = await argon.verify(currentUser.password,password);
+    if (currentUser.isLocked) {
+      const now = new Date();
+
+      if (currentUser.lockUntil && currentUser.lockUntil > now) {
+        const remainingMinutes = Math.ceil(
+          (currentUser.lockUntil - now) / (1000 * 60)
+        );
+
+        return res.status(423).json({
+          status: false,
+          message: `Account is temporarily locked. Please try again in ${remainingMinutes} minute(s).`,
+        });
+      }
+
+      currentUser.isLocked = false;
+      currentUser.lockUntil = null;
+      currentUser.failedLoginAttempts = 0;
+
+      await currentUser.save();
+    }
+
+    const isMatch = await argon.verify(
+      currentUser.password,
+      password
+    );
 
     if (!isMatch) {
-      return res.status(400).json({status: false,message: "Invalid Password"});
+      currentUser.failedLoginAttempts += 1;
+
+      if (currentUser.failedLoginAttempts >= 5) {
+        currentUser.isLocked = true;
+
+        // Lock for 5 minutes
+        currentUser.lockUntil = new Date(
+          Date.now() + 5 * 60 * 1000
+        );
+
+        await currentUser.save();
+
+        return res.status(423).json({
+          status: false,
+          message:
+            "Too many failed login attempts. Your account is locked for 5 minutes.",
+        });
+      }
+
+      await currentUser.save();
+
+      return res.status(400).json({
+        status: false,
+        message: "Invalid Password",
+      });
     }
 
+
+    currentUser.failedLoginAttempts = 0;
+    currentUser.isLocked = false;
+    currentUser.lockUntil = null;
     const sessionId = crypto.randomUUID();
     const userAgent = req.headers["user-agent"] || "";
     const { device, browser, os, deviceType } = parseUserAgent(userAgent);
@@ -173,10 +238,12 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error("LOGIN ERROR:", error);
 
-    return res.status(500).json({status: false,message: error.message});
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
   }
-}
-
+};
 
 export const verifyOtp = async (req, res) => {
   try {
