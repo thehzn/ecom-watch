@@ -621,6 +621,12 @@ export default function EditProfile() {
 
   const currentEmail = user.email || '';
 
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      navigate('/admin/profile', { replace: true });
+    }
+  }, [user, navigate]);
+
   const formik = useFormik({
     enableReinitialize: true,
 

@@ -361,6 +361,9 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState("");
   const [wishlistSaving, setWishlistSaving] = useState(false);
 
+  const user = useSelector((state) => state.auth?.user);
+  const isAdmin = user?.role === "admin";
+
   const isWishlisted = useSelector((state) =>
     state.wishlist?.items?.some((item) => item._id === id)
   );
@@ -369,7 +372,7 @@ export default function ProductDetails() {
   // "Acquire" button so it can't be added/incremented more than once
   // from this page.
   const isInCart = useSelector((state) =>
-    state.cart?.items?.some((it) => it.product._id === id)
+    state.cart?.items?.some((it) => it.product?._id === id)
   );
 
   useEffect(() => {
@@ -413,6 +416,13 @@ export default function ProductDetails() {
     // also disabled in this case, this is just a safety guard.
     if (adding || isInCart) return;
 
+    if (isAdmin) {
+      dispatch(addOrIncrementCartItem(product));
+      setAddedMessage("Timepiece previewed in bag (Admin Mode).");
+      setTimeout(() => setAddedMessage(""), 3000);
+      return;
+    }
+
     setAdding(true);
     setAddedMessage("");
     try {
@@ -437,6 +447,16 @@ export default function ProductDetails() {
   // re-added it (a no-op) instead of removing it.
   const handleWishlist = async () => {
     if (wishlistSaving) return;
+
+    if (isAdmin) {
+      if (isWishlisted) {
+        dispatch(removeFromWishlist(id));
+      } else {
+        dispatch(addToWishlistLocal(product));
+      }
+      return;
+    }
+
     setWishlistSaving(true);
 
     try {

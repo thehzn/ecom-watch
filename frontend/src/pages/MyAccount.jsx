@@ -1615,9 +1615,13 @@ export default function MyAccount() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
+    if (user?.role === "admin") {
+      navigate("/admin/profile", { replace: true });
+      return;
+    }
     fetchAddresses();
     fetchUserProfile();
-  }, []);
+  }, [user]);
 
   const fetchUserProfile = async () => {
     try {

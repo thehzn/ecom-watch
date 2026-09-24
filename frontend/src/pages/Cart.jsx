@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import { useSelector, useDispatch } from "react-redux";
-import { Trash2, ShoppingBag, ShieldCheck } from "lucide-react";
+import { Trash2, ShoppingBag, ShieldCheck, Crown, ArrowRight, LayoutDashboard, Compass } from "lucide-react";
 import { removeCartItem, updateCartQuantity } from "../redux/cartSlice";
 
 export default function Cart() {
@@ -20,10 +20,16 @@ export default function Cart() {
   const [loading, setLoading] = useState(true);
 
   const { user, token } = useSelector((state) => state.auth);
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
+    if (isAdmin) {
+      setLoading(false);
+      setItems([]);
+      return;
+    }
     loadCart();
-  }, []);
+  }, [isAdmin]);
 
   const loadCart = async () => {
     setLoading(true);
@@ -31,6 +37,7 @@ export default function Cart() {
     try {
       const res = await get("/apicarts/getcartitems", {
         allowNotFound: true,
+        allowForbidden: true,
       });
 
       // Remove invalid cart items where product is null
@@ -108,6 +115,9 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
+    if (isAdmin) {
+      return;
+    }
     if (user && token) {
       navigate("/checkout");
     } else {
@@ -121,6 +131,52 @@ export default function Cart() {
     return (
       <div className="min-h-[70vh] bg-[#08090C] flex items-center justify-center">
         <div className="w-10 h-10 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Administrator Storefront View
+  if (isAdmin) {
+    return (
+      <div className="min-h-[75vh] bg-[#08090C] flex flex-col items-center justify-center text-center px-6 py-16">
+        {/* Luxury Admin Pill */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-widest mb-6">
+          <Crown size={14} />
+          <span>Administrator Storefront Preview</span>
+        </div>
+
+        <h1 className="font-caslon text-3xl sm:text-4xl lg:text-5xl text-white max-w-2xl leading-tight">
+          Client Shopping Bag
+        </h1>
+
+        <p className="mt-4 text-sm sm:text-base text-white/60 max-w-lg font-normal leading-relaxed">
+          You are currently previewing the Chronos boutique under your administrator credentials. Shopping bag reservations, addresses, and payment checkouts are reserved for customer client accounts.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="/admin/dashboard"
+            className="inline-flex items-center gap-2 bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-[0.2em] px-7 py-3.5 rounded-lg transition-all shadow-lg shadow-[#C5A880]/15"
+          >
+            <LayoutDashboard size={15} />
+            <span>Admin Dashboard</span>
+          </Link>
+
+          <Link
+            to="/admin/products"
+            className="inline-flex items-center gap-2 bg-[#12151B] hover:bg-[#1A1E26] border border-white/20 text-white text-xs font-semibold uppercase tracking-[0.16em] px-6 py-3.5 rounded-lg transition-all"
+          >
+            <span>Manage Products</span>
+          </Link>
+
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-xs uppercase tracking-[0.16em] px-4 py-3.5 transition-colors"
+          >
+            <Compass size={14} />
+            <span>Browse Timepieces</span>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -193,7 +249,7 @@ export default function Cart() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center border border-white/20 rounded-lg overflow-hidden bg-[#141720] border border-white/10">
+                    <div className="flex items-center border border-white/20 rounded-lg overflow-hidden bg-[#141720]">
                       <button
                         onClick={() =>
                           handleUpdateQuantity(
@@ -238,7 +294,7 @@ export default function Cart() {
 
           {/* Summary Column */}
           <div className="lg:col-span-4">
-            <div className="bg-[#0E1015] border border-white/20 rounded-xl p-6 sm:p-8 flex flex-col gap-6 shadow-2xl border-white/10">
+            <div className="bg-[#0E1015] border border-white/20 rounded-xl p-6 sm:p-8 flex flex-col gap-6 shadow-2xl">
               <h3 className="font-caslon text-2xl text-white">
                 Order Summary
               </h3>

@@ -8,6 +8,7 @@ const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000');
 
 export function useApi() {
   const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -48,15 +49,16 @@ export function useApi() {
 
         if (!res.ok) {
           if (res.status === 401) {
+            const isAdmin = user?.role === 'admin' || window.location.pathname.startsWith('/admin');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             dispatch(logout());
-            navigate('/login');
-          } else if (res.status === 403) {
+            navigate(isAdmin ? '/admin/login' : '/login');
+          } else if (res.status === 403 && !options.allowForbidden && user?.role !== 'admin') {
             navigate('/unauthorized');
           } else if (res.status === 404 && !options.allowNotFound) {
             navigate('/not-found');
-          } else if (res.status >= 500) {
+          } else if (res.status >= 500 && !options.allowServerError) {
             navigate('/server-error');
           }
 
@@ -74,7 +76,7 @@ export function useApi() {
         setLoading(false);
       }
     },
-    [token, navigate, dispatch]
+    [token, user, navigate, dispatch]
   );
 
   const get = useCallback(
@@ -83,37 +85,40 @@ export function useApi() {
   );
 
   const post = useCallback(
-    (url, body) =>
+    (url, body, options = {}) =>
       request(url, {
         method: 'POST',
         body: JSON.stringify(body),
+        ...options,
       }),
     [request]
   );
-  
 
   const put = useCallback(
-    (url, body) =>
+    (url, body, options = {}) =>
       request(url, {
         method: 'PUT',
         body: JSON.stringify(body),
+        ...options,
       }),
     [request]
   );
 
   const patch = useCallback(
-    (url, body) =>
+    (url, body, options = {}) =>
       request(url, {
         method: 'PATCH',
         body: JSON.stringify(body),
+        ...options,
       }),
     [request]
   );
 
   const del = useCallback(
-    (url) =>
+    (url, options = {}) =>
       request(url, {
         method: 'DELETE',
+        ...options,
       }),
     [request]
   );

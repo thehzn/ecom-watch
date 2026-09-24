@@ -95,6 +95,7 @@ export default function Security() {
   const dispatch = useDispatch();
 
   const token = useSelector((state) => state.auth?.token);
+  const user = useSelector((state) => state.auth?.user);
 
   const API_URL =
     import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -158,8 +159,12 @@ export default function Security() {
   };
 
   useEffect(() => {
+    if (user?.role === 'admin') {
+      navigate('/admin/profile', { replace: true });
+      return;
+    }
     fetchSessions();
-  }, [token]);
+  }, [token, user]);
 
   // ----------------------------------------------------
   // TERMINATE A SPECIFIC SESSION

@@ -1,14 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Trash2, Heart, ArrowRight, Loader2 } from 'lucide-react';
-import { removeFromWishlist, setWishlist } from '../redux/wishlistSlice'; // Ensure setWishlistItems exists in your slice
+import { Trash2, Heart, ArrowRight, Loader2, Crown, LayoutDashboard, Compass } from 'lucide-react';
+import { removeFromWishlist, setWishlist } from '../redux/wishlistSlice';
 import { addOrIncrementCartItem } from '../redux/cartSlice';
 import { useApi } from '../hooks/useApi';
 
 export default function Wishlist() {
   const items = useSelector((state) => state.wishlist?.items || []);
+  const user = useSelector((state) => state.auth?.user);
+  const isAdmin = user?.role === 'admin';
   const dispatch = useDispatch();
   const { get, del, post } = useApi();
   const [loading, setLoading] = useState(true);
@@ -16,23 +17,27 @@ export default function Wishlist() {
 
   // 1. Fetch Wishlist on Mount
   useEffect(() => {
+    if (isAdmin) {
+      setLoading(false);
+      return;
+    }
+
     let isMounted = true;
 
     const fetchWishlist = async () => {
       setLoading(true);
       setFetchError('');
       try {
-        const response = await get('/apiwishlist/getwishlists');
-       console.log(response); // see the full shape
-console.log(response.products);
-        
-        // Handle variations in API response structures (e.g. array vs { items: [...] } or { wishlist: [...] })
-        const wishlistData = Array.isArray(response) 
-          ? response 
+        const response = await get('/apiwishlist/getwishlists', {
+          allowNotFound: true,
+          allowForbidden: true,
+        });
+
+        const wishlistData = Array.isArray(response)
+          ? response
           : (response?.products || response?.wishlist || []);
 
         if (isMounted) {
-          // Sync backend data to Redux if you maintain a wishlist reducer
           if (dispatch && setWishlist) {
             dispatch(setWishlist(wishlistData));
           }
@@ -52,27 +57,25 @@ console.log(response.products);
     return () => {
       isMounted = false;
     };
-  }, [get, dispatch]);
+  }, [get, dispatch, isAdmin]);
 
   // 2. Delete Wishlist Item via API
   const handleRemove = async (id) => {
-    // Optimistic UI update
     dispatch(removeFromWishlist(id));
-
     try {
-      // Correct API Endpoint matching: router.delete("/removefromlist/:productId")
-      await del(`/apiwishlist/removefromlist/${id}`,{
-      method: 'DELETE',
-      allowNotFound: true
-    });
+      await del(`/apiwishlist/removefromlist/${id}`, {
+        method: 'DELETE',
+        allowNotFound: true,
+        allowForbidden: true,
+      });
     } catch (err) {
       console.error('Failed to remove item from wishlist:', err);
-      // Optional: Refetch list on error to revert optimistic update
     }
   };
 
   // 3. Add to Cart Handler
   const handleAddToCart = async (product) => {
+    if (isAdmin) return;
     dispatch(addOrIncrementCartItem(product));
     try {
       await post('/apicarts/addtocart', { ProductId: product._id, quantity: 1 });
@@ -80,6 +83,51 @@ console.log(response.products);
       console.error('Failed to add to cart:', err);
     }
   };
+
+  // Administrator Storefront Preview View
+  if (isAdmin) {
+    return (
+      <div className="min-h-[75vh] bg-[#08090C] flex flex-col items-center justify-center text-center px-6 py-16">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-widest mb-6">
+          <Crown size={14} />
+          <span>Administrator Storefront Preview</span>
+        </div>
+
+        <h1 className="font-caslon text-3xl sm:text-4xl lg:text-5xl text-white max-w-2xl leading-tight">
+          Client Private Vault
+        </h1>
+
+        <p className="mt-4 text-sm sm:text-base text-white/60 max-w-lg font-normal leading-relaxed">
+          You are previewing the Chronos boutique under administrator credentials. The private wishlist vault is tailored for registered customer clients.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="/admin/dashboard"
+            className="inline-flex items-center gap-2 bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-[0.2em] px-7 py-3.5 rounded-lg transition-all shadow-lg shadow-[#C5A880]/15"
+          >
+            <LayoutDashboard size={15} />
+            <span>Admin Dashboard</span>
+          </Link>
+
+          <Link
+            to="/admin/products"
+            className="inline-flex items-center gap-2 bg-[#12151B] hover:bg-[#1A1E26] border border-white/20 text-white text-xs font-semibold uppercase tracking-[0.16em] px-6 py-3.5 rounded-lg transition-all"
+          >
+            <span>Manage Products</span>
+          </Link>
+
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-xs uppercase tracking-[0.16em] px-4 py-3.5 transition-colors"
+          >
+            <Compass size={14} />
+            <span>Browse Timepieces</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Loading State
   if (loading) {

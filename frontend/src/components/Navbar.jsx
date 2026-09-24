@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Search, ShoppingBag, User, Heart, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Heart, Menu, X, Crown, LayoutDashboard } from 'lucide-react';
 import { logout as logoutAction } from '../redux/authSlice';
 import { clearCart } from '../redux/cartSlice'; 
 import {clearWishlist} from '../redux/wishlistSlice';
@@ -177,19 +177,47 @@ export default function Navbar() {
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-3 w-56 bg-[#10131A] border border-white/15 shadow-2xl p-3 rounded-xl flex flex-col gap-2 z-50 backdrop-blur-xl">
+              <div className="absolute right-0 mt-3 w-60 bg-[#10131A] border border-white/15 shadow-2xl p-3 rounded-xl flex flex-col gap-2 z-50 backdrop-blur-xl">
                 {user ? (
                   <>
                     <div className="px-3 py-2 border-b border-white/10">
-                      <p className="text-[10px] uppercase tracking-wider text-[#C5A880] font-semibold">
-                        Client Dossier
-                      </p>
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[#C5A880] font-semibold mb-0.5">
+                        {user.role === 'admin' && <Crown size={12} />}
+                        <span>{user.role === 'admin' ? 'Administrator' : 'Client Dossier'}</span>
+                      </div>
                       <p className="truncate text-sm font-medium text-white">
-                        {user.firstName} {user.lastName}
+                        {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
                       </p>
                     </div>
 
-                    {user.role !== 'admin' && (
+                    {user.role === 'admin' ? (
+                      <>
+                        <Link
+                          to="/admin/dashboard"
+                          onClick={() => setProfileOpen(false)}
+                          className="w-full text-left text-xs text-[#E4CA99] px-3 py-2 hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2"
+                        >
+                          <LayoutDashboard size={13} />
+                          <span>Admin Dashboard</span>
+                        </Link>
+
+                        <Link
+                          to="/admin/profile"
+                          onClick={() => setProfileOpen(false)}
+                          className="w-full text-left text-xs text-gray-300 px-3 py-2 hover:bg-white/5 hover:text-white rounded-lg transition-colors"
+                        >
+                          Security & Profile
+                        </Link>
+
+                        <Link
+                          to="/admin/products"
+                          onClick={() => setProfileOpen(false)}
+                          className="w-full text-left text-xs text-gray-300 px-3 py-2 hover:bg-white/5 hover:text-white rounded-lg transition-colors"
+                        >
+                          Manage Inventory
+                        </Link>
+                      </>
+                    ) : (
                       <Link
                         to="/myaccount"
                         onClick={() => setProfileOpen(false)}
@@ -269,9 +297,31 @@ export default function Navbar() {
           {user ? (
             <div className="pt-3 flex flex-col gap-3">
               <div className="text-xs text-gray-400">
-                Signed in as <span className="text-white font-medium">{user.firstName}</span>
+                Signed in as <span className="text-white font-medium">{user.name || user.firstName || user.email}</span>
+                {user.role === 'admin' && (
+                  <span className="ml-2 text-[9px] uppercase tracking-wider text-[#C5A880] font-bold">Admin</span>
+                )}
               </div>
-              {user.role !== 'admin' && (
+              {user.role === 'admin' ? (
+                <>
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-left text-xs uppercase tracking-[0.18em] text-[#E4CA99] hover:text-white py-2 border-b border-white/5 transition-colors font-medium flex items-center gap-2"
+                  >
+                    <LayoutDashboard size={14} />
+                    <span>Admin Dashboard</span>
+                  </Link>
+
+                  <Link
+                    to="/admin/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-left text-xs uppercase tracking-[0.18em] text-gray-300 hover:text-white py-2 border-b border-white/5 transition-colors"
+                  >
+                    Security & Profile
+                  </Link>
+                </>
+              ) : (
                 <Link
                   to="/myaccount"
                   onClick={() => setMobileMenuOpen(false)}

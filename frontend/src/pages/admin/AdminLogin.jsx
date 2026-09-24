@@ -19,105 +19,21 @@ import watchImage from '../../assets/admin-watch.avif';
 
 
 
-const EMAIL_REGEX = /^[a-zA-Z0-9.\_%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-const PASSWORD_ERROR =
-  'Password must be 8–64 characters, start with a letter, and include at least one uppercase letter, one lowercase letter, one number, and one special character. Spaces are not allowed.';
-
-
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const validationSchema = Yup.object({
-
   email: Yup.string()
-
     .trim()
-
     .required('Email address is required')
-
     .matches(EMAIL_REGEX, 'Please enter a valid email address'),
 
   password: Yup.string()
-
-    .required('Password is required')
-
-    .test(
-
-      'no-spaces',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && !/\s/.test(v)
-
-    )
-
-    .test(
-
-      'length',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && v.length >= 8 && v.length <= 64
-
-    )
-
-    .test(
-
-      'starts-with-letter',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && /^[A-Za-z]/.test(v)
-
-    )
-
-    .test(
-
-      'has-lower',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && /[a-z]/.test(v)
-
-    )
-
-    .test(
-
-      'has-upper',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && /[A-Z]/.test(v)
-
-    )
-
-    .test(
-
-      'has-digit',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && /\d/.test(v)
-
-    )
-
-    .test(
-
-      'has-special',
-
-      PASSWORD_ERROR,
-
-      (v) => !!v && /[^A-Za-z0-9\s]/.test(v)
-
-    ),
+    .required('Password is required'),
 
   // ================= PRIVACY CONSENT =================
-
   privacyConsent: Yup.boolean()
-
     .oneOf([true], 'You must agree to the Privacy Policy')
-
     .required('You must agree to the Privacy Policy'),
-
 });
 
 
@@ -415,23 +331,14 @@ export default function AdminLogin() {
 
 
       } catch (error) {
-
         console.error(
-
           'ADMIN LOGIN ERROR:',
-
           error
-
         );
-
         setAuthError(
-
-          'Invalid email or password'
-
+          error.message || 'Unable to connect to server. Please try again.'
         );
-
         resetCaptcha();
-
       } finally {
 
         setSubmitting(false);
