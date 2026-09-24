@@ -1051,7 +1051,7 @@ const QUICK_ACCESS_CARDS = [
   },
   { 
     key: "wishlist", 
-    title: "Private Vault (Wishlist)", 
+    title: "Wishlist", 
     subtitle: "Your reserved & curated haute horlogerie timepieces",
     icon: Heart, 
     route: "/wishlist" 
