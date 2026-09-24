@@ -11,15 +11,15 @@ export default function AppInitializer() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // If user logs out or isn't authenticated, clear both stores
-      if (!user || !token) {
+      // If user logs out, isn't authenticated, or is an admin, do not fetch user cart/wishlist
+      if (!user || !token || user.role === "admin") {
         dispatch(setCart([]));
         dispatch(setWishlist([]));
         return;
       }
 
       try {
-        // Fetch cart and wishlist in parallel for optimal performance
+        // Fetch cart and wishlist in parallel for customer users
         const [cartRes, wishlistRes] = await Promise.all([
           get("/apicarts/getcartitems", { allowNotFound: true }),
           get("/apiwishlist/getwishlists", { allowNotFound: true }),
@@ -29,7 +29,7 @@ export default function AppInitializer() {
         const cartItems = cartRes?.cart?.items || cartRes?.items || [];
         dispatch(setCart(cartItems));
 
-        // Sync Wishlist data to Redux (matching the robust parsing from your Wishlist component)
+        // Sync Wishlist data to Redux
         const wishlistData = Array.isArray(wishlistRes)
           ? wishlistRes
           : wishlistRes?.products || wishlistRes?.wishlist || [];

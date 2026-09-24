@@ -485,12 +485,12 @@ import { LockKeyhole, ArrowLeft, Eye, EyeOff, Check, CheckCircle2 } from 'lucide
 // AdminProfile.jsx's reset-password flow, which hits the same
 // /apiadmin/admin/resetadminpassword endpoint) — so the client never accepts
 // something the server would reject.
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{12,}$/;
 const PASSWORD_ERROR =
-  'Must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+  'Must be at least 12 characters and include uppercase, lowercase, a number, and a special character.';
 
 const LIVE_RULES = [
-  { key: 'length', label: 'Minimum 8 characters', test: (v) => v.length >= 8 },
+  { key: 'length', label: 'Minimum 12 characters', test: (v) => v.length >= 12 },
   { key: 'upper', label: 'Includes an uppercase letter', test: (v) => /[A-Z]/.test(v) },
   { key: 'lower', label: 'Includes a lowercase letter', test: (v) => /[a-z]/.test(v) },
   { key: 'digit', label: 'Includes a number', test: (v) => /\d/.test(v) },

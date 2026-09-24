@@ -4,8 +4,9 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Crown, LayoutDashboard, Compass } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { setAddresses } from "../redux/addressSlice";
 import { clearCart } from "../redux/cartSlice";
@@ -93,21 +94,32 @@ export default function Checkout() {
   // 'new' or an address _id
   const [selectedAddressId, setSelectedAddressId] = useState("new");
 
+  const user = useSelector((state) => state.auth.user);
+  const isAdmin = user?.role === "admin";
+
   // ============================================================
   // LOAD CART FROM BACKEND
   // ============================================================
 
   useEffect(() => {
+    if (isAdmin) {
+      setCartLoading(false);
+      setAddressesLoading(false);
+      return;
+    }
     loadCart();
     loadAddresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAdmin]);
 
   const loadCart = async () => {
     try {
       setCartLoading(true);
 
-      const res = await get("/apicarts/getcartitems", { allowNotFound: true });
+      const res = await get("/apicarts/getcartitems", {
+        allowNotFound: true,
+        allowForbidden: true,
+      });
 
       console.log("Checkout cart response:", res);
 
@@ -465,6 +477,50 @@ export default function Checkout() {
   // ============================================================
   // UI
   // ============================================================
+
+  if (isAdmin) {
+    return (
+      <div className="min-h-[75vh] bg-[#08090C] flex flex-col items-center justify-center text-center px-6 py-16">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-widest mb-6">
+          <Crown size={14} />
+          <span>Administrator Storefront Preview</span>
+        </div>
+
+        <h1 className="font-caslon text-3xl sm:text-4xl lg:text-5xl text-white max-w-2xl leading-tight">
+          Client Checkout
+        </h1>
+
+        <p className="mt-4 text-sm sm:text-base text-white/60 max-w-lg font-normal leading-relaxed">
+          You are currently previewing the checkout portal with administrator credentials. Client acquisition, payment verification, and order processing are designed for client accounts.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="/admin/dashboard"
+            className="inline-flex items-center gap-2 bg-[#C5A880] hover:bg-[#d8bd95] text-black text-xs font-bold uppercase tracking-[0.2em] px-7 py-3.5 rounded-lg transition-all shadow-lg shadow-[#C5A880]/15"
+          >
+            <LayoutDashboard size={15} />
+            <span>Admin Dashboard</span>
+          </Link>
+
+          <Link
+            to="/admin/orders"
+            className="inline-flex items-center gap-2 bg-[#12151B] hover:bg-[#1A1E26] border border-white/20 text-white text-xs font-semibold uppercase tracking-[0.16em] px-6 py-3.5 rounded-lg transition-all"
+          >
+            <span>View Client Orders</span>
+          </Link>
+
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-xs uppercase tracking-[0.16em] px-4 py-3.5 transition-colors"
+          >
+            <Compass size={14} />
+            <span>Browse Collections</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-[#08090C] text-white">

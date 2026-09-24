@@ -21,16 +21,26 @@ export default function OrderDetails() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
+  const user = useSelector((state) => state.auth?.user);
+
   // =========================
   // FETCH SINGLE ORDER
   // =========================
   useEffect(() => {
+    if (user?.role === "admin" && id) {
+      navigate(`/admin/order/${id}`, { replace: true });
+      return;
+    }
+
     const fetchOrder = async () => {
       setLoading(true);
       setError("");
 
       try {
-        const res = await get(`/apiorders/singleorder/${id}`);
+        const res = await get(`/apiorders/singleorder/${id}`, {
+          allowNotFound: true,
+          allowForbidden: true,
+        });
 
         if (!res?.order) {
           setError("Order not found.");

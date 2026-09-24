@@ -463,9 +463,15 @@ export default function MyOrders() {
     }
   };
 
+  const user = useSelector((state) => state.auth?.user);
+
   useEffect(() => {
+    if (user?.role === "admin") {
+      navigate("/admin/orders", { replace: true });
+      return;
+    }
     fetchOrders();
-  }, []);
+  }, [user]);
 
   // Reset pagination to page 1 when search query changes
   useEffect(() => {

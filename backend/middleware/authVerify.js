@@ -13,6 +13,13 @@ export const verifyUser = async (req, res, next) => {
     const token = userToken.split(" ")[1];
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
+    if (decodedData.role === "admin") {
+      return res.status(403).json({
+        status: false,
+        message: "Access Denied: Customer endpoints cannot be accessed by admin accounts.",
+      });
+    }
+
     // If token has a sessionId, verify session is still active in database
     if (decodedData.sessionId) {
       const user = await User.findOne({
