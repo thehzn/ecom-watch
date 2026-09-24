@@ -38,6 +38,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    mobileChangeOtp: { type: String },
+
+mobileChangeOtpExpiresAt: { type: Date },
+
+mobileChangeVerified: { type: Boolean, default: false },
+
+mobileVerifiedAt: { type: Date },
 
 
     password: { type: String, required: function(){

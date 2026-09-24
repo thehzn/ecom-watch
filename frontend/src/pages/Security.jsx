@@ -901,9 +901,7 @@ export default function Security() {
         </div>
       </main>
 
-      <footer className="w-full border-t border-white/5 py-4 px-6 text-center text-[10px] text-gray-500 tracking-widest uppercase">
-        256-Bit Encrypted Multi-Device Security • Geneva Standard
-      </footer>
+      
     </div>
   );
 }
