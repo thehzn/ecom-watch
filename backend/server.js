@@ -17,7 +17,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js"
 import enquiryRoutes from "./routes/EnquiryRoutes.js"
 import reviewRoutes from "./routes/reviewRoutes.js"
 import { createAdmin } from "./utils/createAdmin.js";
-
+import passport from "./config/passport.js";
 
 
 const app = express();
@@ -36,6 +36,7 @@ app.get("/", (req, res) => {
     message: "CHRONOS Backend is running"
   });
 });
+app.use(passport.initialize());
 
 
 app.use("/apiauth",authRoutes)

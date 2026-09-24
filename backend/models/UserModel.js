@@ -46,6 +46,41 @@ mobileChangeVerified: { type: Boolean, default: false },
 
 mobileVerifiedAt: { type: Date },
 
+
+    password: { type: String, required: function(){
+    return this.authProvider === "local"
+    }},
+
+    googleId: {type: String,unique: true,sparse: true},
+
+    authProvider: {type: String,enum: ["local", "google"],default: "local"},
+    
+    failedLoginAttempts: {type: Number,default: 0},
+
+    lockUntil: {type: Date,default: null},
+
+    isLocked: { type: Boolean, default: false},
+    dob: {
+      type: Date,
+      default: null,
+      validate: {
+        validator: function (value) {
+          if (!value) return true;
+          const now = new Date();
+          const minDate = new Date();
+          minDate.setFullYear(minDate.getFullYear() - 120);
+          return value <= now && value >= minDate;
+        },
+        message: "Please enter a valid date of birth",
+      },
+    },
+
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Prefer not to say", ""],
+      default: "",
+    },
+
     password: { type: String, required: [true, "Password is required"] },
 
     role: { type: String, enum: ["user", "admin"], default: "user" },
@@ -76,6 +111,19 @@ mobileVerifiedAt: { type: Date },
         state: { type: String, trim: true },
         pincode: { type: String, trim: true },
         isDefault: { type: Boolean, default: false },
+      },
+    ],
+
+    sessions: [
+      {
+        sessionId: { type: String, required: true },
+        device: { type: String, default: "Unknown Device" },
+        browser: { type: String, default: "Unknown Browser" },
+        os: { type: String, default: "Unknown OS" },
+        deviceType: { type: String, enum: ["Desktop", "Mobile", "Tablet"], default: "Desktop" },
+        ipAddress: { type: String, default: "" },
+        lastActive: { type: Date, default: Date.now },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
   },
