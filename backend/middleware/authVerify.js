@@ -4,6 +4,9 @@ import User from "../models/UserModel.js";
 
 dotenv.config();
 
+// 30 minutes inactivity timeout for user sessions
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+
 export const verifyUser = async (req, res, next) => {
   try {
     const userToken = req.headers.authorization;
@@ -11,6 +14,9 @@ export const verifyUser = async (req, res, next) => {
       return res.status(401).json({ status: false, message: "Token not Found" });
     }
     const token = userToken.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ status: false, message: "Invalid authorization header format" });
+    }
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decodedData.role === "admin") {
@@ -33,30 +39,46 @@ export const verifyUser = async (req, res, next) => {
 
       // If the user document has sessions tracked and this sessionId was removed, deny
       if (Array.isArray(user.sessions) && user.sessions.length > 0) {
-        const sessionExists = user.sessions.some(
+        const currentSession = user.sessions.find(
           (s) => s.sessionId === decodedData.sessionId
         );
-        if (!sessionExists) {
+
+        if (!currentSession) {
           return res.status(401).json({
             status: false,
+            sessionExpired: true,
             message: "Session has been terminated or logged out. Please sign in again.",
           });
         }
-      }
 
-      // Update last active timestamp
-      const currentSession = (user.sessions || []).find(
-        (s) => s.sessionId === decodedData.sessionId
-      );
-      if (
-        currentSession &&
-        (!currentSession.lastActive ||
-          Date.now() - new Date(currentSession.lastActive).getTime() > 5 * 60 * 1000)
-      ) {
-        User.updateOne(
-          { _id: user._id, "sessions.sessionId": decodedData.sessionId },
-          { $set: { "sessions.$.lastActive": new Date() } }
-        ).catch(() => {});
+        // Inactivity timeout check (30 minutes)
+        const lastActiveTime = currentSession.lastActive
+          ? new Date(currentSession.lastActive).getTime()
+          : currentSession.createdAt
+          ? new Date(currentSession.createdAt).getTime()
+          : Date.now();
+
+        if (Date.now() - lastActiveTime > INACTIVITY_TIMEOUT_MS) {
+          // Expire session from database
+          await User.updateOne(
+            { _id: user._id },
+            { $pull: { sessions: { sessionId: decodedData.sessionId } } }
+          ).catch(() => {});
+
+          return res.status(401).json({
+            status: false,
+            sessionTimeout: true,
+            message: "Session timed out due to 30 minutes of inactivity. Please sign in again.",
+          });
+        }
+
+        // Update last active timestamp if more than 1 minute has passed
+        if (Date.now() - lastActiveTime > 60 * 1000) {
+          User.updateOne(
+            { _id: user._id, "sessions.sessionId": decodedData.sessionId },
+            { $set: { "sessions.$.lastActive": new Date() } }
+          ).catch(() => {});
+        }
       }
     }
 

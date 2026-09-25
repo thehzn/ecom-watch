@@ -50,6 +50,17 @@ router.get(
       if (!Array.isArray(req.user.sessions)) {
         req.user.sessions = [];
       }
+
+      // Remove any previous active session from the same physical device/browser to prevent duplication
+      req.user.sessions = req.user.sessions.filter(
+        (s) =>
+          !(
+            s.browser === browser &&
+            s.os === os &&
+            (s.deviceType || 'Desktop') === (deviceType || 'Desktop')
+          )
+      );
+
       req.user.sessions.unshift(newSession);
       if (req.user.sessions.length > 10) {
         req.user.sessions = req.user.sessions.slice(0, 10);

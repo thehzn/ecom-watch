@@ -97,6 +97,27 @@ function DeviceIcon({ type }) {
   return <Laptop size={20} className="text-gray-300" />;
 }
 
+function deduplicateSessions(sessionList = []) {
+  if (!Array.isArray(sessionList)) return [];
+  const seen = new Set();
+  const result = [];
+  const current = sessionList.find((s) => s.isCurrent);
+  if (current) {
+    const key = `${current.device || ''}_${current.browser || ''}_${current.os || ''}_${current.deviceType || 'Desktop'}`.toLowerCase();
+    seen.add(key);
+    result.push(current);
+  }
+  for (const s of sessionList) {
+    if (s.isCurrent) continue;
+    const key = `${s.device || ''}_${s.browser || ''}_${s.os || ''}_${s.deviceType || 'Desktop'}`.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(s);
+    }
+  }
+  return result;
+}
+
 export default function Security() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,7 +173,7 @@ export default function Security() {
         allowNotFound: true,
       });
 
-      setSessions(data?.sessions || []);
+      setSessions(deduplicateSessions(data?.sessions || []));
     } catch (err) {
       setSessionsError(err?.message || 'Unable to reach server to load active sessions.');
     } finally {
@@ -218,7 +239,7 @@ export default function Security() {
         return;
       }
 
-      setSessions(data?.sessions || []);
+      setSessions(deduplicateSessions(data?.sessions || []));
       setSessionSuccessMessage('Device session signed out successfully.');
       toast.success('Device signed out');
       setTimeout(() => setSessionSuccessMessage(''), 4000);
@@ -249,7 +270,7 @@ export default function Security() {
     try {
       const data = await del('/apiuser/user/sessions/others');
 
-      setSessions(data?.sessions || []);
+      setSessions(deduplicateSessions(data?.sessions || []));
       setSessionSuccessMessage(
         'All other active devices have been signed out.'
       );
@@ -660,6 +681,26 @@ export default function Security() {
                   ))}
                 </div>
               )}
+
+              {/* Inactivity Policy Banner */}
+              <div className="p-4 bg-[#141720] border border-[#C5A880]/30 rounded-2xl flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-xl bg-[#C5A880]/15 border border-[#C5A880]/30 flex items-center justify-center shrink-0 text-[#C5A880]">
+                  <Clock size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <p className="text-xs font-bold text-white uppercase tracking-wider">
+                      30-Minute Inactivity Protection
+                    </p>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                    For your account security, client sessions are automatically terminated after 30 minutes of inactivity. Interacting with the boutique resets the security timer.
+                  </p>
+                </div>
+              </div>
 
               {/* Security Note */}
               <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-xs text-gray-400 flex items-start gap-3">

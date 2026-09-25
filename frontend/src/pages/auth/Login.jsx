@@ -54,6 +54,10 @@ export default function Login() {
     const token = params.get('token');
     const userParam = params.get('user');
 
+    if (params.get('reason') === 'inactivity_timeout') {
+      setAuthError('Your session expired due to 30 minutes of inactivity. Please sign in again.');
+    }
+
     if (token && userParam) {
       try {
         const user = JSON.parse(decodeURIComponent(userParam));

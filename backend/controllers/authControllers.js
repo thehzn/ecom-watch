@@ -235,6 +235,16 @@ export const login = async (req, res) => {
       currentUser.sessions = [];
     }
 
+    // Remove any previous active session from the same physical device/browser to prevent duplication
+    currentUser.sessions = currentUser.sessions.filter(
+      (s) =>
+        !(
+          s.browser === browser &&
+          s.os === os &&
+          (s.deviceType || 'Desktop') === (deviceType || 'Desktop')
+        )
+    );
+
     currentUser.sessions.unshift(newSession);
     if (currentUser.sessions.length > 10) {
       currentUser.sessions = currentUser.sessions.slice(0, 10);

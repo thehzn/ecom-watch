@@ -607,6 +607,27 @@ function LogoutConfirmModal({ onClose, onConfirm }) {
   );
 }
 
+function deduplicateSessions(sessionList = []) {
+  if (!Array.isArray(sessionList)) return [];
+  const seen = new Set();
+  const result = [];
+  const current = sessionList.find((s) => s.isCurrent);
+  if (current) {
+    const key = `${current.device || ''}_${current.browser || ''}_${current.os || ''}_${current.deviceType || 'Desktop'}`.toLowerCase();
+    seen.add(key);
+    result.push(current);
+  }
+  for (const s of sessionList) {
+    if (s.isCurrent) continue;
+    const key = `${s.device || ''}_${s.browser || ''}_${s.os || ''}_${s.deviceType || 'Desktop'}`.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(s);
+    }
+  }
+  return result;
+}
+
 export default function MyAccount() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -663,7 +684,7 @@ export default function MyAccount() {
     setSessionsLoading(true);
     try {
       const res = await get("/apiuser/user/sessions", { allowForbidden: true, allowNotFound: true });
-      setSessions(res?.sessions || []);
+      setSessions(deduplicateSessions(res?.sessions || []));
     } catch {
       // ignore
     } finally {
@@ -728,7 +749,7 @@ export default function MyAccount() {
         navigate("/login");
         return;
       }
-      setSessions(res?.sessions || []);
+      setSessions(deduplicateSessions(res?.sessions || []));
       toast.success("Device signed out successfully");
     } catch {
       toast.error("Failed to sign out device");
@@ -742,7 +763,7 @@ export default function MyAccount() {
     setTerminatingOthers(true);
     try {
       const res = await del("/apiuser/user/sessions/others");
-      setSessions(res?.sessions || []);
+      setSessions(deduplicateSessions(res?.sessions || []));
       toast.success("Signed out all other active sessions");
     } catch {
       toast.error("Failed to sign out other sessions");
@@ -955,9 +976,12 @@ export default function MyAccount() {
                     {sessions.length} {sessions.length === 1 ? 'Device' : 'Devices'} Connected
                   </span>
                 )}
+                <span className="px-2.5 py-0.5 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[10px] font-bold uppercase tracking-wider text-[#C5A880]">
+                  30m Auto-Timeout Protected
+                </span>
               </div>
               <p className="text-xs text-gray-400 mt-0.5">
-                Real-time overview of devices currently authenticated with your account
+                Real-time overview of devices currently authenticated with your account (auto-terminates after 30 mins inactivity)
               </p>
             </div>
 
