@@ -24,7 +24,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "/apiauth/user/login",
+failureRedirect: "https://ecom-watch-peach.vercel.app/login",
   }),
   (req, res) => {
     const userToken = jwt.sign(
@@ -49,9 +49,9 @@ router.get(
       })
     );
 
-    return res.redirect(
-      `http://localhost:5173/login?token=${userToken}&user=${userData}`
-    );
+  return res.redirect(
+  `https://ecom-watch-peach.vercel.app/login?token=${userToken}&user=${userData}`
+);
   }
 );
 export default router

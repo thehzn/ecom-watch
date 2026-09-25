@@ -9,8 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/apiauth/google/callback",
-    },
+      callbackURL:"https://ecom-watch-r6f9.onrender.com/apiauth/google/callback",    },
 
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -72,8 +71,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/apiadmin/google/admin/callback",
-    },
+      callbackURL:"https://ecom-watch-r6f9.onrender.com/apiadmin/google/admin/callback",    },
 
     async (accessToken, refreshToken, profile, done) => {
       try {
