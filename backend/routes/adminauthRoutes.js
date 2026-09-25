@@ -60,7 +60,7 @@ router.get(
   "/google/admin/callback",
   passport.authenticate("google-admin", {
     session: false,
-    failureRedirect: "/admin/login",
+   failureRedirect: "https://ecom-watch-peach.vercel.app/admin/login",
   }),
   async (req, res) => {
     try {
@@ -123,9 +123,9 @@ router.get(
         })
       );
 
-      return res.redirect(
-        `http://localhost:5173/admin/login?token=${adminToken}&user=${adminData}`
-      );
+    return res.redirect(
+  `https://ecom-watch-peach.vercel.app/admin/login?token=${adminToken}&user=${adminData}`
+);
     } catch (err) {
       console.error("Google Admin callback error:", err);
       return res.redirect("/admin/login?error=oauth_failed");
