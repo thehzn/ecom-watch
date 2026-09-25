@@ -273,13 +273,13 @@ const seedProducts = async () => {
                 }
             );
 
-            console.log(`✓ ${product.modelName} added`);
+            console.log(`${product.modelName} added`);
         }
 
-        console.log("\n🎉 All 12 products added successfully!");
+        console.log("\nAll 12 products added successfully!");
 
     } catch (error) {
-        console.error("❌ Product seeding failed:");
+        console.error("Product seeding failed:");
         console.error(error);
     } finally {
         await mongoose.disconnect();

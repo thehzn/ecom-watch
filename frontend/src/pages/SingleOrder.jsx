@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {ArrowLeft,Package,ShieldCheck,MapPin,CreditCard,Truck,} from "lucide-react";
 import { useApi } from "../hooks/useApi";
+import { useSelector } from "react-redux";
 
 const STATUS_STYLES = {
   Delivered: "bg-white text-black font-bold border border-white",
@@ -20,6 +21,7 @@ export default function OrderDetails() {
 
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const navigate = useNavigate()
 
   const user = useSelector((state) => state.auth?.user);
 
@@ -61,7 +63,7 @@ export default function OrderDetails() {
     if (id) {
       fetchOrder();
     }
-  }, [id]);
+  }, [id, user, navigate, get]);
 
   // =========================
   // PAY NOW / RETRY PAYMENT
