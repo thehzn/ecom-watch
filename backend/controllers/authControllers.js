@@ -146,15 +146,16 @@ export const login = async (req, res) => {
       await currentUser.save();
     }
 
-    const isMatch = await argon.verify(
-      currentUser.password,
-      password
-    );
-
+    
     if (!currentUser.password) {
     return res.status(400).json({status: false,message: "This account does not have a password. Please use Google login or reset your password.",
   });
 }
+
+    const isMatch = await argon.verify(
+      currentUser.password,
+      password
+    );
 
     if (!isMatch) {
       currentUser.failedLoginAttempts += 1;

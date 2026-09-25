@@ -68,7 +68,7 @@ const updateProductImages = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URL);
 
-        console.log("✅ MongoDB connected\n");
+        console.log("MongoDB connected\n");
 
         const imageFolder = path.join(
             process.cwd(),
@@ -104,20 +104,20 @@ const updateProductImages = async () => {
             );
 
             if (!updatedProduct) {
-                console.log(`❌ Product not found: ${product.sku}`);
+                console.log(` Product not found: ${product.sku}`);
                 continue;
             }
 
             console.log(
-                `✅ ${updatedProduct.modelName} → image updated`
+                ` ${updatedProduct.modelName} → image updated`
             );
             console.log("");
         }
 
-        console.log("🎉 ALL PRODUCT IMAGES UPDATED!");
+        console.log("ALL PRODUCT IMAGES UPDATED!");
 
     } catch (error) {
-        console.error("❌ Image update failed:");
+        console.error("Image update failed:");
         console.error(error);
     } finally {
         await mongoose.disconnect();
