@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { logout, updateUser } from '../../redux/authSlice';
+import toast from 'react-hot-toast';
 
 // Swiss Atelier Company Defaults
 const COMPANY = {
@@ -291,10 +292,12 @@ export default function AdminProfile() {
         );
         setIsEditingProfile(false);
         setProfileSuccessMsg('Profile updated successfully.');
+        toast.success('Admin profile updated successfully');
         setTimeout(() => setProfileSuccessMsg(null), 4000);
       }
     } catch (err) {
       setProfileErrorMsg(err.message || 'Failed to update profile.');
+      toast.error(err.message || 'Failed to update profile');
     } finally {
       setProfileSaveSubmitting(false);
     }
@@ -313,10 +316,12 @@ export default function AdminProfile() {
       if (data?.sessions) {
         setSessions(data.sessions);
         setSessionSuccessMsg('Session terminated successfully.');
+        toast.success('Session terminated successfully');
         setTimeout(() => setSessionSuccessMsg(null), 3500);
       }
     } catch (err) {
       setSessionErrorMsg(err.message || 'Failed to terminate session.');
+      toast.error(err.message || 'Failed to terminate session');
     } finally {
       setSessionActionId(null);
     }
@@ -330,10 +335,12 @@ export default function AdminProfile() {
       if (data?.sessions) {
         setSessions(data.sessions);
         setSessionSuccessMsg('All other devices have been signed out.');
+        toast.success('All other devices have been signed out');
         setTimeout(() => setSessionSuccessMsg(null), 3500);
       }
     } catch (err) {
       setSessionErrorMsg(err.message || 'Failed to sign out other sessions.');
+      toast.error(err.message || 'Failed to sign out other sessions');
     } finally {
       setConfirmModal({ isOpen: false, type: null, sessionId: null, title: '', description: '' });
     }
@@ -346,9 +353,11 @@ export default function AdminProfile() {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       dispatch(logout());
+      toast.success('Signed out of all administrative sessions');
       navigate('/admin/login');
     } catch (err) {
       setSessionErrorMsg(err.message || 'Failed to sign out all sessions.');
+      toast.error(err.message || 'Failed to sign out all sessions');
     } finally {
       setConfirmModal({ isOpen: false, type: null, sessionId: null, title: '', description: '' });
     }
@@ -369,8 +378,10 @@ export default function AdminProfile() {
       setEmailOtpVerified(false);
       setEmailOtp('');
       setNewEmail('');
+      toast.success('Security code sent to your current email');
     } catch (err) {
       setEmailChangeError(err.message || 'Failed to send OTP.');
+      toast.error(err.message || 'Failed to send OTP');
     } finally {
       setEmailOtpSubmitting(false);
     }
@@ -381,7 +392,9 @@ export default function AdminProfile() {
     setEmailChangeError(null);
 
     if (emailOtp.length !== 6) {
-      setEmailChangeError('Enter the 6-digit OTP sent to your current email.');
+      const msg = 'Enter the 6-digit OTP sent to your current email.';
+      setEmailChangeError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -390,8 +403,10 @@ export default function AdminProfile() {
       await post('/apiadmin/admin/verify-email', { otp: emailOtp });
       setEmailOtpVerified(true);
       setEmailChangeError(null);
+      toast.success('Email authorization verified');
     } catch (err) {
       setEmailChangeError(err.message || 'OTP verification failed.');
+      toast.error(err.message || 'OTP verification failed');
     } finally {
       setEmailVerifySubmitting(false);
     }
@@ -404,21 +419,29 @@ export default function AdminProfile() {
 
     const cleanNewEmail = newEmail.toLowerCase().trim();
     if (!emailOtpVerified) {
-      setEmailChangeError('Please verify your current email first.');
+      const msg = 'Please verify your current email first.';
+      setEmailChangeError(msg);
+      toast.error(msg);
       return;
     }
     if (!cleanNewEmail) {
-      setEmailChangeError('Please enter your new email address.');
+      const msg = 'Please enter your new email address.';
+      setEmailChangeError(msg);
+      toast.error(msg);
       return;
     }
     if (cleanNewEmail === currentEmail.toLowerCase().trim()) {
-      setEmailChangeError('New email must be different from current email.');
+      const msg = 'New email must be different from current email.';
+      setEmailChangeError(msg);
+      toast.error(msg);
       return;
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(cleanNewEmail)) {
-      setEmailChangeError('Please enter a valid email address.');
+      const msg = 'Please enter a valid email address.';
+      setEmailChangeError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -439,8 +462,10 @@ export default function AdminProfile() {
       setEmailOtpRequested(false);
       setEmailOtpVerified(false);
       setEmailChangeSuccess(true);
+      toast.success('Administrative email updated successfully');
     } catch (err) {
       setEmailChangeError(err.message || 'Failed to change email.');
+      toast.error(err.message || 'Failed to change email');
     } finally {
       setEmailChangeSubmitting(false);
     }
@@ -459,8 +484,10 @@ export default function AdminProfile() {
       await post('/apiadmin/admin/sendotp', { email: otpEmail });
       setOtpRequested(true);
       setOtp('');
+      toast.success('OTP sent to your administrator email');
     } catch (err) {
       setResetError(err.message || 'Failed to send OTP.');
+      toast.error(err.message || 'Failed to send OTP');
     } finally {
       setOtpSubmitting(false);
     }
@@ -471,7 +498,9 @@ export default function AdminProfile() {
     setResetError(null);
 
     if (otp.length !== 6) {
-      setResetError('Enter the 6-digit OTP sent to your email.');
+      const msg = 'Enter the 6-digit OTP sent to your email.';
+      setResetError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -483,8 +512,10 @@ export default function AdminProfile() {
       });
       setResetToken(data.resetToken);
       setOtpVerified(true);
+      toast.success('Master security OTP verified');
     } catch (err) {
       setResetError(err.message || 'OTP verification failed.');
+      toast.error(err.message || 'OTP verification failed');
     } finally {
       setVerifySubmitting(false);
     }
@@ -495,19 +526,23 @@ export default function AdminProfile() {
     setResetError(null);
 
     if (newPassword.length < 12) {
-      setResetError('Administrator password must be at least 12 characters.');
+      const msg = 'Administrator password must be at least 12 characters.';
+      setResetError(msg);
+      toast.error(msg);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setResetError('Passwords do not match.');
+      const msg = 'Passwords do not match.';
+      setResetError(msg);
+      toast.error(msg);
       return;
     }
 
     if (!PASSWORD_REGEX.test(newPassword)) {
-      setResetError(
-        'Password must include uppercase, lowercase, a number, and a special character.'
-      );
+      const msg = 'Password must include uppercase, lowercase, a number, and a special character.';
+      setResetError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -526,10 +561,12 @@ export default function AdminProfile() {
       setOtpRequested(false);
       setOtpVerified(false);
       setResetToken(null);
+      toast.success('Master administrator password rotated successfully');
       // Refresh profile to pull updated passwordChangedAt
       fetchProfile();
     } catch (err) {
       setResetError(err.message || 'Failed to reset password.');
+      toast.error(err.message || 'Failed to rotate password');
     } finally {
       setResetSubmitting(false);
     }

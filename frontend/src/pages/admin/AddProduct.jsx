@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 const CATEGORIES = ['Luxury Watch', 'Heritage', 'Contemporary', 'Sports'];
 const PRODUCT_FOR_OPTIONS = ['Men', 'Women', 'Children'];
@@ -146,12 +147,16 @@ export default function AddProduct() {
     const stockErr = validateField('stock', form.stock);
 
     if (priceErr || stockErr) {
-      setError('Please correct the validation errors in the form.');
+      const msg = 'Please correct the validation errors in the form.';
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
     if (!mainImage) {
-      setError('A primary image is required.');
+      const msg = 'A primary image is required.';
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -164,12 +169,15 @@ export default function AddProduct() {
     ];
     for (const [field, label] of requiredTextFields) {
       if (!form[field] || !form[field].trim()) {
-        setError(`${label} cannot be empty or just whitespace.`);
+        const msg = `${label} cannot be empty or just whitespace.`;
+        setError(msg);
+        toast.error(msg);
         return;
       }
     }
 
     setSubmitting(true);
+    const loadingToast = toast.loading('Registering timepiece to catalogue...');
     try {
       const payload = new FormData();
       Object.entries(form).forEach(([key, value]) => payload.append(key, value));
@@ -191,9 +199,13 @@ export default function AddProduct() {
         throw new Error(data?.message || `Request failed: ${res.status}`);
       }
 
+      toast.dismiss(loadingToast);
+      toast.success('Timepiece registered successfully to catalogue');
       navigate('/admin/products');
     } catch (err) {
+      toast.dismiss(loadingToast);
       setError(err.message);
+      toast.error(err.message || 'Failed to register timepiece');
     } finally {
       setSubmitting(false);
     }
