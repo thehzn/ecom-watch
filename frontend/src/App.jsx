@@ -41,6 +41,7 @@ import ScrollToTop from './components/ScrollToTop';
 import AppInitializer from './AppInitializer';
 import AdminReviewList from './pages/admin/AdminReviewList'; // Import the AdminReviewList component
 import { Toaster } from 'react-hot-toast';
+import UserSessionTimeout from './components/UserSessionTimeout';
 
 
 
@@ -71,6 +72,7 @@ function App() {
       />
       <ScrollToTop />
       <AppInitializer />
+      <UserSessionTimeout />
       <Routes>
         {/* site routes — shared Navbar/Footer via UserLayout */}
         <Route element={<UserLayout />}>

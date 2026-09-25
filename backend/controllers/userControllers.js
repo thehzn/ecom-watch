@@ -2241,17 +2241,57 @@ export const getUserSessions = async (req, res) => {
         lastActive: new Date(),
         createdAt: new Date(),
       };
+
+      // Remove any older session matching this device fingerprint before inserting
+      user.sessions = user.sessions.filter(
+        (s) =>
+          !(
+            s.browser === browser &&
+            s.os === os &&
+            (s.deviceType || "Desktop") === (deviceType || "Desktop")
+          )
+      );
+
       user.sessions.unshift(newSession);
-      if (user.sessions.length > 10) {
-        user.sessions = user.sessions.slice(0, 10);
-      }
       currentSessionId = activeSessionId;
-      await user.save();
     } else {
       user.sessions[sessionIndex].lastActive = new Date();
       if (ipAddress) user.sessions[sessionIndex].ipAddress = ipAddress;
-      await user.save();
     }
+
+    // Clean up / deduplicate stored sessions in DB so each physical device/browser has only 1 record
+    const seenDeviceKeys = new Set();
+    const deduplicatedSessions = [];
+
+    // Prioritize current session
+    const currentSessionObj = user.sessions.find(
+      (s) => s.sessionId === currentSessionId
+    );
+    if (currentSessionObj) {
+      const curKey = `${currentSessionObj.device || ""}_${currentSessionObj.browser || ""}_${currentSessionObj.os || ""}_${currentSessionObj.deviceType || "Desktop"}`.toLowerCase();
+      seenDeviceKeys.add(curKey);
+      deduplicatedSessions.push(currentSessionObj);
+    }
+
+    // Sort remaining by lastActive desc and keep unique device fingerprints only
+    const otherSessions = user.sessions
+      .filter((s) => s.sessionId !== currentSessionId)
+      .sort(
+        (a, b) =>
+          new Date(b.lastActive || b.createdAt || 0).getTime() -
+          new Date(a.lastActive || a.createdAt || 0).getTime()
+      );
+
+    for (const s of otherSessions) {
+      const key = `${s.device || ""}_${s.browser || ""}_${s.os || ""}_${s.deviceType || "Desktop"}`.toLowerCase();
+      if (!seenDeviceKeys.has(key)) {
+        seenDeviceKeys.add(key);
+        deduplicatedSessions.push(s);
+      }
+    }
+
+    user.sessions = deduplicatedSessions.slice(0, 10);
+    await user.save();
 
     const sessions = user.sessions.map((s) => ({
       sessionId: s.sessionId,
@@ -2298,9 +2338,21 @@ export const deleteUserSession = async (req, res) => {
       return res.status(404).json({ status: false, message: "User not found" });
     }
 
-    user.sessions = (user.sessions || []).filter(
-      (s) => s.sessionId !== sessionId
-    );
+    const sessionToDelete = (user.sessions || []).find((s) => s.sessionId === sessionId);
+
+    if (sessionToDelete) {
+      const targetFingerprint = `${sessionToDelete.device || ""}_${sessionToDelete.browser || ""}_${sessionToDelete.os || ""}_${sessionToDelete.deviceType || "Desktop"}`.toLowerCase();
+      user.sessions = (user.sessions || []).filter((s) => {
+        if (s.sessionId === sessionId) return false;
+        if (s.sessionId === currentSessionId) return true;
+        const key = `${s.device || ""}_${s.browser || ""}_${s.os || ""}_${s.deviceType || "Desktop"}`.toLowerCase();
+        return key !== targetFingerprint;
+      });
+    } else {
+      user.sessions = (user.sessions || []).filter(
+        (s) => s.sessionId !== sessionId
+      );
+    }
 
     await user.save();
 
@@ -2317,6 +2369,12 @@ export const deleteUserSession = async (req, res) => {
       createdAt: s.createdAt,
       isCurrent: s.sessionId === currentSessionId,
     }));
+
+    remainingSessions.sort((a, b) => {
+      if (a.isCurrent) return -1;
+      if (b.isCurrent) return 1;
+      return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
+    });
 
     return res.status(200).json({
       status: true,

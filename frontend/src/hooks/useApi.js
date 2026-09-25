@@ -50,10 +50,18 @@ export function useApi() {
         if (!res.ok) {
           if (res.status === 401) {
             const isAdmin = user?.role === 'admin' || window.location.pathname.startsWith('/admin');
+            const isTimeout =
+              data?.sessionTimeout === true ||
+              (typeof data?.message === 'string' &&
+                data.message.toLowerCase().includes('timed out'));
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             dispatch(logout());
-            navigate(isAdmin ? '/admin/login' : '/login');
+            if (isTimeout) {
+              navigate(isAdmin ? '/admin/login?reason=inactivity_timeout' : '/login?reason=inactivity_timeout');
+            } else {
+              navigate(isAdmin ? '/admin/login' : '/login');
+            }
           } else if (res.status === 403 && !options.allowForbidden && user?.role !== 'admin') {
             navigate('/unauthorized');
           } else if (res.status === 404 && !options.allowNotFound) {
