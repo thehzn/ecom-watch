@@ -2325,3 +2325,57 @@ export const logoutOtherSessions = async (req, res) => {
     return res.status(500).json({ status: false, message: error.message });
   }
 };
+
+export const logoutAllSessions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    user.sessions = [];
+    await user.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "All sessions logged out successfully",
+      isCurrentDeleted: true,
+      sessions: [],
+    });
+  } catch (error) {
+    console.error("logoutAllSessions Error:", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const getUserLoginActivity = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select("loginActivities");
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    const activities = user.loginActivities || [];
+    const totalLogins = activities.length;
+    const failedLogins = activities.filter((a) => a.status === "Failed" || a.status === "Blocked").length;
+    const suspiciousCount = activities.filter((a) => a.isSuspicious).length;
+
+    return res.status(200).json({
+      status: true,
+      message: "Login activity retrieved successfully",
+      activities,
+      stats: {
+        totalLogins,
+        failedLogins,
+        suspiciousCount,
+      },
+    });
+  } catch (error) {
+    console.error("getUserLoginActivity Error:", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};

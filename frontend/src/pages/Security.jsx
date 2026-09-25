@@ -18,6 +18,11 @@ import {
   Sparkles,
   RefreshCw,
   Globe,
+  Activity,
+  AlertTriangle,
+  ShieldAlert,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { logout } from '../redux/authSlice';
 
@@ -100,7 +105,7 @@ export default function Security() {
   const API_URL =
     import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-  const [activeTab, setActiveTab] = useState('devices'); // 'devices' | 'password'
+  const [activeTab, setActiveTab] = useState('devices'); // 'devices' | 'activity' | 'password'
 
   // Sessions state
   const [sessions, setSessions] = useState([]);
@@ -108,7 +113,17 @@ export default function Security() {
   const [sessionsError, setSessionsError] = useState('');
   const [terminatingId, setTerminatingId] = useState(null);
   const [terminatingOthers, setTerminatingOthers] = useState(false);
+  const [terminatingAll, setTerminatingAll] = useState(false);
   const [sessionSuccessMessage, setSessionSuccessMessage] = useState('');
+
+  // Login activity state
+  const [activities, setActivities] = useState([]);
+  const [activityStats, setActivityStats] = useState({
+    totalLogins: 0,
+    failedLogins: 0,
+    suspiciousCount: 0,
+  });
+  const [activityLoading, setActivityLoading] = useState(false);
 
   // Password change state
   const [showNew, setShowNew] = useState(false);
@@ -158,13 +173,49 @@ export default function Security() {
     }
   };
 
+  // ----------------------------------------------------
+  // FETCH LOGIN ACTIVITIES
+  // ----------------------------------------------------
+  const fetchActivities = async () => {
+    if (!token) return;
+    setActivityLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/apiuser/user/activity`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.status) {
+        setActivities(data.activities || []);
+        setActivityStats(
+          data.stats || {
+            totalLogins: (data.activities || []).length,
+            failedLogins: (data.activities || []).filter((a) => a.status !== 'Success').length,
+            suspiciousCount: (data.activities || []).filter((a) => a.isSuspicious).length,
+          }
+        );
+      }
+    } catch {
+      // ignore
+    } finally {
+      setActivityLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (user?.role === 'admin') {
       navigate('/admin/profile', { replace: true });
       return;
     }
     fetchSessions();
-  }, [token, user]);
+    if (activeTab === 'activity') {
+      fetchActivities();
+    }
+  }, [token, user, activeTab]);
 
   // ----------------------------------------------------
   // TERMINATE A SPECIFIC SESSION
@@ -260,6 +311,36 @@ export default function Security() {
       setSessionsError('Unable to reach server to sign out other devices.');
     } finally {
       setTerminatingOthers(false);
+    }
+  };
+
+  // ----------------------------------------------------
+  // TERMINATE ALL SESSIONS (LOGOUT ALL)
+  // ----------------------------------------------------
+  const handleLogoutAll = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to sign out of ALL devices (including this one)?'
+      )
+    ) {
+      return;
+    }
+
+    setTerminatingAll(true);
+    try {
+      await fetch(`${API_URL}/apiuser/user/sessions/all`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch(logout());
+      navigate('/login');
+    } catch {
+      dispatch(logout());
+      navigate('/login');
+    } finally {
+      setTerminatingAll(false);
     }
   };
 
@@ -415,7 +496,7 @@ export default function Security() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle,_rgba(255,255,255,0.06)_0%,_transparent_70%)] pointer-events-none" />
 
       <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-12 z-10">
-        <div className="w-full max-w-[620px] bg-[#0E1015]/95 border border-white/15 backdrop-blur-2xl rounded-3xl p-6 sm:p-10 shadow-2xl">
+        <div className="w-full max-w-[680px] bg-[#0E1015]/95 border border-white/15 backdrop-blur-2xl rounded-3xl p-6 sm:p-10 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white mx-auto mb-4 shadow-lg">
@@ -427,7 +508,7 @@ export default function Security() {
             </h1>
 
             <p className="text-xs sm:text-sm text-gray-400 mt-2">
-              Monitor active device sessions and manage your master security keys.
+              Monitor active device sessions, review login activity, and manage security keys.
             </p>
           </div>
 
@@ -436,17 +517,17 @@ export default function Security() {
             <button
               type="button"
               onClick={() => setActiveTab('devices')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === 'devices'
                   ? 'bg-white text-black shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Laptop size={15} />
-              <span>Logged-in Devices</span>
+              <Laptop size={14} />
+              <span className="hidden sm:inline">Active</span> Devices
               {sessions.length > 0 && (
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                     activeTab === 'devices'
                       ? 'bg-black text-white'
                       : 'bg-white/10 text-gray-300'
@@ -459,15 +540,36 @@ export default function Security() {
 
             <button
               type="button"
+              onClick={() => {
+                setActiveTab('activity');
+                fetchActivities();
+              }}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'activity'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Activity size={14} />
+              <span>Activity</span>
+              {activityStats.suspiciousCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-500 text-black">
+                  {activityStats.suspiciousCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActiveTab('password')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === 'password'
                   ? 'bg-white text-black shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <KeyRound size={15} />
-              <span>Password &amp; Key</span>
+              <KeyRound size={14} />
+              <span>Password</span>
             </button>
           </div>
 
@@ -487,7 +589,7 @@ export default function Security() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <button
                     type="button"
                     onClick={fetchSessions}
@@ -506,11 +608,22 @@ export default function Security() {
                       type="button"
                       onClick={handleLogoutAllOthers}
                       disabled={terminatingOthers}
-                      className="px-4 py-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 text-[11px] font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+                      className="px-3.5 py-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 text-[11px] font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
                     >
                       {terminatingOthers
-                        ? 'Signing out others…'
-                        : 'Sign Out Other Devices'}
+                        ? 'Signing out…'
+                        : 'Sign Out Others'}
+                    </button>
+                  )}
+
+                  {sessions.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleLogoutAll}
+                      disabled={terminatingAll}
+                      className="px-3.5 py-2 border border-white/20 hover:border-white text-white text-[11px] font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+                    >
+                      {terminatingAll ? 'Signing out…' : 'Sign Out All'}
                     </button>
                   )}
                 </div>
@@ -637,7 +750,7 @@ export default function Security() {
               <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-xs text-gray-400 flex items-start gap-3">
                 <Sparkles size={16} className="text-gray-300 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  If you spot an unrecognized device or location, sign it out immediately and update your master password key.
+                  If you spot an unrecognized device or location, sign it out immediately and update your password key.
                 </p>
               </div>
 
@@ -654,7 +767,112 @@ export default function Security() {
           )}
 
           {/* ========================================================= */}
-          {/* TAB 2: MASTER PASSWORD & KEY UPDATE                       */}
+          {/* TAB 2: LOGIN ACTIVITY & SECURITY AUDIT                    */}
+          {/* ========================================================= */}
+          {activeTab === 'activity' && (
+            <div className="flex flex-col gap-6">
+              {/* Stat Summary Cards */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-4 bg-[#141720] border border-white/10 rounded-2xl text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total Logins</p>
+                  <p className="text-xl font-bold text-white mt-1">{activityStats.totalLogins}</p>
+                </div>
+                <div className="p-4 bg-[#141720] border border-white/10 rounded-2xl text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Failed</p>
+                  <p className="text-xl font-bold text-amber-400 mt-1">{activityStats.failedLogins}</p>
+                </div>
+                <div className="p-4 bg-[#141720] border border-white/10 rounded-2xl text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Suspicious</p>
+                  <p className="text-xl font-bold text-red-400 mt-1">{activityStats.suspiciousCount}</p>
+                </div>
+              </div>
+
+              {activityStats.suspiciousCount > 0 && (
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-start gap-3">
+                  <ShieldAlert size={18} className="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">Unusual Activity Detected</p>
+                    <p className="text-xs text-amber-200/80 mt-0.5">
+                      Multiple failed login attempts were recorded on this account. Consider changing your password.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Activity List */}
+              {activityLoading ? (
+                <div className="py-10 text-center text-xs text-gray-400">Loading activity timeline…</div>
+              ) : activities.length === 0 ? (
+                <div className="p-8 bg-[#141720] border border-white/10 rounded-2xl text-center">
+                  <Activity size={24} className="text-gray-500 mx-auto mb-2" />
+                  <p className="text-xs text-gray-400">No login activity recorded yet.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+                  {activities.map((act, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 bg-[#10131A] border border-white/10 rounded-xl flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {act.status === 'Success' ? (
+                          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                            <CheckCircle2 size={16} />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+                            <XCircle size={16} />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-white font-semibold truncate">
+                            {act.device || `${act.browser} on ${act.os}`}
+                          </p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            {act.ipAddress ? `${act.ipAddress} • ` : ''}
+                            {new Date(act.timestamp).toLocaleString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 text-right">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                            act.status === 'Success'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                          }`}
+                        >
+                          {act.status}
+                        </span>
+                        {act.reason && (
+                          <p className="text-[10px] text-gray-400 mt-0.5">{act.reason}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Return link */}
+              <div className="text-center pt-2">
+                <Link
+                  to="/myaccount"
+                  className="text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
+                >
+                  Return to Dashboard
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* TAB 3: MASTER PASSWORD & KEY UPDATE                       */}
           {/* ========================================================= */}
           {activeTab === 'password' && (
             <div>
@@ -905,8 +1123,6 @@ export default function Security() {
           )}
         </div>
       </main>
-
-      
     </div>
   );
 }

@@ -80,6 +80,8 @@ import {
   getUserSessions,
   deleteUserSession,
   logoutOtherSessions,
+  logoutAllSessions,
+  getUserLoginActivity,
 } from "../controllers/userControllers.js"
 
 const router = express.Router()
@@ -89,7 +91,9 @@ router.put("/user/updateprofile", verifyUser, updateUser)
 
 router.get("/user/sessions", verifyUser, getUserSessions)
 router.delete("/user/sessions/others", verifyUser, logoutOtherSessions)
+router.delete("/user/sessions/all", verifyUser, logoutAllSessions)
 router.delete("/user/sessions/:sessionId", verifyUser, deleteUserSession)
+router.get("/user/activity", verifyUser, getUserLoginActivity)
 
 
 router.post("/user/address", verifyUser, addAddress)
