@@ -81,8 +81,6 @@ mobileVerifiedAt: { type: Date },
       default: "",
     },
 
-    password: { type: String, required: [true, "Password is required"] },
-
     role: { type: String, enum: ["user", "admin"], default: "user" },
 
     otp: { type: String },
