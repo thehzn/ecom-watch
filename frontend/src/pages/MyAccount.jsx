@@ -1621,7 +1621,7 @@ export default function MyAccount() {
     }
     fetchAddresses();
     fetchUserProfile();
-  }, [user]);
+  }, []);
 
   const fetchUserProfile = async () => {
     try {
