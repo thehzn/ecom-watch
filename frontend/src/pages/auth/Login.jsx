@@ -413,9 +413,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => {
-                window.location.href = `${
-                  import.meta.env.VITE_API_URL
-                }/apiauth/google`;
+                window.location.href = `/apiauth/google`;
               }}
               className="w-full flex items-center justify-center gap-3 border border-black/20 bg-white text-black hover:bg-black hover:text-white text-xs font-semibold uppercase tracking-[0.15em] py-4 transition-all cursor-pointer"
             >
