@@ -1164,6 +1164,8 @@
 // };
 import User from "../models/UserModel.js"
 import argon from "argon2"
+import crypto from "crypto"
+import { parseUserAgent, getClientIp } from "../utils/deviceParser.js"
 
 
 const generateOTP = () =>
@@ -2207,14 +2209,51 @@ export const updateMobileNumber = async (req, res) => {
 export const getUserSessions = async (req, res) => {
   try {
     const userId = req.user.id;
-    const currentSessionId = req.user.sessionId;
+    let currentSessionId = req.user.sessionId;
 
-    const user = await User.findById(userId).select("sessions");
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ status: false, message: "User not found" });
     }
 
-    const sessions = (user.sessions || []).map((s) => ({
+    if (!Array.isArray(user.sessions)) {
+      user.sessions = [];
+    }
+
+    const userAgent = req.headers["user-agent"] || "";
+    const { device, browser, os, deviceType } = parseUserAgent(userAgent);
+    const ipAddress = getClientIp(req);
+
+    // If no sessions exist or currentSessionId is not in user.sessions, ensure one exists
+    let sessionIndex = currentSessionId
+      ? user.sessions.findIndex((s) => s.sessionId === currentSessionId)
+      : -1;
+
+    if (sessionIndex === -1) {
+      const activeSessionId = currentSessionId || crypto.randomUUID();
+      const newSession = {
+        sessionId: activeSessionId,
+        device,
+        browser,
+        os,
+        deviceType,
+        ipAddress,
+        lastActive: new Date(),
+        createdAt: new Date(),
+      };
+      user.sessions.unshift(newSession);
+      if (user.sessions.length > 10) {
+        user.sessions = user.sessions.slice(0, 10);
+      }
+      currentSessionId = activeSessionId;
+      await user.save();
+    } else {
+      user.sessions[sessionIndex].lastActive = new Date();
+      if (ipAddress) user.sessions[sessionIndex].ipAddress = ipAddress;
+      await user.save();
+    }
+
+    const sessions = user.sessions.map((s) => ({
       sessionId: s.sessionId,
       device: s.device,
       browser: s.browser,
@@ -2232,6 +2271,10 @@ export const getUserSessions = async (req, res) => {
       if (b.isCurrent) return 1;
       return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
     });
+
+    if (sessions.length > 0 && !sessions.some((s) => s.isCurrent)) {
+      sessions[0].isCurrent = true;
+    }
 
     return res.status(200).json({
       status: true,
