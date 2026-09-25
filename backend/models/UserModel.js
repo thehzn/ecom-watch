@@ -124,6 +124,21 @@ mobileVerifiedAt: { type: Date },
         createdAt: { type: Date, default: Date.now },
       },
     ],
+
+    loginActivities: [
+      {
+        ipAddress: { type: String, default: "" },
+        userAgent: { type: String, default: "" },
+        device: { type: String, default: "Unknown Device" },
+        browser: { type: String, default: "Unknown Browser" },
+        os: { type: String, default: "Unknown OS" },
+        deviceType: { type: String, default: "Desktop" },
+        status: { type: String, enum: ["Success", "Failed", "Blocked"], default: "Success" },
+        reason: { type: String, default: "" },
+        isSuspicious: { type: Boolean, default: false },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -159,8 +159,34 @@ export const login = async (req, res) => {
 
     if (!isMatch) {
       currentUser.failedLoginAttempts += 1;
+      const userAgent = req.headers["user-agent"] || "";
+      const { device, browser, os, deviceType } = parseUserAgent(userAgent);
+      const ipAddress = getClientIp(req);
 
-      if (currentUser.failedLoginAttempts >= 5) {
+      if (!Array.isArray(currentUser.loginActivities)) {
+        currentUser.loginActivities = [];
+      }
+
+      const isLockedNow = currentUser.failedLoginAttempts >= 5;
+
+      currentUser.loginActivities.unshift({
+        ipAddress,
+        userAgent,
+        device,
+        browser,
+        os,
+        deviceType,
+        status: isLockedNow ? "Blocked" : "Failed",
+        reason: isLockedNow ? "Account locked after 5 failed attempts" : "Invalid Password",
+        isSuspicious: currentUser.failedLoginAttempts >= 3,
+        timestamp: new Date(),
+      });
+
+      if (currentUser.loginActivities.length > 20) {
+        currentUser.loginActivities = currentUser.loginActivities.slice(0, 20);
+      }
+
+      if (isLockedNow) {
         currentUser.isLocked = true;
 
         // Lock for 5 minutes
@@ -212,6 +238,25 @@ export const login = async (req, res) => {
     currentUser.sessions.unshift(newSession);
     if (currentUser.sessions.length > 10) {
       currentUser.sessions = currentUser.sessions.slice(0, 10);
+    }
+
+    if (!Array.isArray(currentUser.loginActivities)) {
+      currentUser.loginActivities = [];
+    }
+    currentUser.loginActivities.unshift({
+      ipAddress,
+      userAgent,
+      device,
+      browser,
+      os,
+      deviceType,
+      status: "Success",
+      reason: "Credentials Verified",
+      isSuspicious: false,
+      timestamp: new Date(),
+    });
+    if (currentUser.loginActivities.length > 20) {
+      currentUser.loginActivities = currentUser.loginActivities.slice(0, 20);
     }
 
     await currentUser.save();
