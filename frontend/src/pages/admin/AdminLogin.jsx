@@ -10,11 +10,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { login } from '../../redux/authSlice';
-
 import { LockKeyhole, Eye, EyeOff } from 'lucide-react';
-
 import ReCAPTCHA from 'react-google-recaptcha';
-
+import toast from 'react-hot-toast';
 import watchImage from '../../assets/admin-watch.avif';
 
 
@@ -229,120 +227,68 @@ export default function AdminLogin() {
       // RECAPTCHA CHECK
 
       if (!captchaToken) {
-
-        setAuthError(
-
-          'Please complete the reCAPTCHA.'
-
-        );
-
+        const msg = 'Please complete the reCAPTCHA.';
+        setAuthError(msg);
+        toast.error(msg);
         setSubmitting(false);
-
         return;
-
       }
 
       try {
-
         const res = await fetch(
-
           `${import.meta.env.VITE_API_URL}/apiadmin/admin/login`,
-
           {
-
             method: 'POST',
-
             headers: {
-
               'Content-Type': 'application/json',
-
             },
-
             body: JSON.stringify({
-
               email: values.email,
-
               password: values.password,
-
               captchaToken,
-
             }),
-
           }
-
         );
-
-
 
         const data = await res.json();
 
-
-
         if (!res.ok) {
-
-          setAuthError(
-
-            data.message ||
-
-            'Invalid email or password'
-
-          );
-
+          const msg = data.message || 'Invalid email or password';
+          setAuthError(msg);
+          toast.error(msg);
           resetCaptcha();
-
           return;
-
         }
-
-
 
         if (data.user?.role !== 'admin') {
-
-          setAuthError(
-
-            'Invalid email or password'
-
-          );
-
+          const msg = 'Invalid administrator credentials';
+          setAuthError(msg);
+          toast.error(msg);
           resetCaptcha();
-
           return;
-
         }
 
-
-
         dispatch(
-
           login({
-
             token: data.token,
-
             user: data.user,
-
           })
-
         );
 
-
-
+        toast.success(`Welcome back, ${data.user?.name || 'Administrator'}`);
         navigate('/admin/dashboard');
-
-
 
       } catch (error) {
         console.error(
           'ADMIN LOGIN ERROR:',
           error
         );
-        setAuthError(
-          error.message || 'Unable to connect to server. Please try again.'
-        );
+        const msg = error.message || 'Unable to connect to server. Please try again.';
+        setAuthError(msg);
+        toast.error(msg);
         resetCaptcha();
       } finally {
-
         setSubmitting(false);
-
       }
 
     },

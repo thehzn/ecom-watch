@@ -1,161 +1,6 @@
-// import { useState, useEffect, useCallback } from 'react';
-// import { useApi } from '../../hooks/useApi'; // adjust path to match your admin folder structure
-// import StarRating from '../../components/StarRating'; // adjust path as needed
-
-// const LIMIT = 10;
-
-// export default function AdminReviewList() {
-//   const { get, patch } = useApi(); // make sure your useApi hook exposes `patch` — see note below
-
-//   const [reviews, setReviews] = useState([]);
-//   const [page, setPage] = useState(1);
-//   const [totalPages, setTotalPages] = useState(1);
-//   const [featuredFilter, setFeaturedFilter] = useState('all'); // 'all' | 'true' | 'false'
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState('');
-//   const [togglingId, setTogglingId] = useState(null);
-
-//   const fetchReviews = useCallback(
-//     async (pageNum, filter) => {
-//       setLoading(true);
-//       setError('');
-//       try {
-//         const filterParam = filter !== 'all' ? `&featured=${filter}` : '';
-//         const data = await get(
-//           `/apireview/getallreviews?page=${pageNum}&limit=${LIMIT}${filterParam}`
-//         );
-//         setReviews(data.reviews || []);
-//         setTotalPages(data.totalPages || 1);
-//         setPage(pageNum);
-//       } catch (err) {
-//         setError(err?.message || 'Unable to load reviews.');
-//       } finally {
-//         setLoading(false);
-//       }
-//     },
-//     [get]
-//   );
-
-//   useEffect(() => {
-//     fetchReviews(1, featuredFilter);
-//   }, [fetchReviews, featuredFilter]);
-
-//   const handleToggleFeatured = async (reviewId) => {
-//     setTogglingId(reviewId);
-//     try {
-//       await patch(`/apireview/togglefeatured/${reviewId}`);
-//       // Refresh current page so the list reflects the change
-//       // (a toggled-off review may need to drop off if a "featured=true" filter is active)
-//       fetchReviews(page, featuredFilter);
-//     } catch (err) {
-//       setError(err?.message || 'Failed to update featured status.');
-//     } finally {
-//       setTogglingId(null);
-//     }
-//   };
-
-//   return (
-//     <div className="w-full flex flex-col gap-6 p-6">
-//       <div className="flex items-center justify-between">
-//         <h1 className="text-2xl font-bold text-white">Manage Reviews</h1>
-
-//         <div className="flex items-center gap-2">
-//           {['all', 'true', 'false'].map((val) => (
-//             <button
-//               key={val}
-//               onClick={() => setFeaturedFilter(val)}
-//               className={`text-xs uppercase tracking-wider px-4 py-2 rounded-full border transition-colors ${
-//                 featuredFilter === val
-//                   ? 'bg-white text-black border-white'
-//                   : 'bg-transparent text-gray-400 border-white/15 hover:border-white/40'
-//               }`}
-//             >
-//               {val === 'all' ? 'All' : val === 'true' ? 'Featured' : 'Not Featured'}
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-
-//       {error && <p className="text-sm text-red-400">{error}</p>}
-//       {loading && <p className="text-sm text-gray-400">Loading reviews…</p>}
-
-//       {!loading && reviews.length === 0 && (
-//         <p className="text-sm text-gray-400">No reviews found.</p>
-//       )}
-
-//       {!loading && reviews.length > 0 && (
-//         <div className="flex flex-col gap-4">
-//           {reviews.map((r) => (
-//             <div
-//               key={r._id}
-//               className="bg-[#0E1015] border border-white/10 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between"
-//             >
-//               <div className="flex-1 min-w-0">
-//                 <div className="flex items-center gap-3 mb-1">
-//                   <StarRating value={r.rating} mode="display" size={14} />
-//                   <span className="text-sm font-semibold text-white">
-//                     {r.user?.firstName} {r.user?.lastName}
-//                   </span>
-//                   <span className="text-xs text-gray-500">{r.user?.email}</span>
-//                 </div>
-//                 {r.title && <p className="text-sm font-bold text-white">{r.title}</p>}
-//                 <p className="text-sm text-gray-300 line-clamp-2">{r.comment}</p>
-//                 <p className="mt-1 text-xs text-gray-500">
-//                   {r.product?.modelName} ·{' '}
-//                   {new Date(r.createdAt).toLocaleDateString('en-US', {
-//                     month: 'short',
-//                     day: 'numeric',
-//                     year: 'numeric',
-//                   })}
-//                 </p>
-//               </div>
-
-//               <button
-//                 onClick={() => handleToggleFeatured(r._id)}
-//                 disabled={togglingId === r._id}
-//                 className={`shrink-0 text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-all disabled:opacity-50 ${
-//                   r.featured
-//                     ? 'bg-white/10 text-white border border-white/30 hover:bg-white/15'
-//                     : 'bg-white text-black hover:bg-gray-200'
-//                 }`}
-//               >
-//                 {togglingId === r._id
-//                   ? 'Updating…'
-//                   : r.featured
-//                   ? 'Unfeature'
-//                   : 'Feature'}
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {totalPages > 1 && (
-//         <div className="flex items-center justify-center gap-4 pt-2">
-//           <button
-//             onClick={() => fetchReviews(page - 1, featuredFilter)}
-//             disabled={page === 1}
-//             className="text-xs uppercase tracking-wider text-gray-400 hover:text-white disabled:opacity-30 transition-colors"
-//           >
-//             Previous
-//           </button>
-//           <span className="text-xs text-gray-500">
-//             Page {page} of {totalPages}
-//           </span>
-//           <button
-//             onClick={() => fetchReviews(page + 1, featuredFilter)}
-//             disabled={page === totalPages}
-//             className="text-xs uppercase tracking-wider text-gray-400 hover:text-white disabled:opacity-30 transition-colors"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 import { useEffect, useState, useMemo } from 'react';
 import { Search, Star, ArrowLeft, ArrowRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
 
 const PAGE_SIZE = 10;
@@ -246,14 +91,20 @@ export default function AdminReviewList() {
   };
 
   const handleToggleFeatured = async (id) => {
+    const currentReview = reviews.find((r) => r._id === id);
+    const willFeature = !currentReview?.featured;
+
     setTogglingId(id);
     try {
       await patch(`/apireview/togglefeatured/${id}`);
       setReviews((prev) =>
         prev.map((r) => (r._id === id ? { ...r, featured: !r.featured } : r))
       );
+      toast.success(
+        willFeature ? 'Review featured on storefront' : 'Review unfeatured'
+      );
     } catch (err) {
-      // error already captured by useApi
+      toast.error(err.message || 'Failed to update review status');
     } finally {
       setTogglingId(null);
     }

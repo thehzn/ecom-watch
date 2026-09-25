@@ -40,12 +40,35 @@ import AdminEnquiries from './pages/admin/Adminenquiries';
 import ScrollToTop from './components/ScrollToTop';
 import AppInitializer from './AppInitializer';
 import AdminReviewList from './pages/admin/AdminReviewList'; // Import the AdminReviewList component
+import { Toaster } from 'react-hot-toast';
 
 
 
 function App() {
   return (
     <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "#0E1015",
+            color: "#FFFFFF",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "12px",
+            fontSize: "13px",
+            padding: "12px 16px",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+          },
+          success: {
+            iconTheme: { primary: "#FFFFFF", secondary: "#0E1015" },
+          },
+          error: {
+            iconTheme: { primary: "#F87171", secondary: "#0E1015" },
+          },
+        }}
+      />
       <ScrollToTop />
       <AppInitializer />
       <Routes>

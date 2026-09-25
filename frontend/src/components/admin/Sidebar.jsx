@@ -1,23 +1,27 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Receipt, Users, Mail, LogOut } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { LayoutDashboard, Package, Receipt, Users, Mail, Star, LogOut } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { logout } from '../../redux/authSlice';
 
 const navItems = [
-
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
   { label: 'Product List', icon: Package, path: '/admin/products' },
   { label: 'Order Details', icon: Receipt, path: '/admin/orders' },
   { label: 'Customer Details', icon: Users, path: '/admin/users' },
   { label: 'Enquiries', icon: Mail, path: '/admin/enquiries' },
-  { label: 'Reviews', icon: 'star', path: '/admin/reviews' }
-
+  { label: 'Reviews', icon: Star, path: '/admin/reviews' }
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
+    dispatch(logout());
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    toast.success('Signed out of admin console');
     navigate('/admin/login');
   };
 

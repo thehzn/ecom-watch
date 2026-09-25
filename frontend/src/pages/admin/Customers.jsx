@@ -1,6 +1,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { Search, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
 
 const PAGE_SIZE = 10;
@@ -88,8 +89,9 @@ export default function Customers() {
     try {
       await del(`/apicustomers/deletecustomer/${id}`);
       setCustomers((prev) => prev.filter((c) => c._id !== id));
+      toast.success('Customer account removed successfully');
     } catch (err) {
-      // error already captured by useApi
+      toast.error(err.message || 'Failed to remove customer account');
     } finally {
       setDeletingId(null);
     }

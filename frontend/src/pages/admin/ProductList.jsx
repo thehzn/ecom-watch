@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
 
 const PAGE_SIZE = 5;
@@ -211,8 +212,9 @@ export default function ProductList() {
       setProducts((prev) =>
         prev.filter((p) => p._id !== id)
       );
+      toast.success('Timepiece removed from catalogue');
     } catch (err) {
-      // Error is already handled by useApi
+      toast.error(err.message || 'Failed to remove timepiece');
     } finally {
       setDeletingId(null);
     }

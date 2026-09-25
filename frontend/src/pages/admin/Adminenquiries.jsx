@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Mail, MailOpen, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
 
 function timeAgo(dateString) {
@@ -50,7 +51,9 @@ export default function AdminEnquiries() {
     );
     try {
       await patch(`/enquiry/updateenquiry/${id}`);
+      toast.success('Enquiry marked as resolved');
     } catch (err) {
+      toast.error('Failed to update enquiry status');
       // resync from server on failure so state doesn't silently drift
       fetchEnquiries();
     } finally {

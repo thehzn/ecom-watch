@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
 
 const STATUS_STYLES = {
@@ -56,8 +57,10 @@ export default function OrderDetail() {
       );
 
       setOrder(data.order);
+      toast.success('Order marked as dispatched & shipped');
     } catch (err) {
       setActionError(err.message);
+      toast.error(err.message || 'Failed to update order status');
     } finally {
       setUpdating(false);
     }
@@ -73,8 +76,10 @@ export default function OrderDetail() {
       );
 
       setOrder(data.order);
+      toast.success('Order marked as delivered');
     } catch (err) {
       setActionError(err.message);
+      toast.error(err.message || 'Failed to update order status');
     } finally {
       setUpdating(false);
     }
@@ -92,8 +97,10 @@ export default function OrderDetail() {
       );
 
       setOrder(data.order);
+      toast.success('Order cancelled successfully');
     } catch (err) {
       setActionError(err.message);
+      toast.error(err.message || 'Failed to cancel order');
     } finally {
       setUpdating(false);
     }
