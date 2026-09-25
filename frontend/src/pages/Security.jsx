@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useApi } from '../hooks/useApi';
 import { logout } from '../redux/authSlice';
 
 const passwordRegex =
@@ -98,12 +100,10 @@ function DeviceIcon({ type }) {
 export default function Security() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { get, post, put, del } = useApi();
 
   const token = useSelector((state) => state.auth?.token);
   const user = useSelector((state) => state.auth?.user);
-
-  const API_URL =
-    import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   const [activeTab, setActiveTab] = useState('devices'); // 'devices' | 'activity' | 'password'
 
@@ -147,27 +147,14 @@ export default function Security() {
     setSessionsError('');
 
     try {
-      const res = await fetch(`${API_URL}/apiuser/user/sessions`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const data = await get('/apiuser/user/sessions', {
+        allowForbidden: true,
+        allowNotFound: true,
       });
 
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || (data && data.status === false)) {
-        if (res.status === 401) {
-          dispatch(logout());
-          navigate('/login');
-          return;
-        }
-        setSessionsError(data?.message || 'Failed to load active sessions.');
-        return;
-      }
-
       setSessions(data?.sessions || []);
-    } catch {
-      setSessionsError('Unable to reach server to load active sessions.');
+    } catch (err) {
+      setSessionsError(err?.message || 'Unable to reach server to load active sessions.');
     } finally {
       setSessionsLoading(false);
     }
@@ -181,15 +168,12 @@ export default function Security() {
     setActivityLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/apiuser/user/activity`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const data = await get('/apiuser/user/activity', {
+        allowForbidden: true,
+        allowNotFound: true,
       });
 
-      const data = await res.json().catch(() => null);
-
-      if (res.ok && data?.status) {
+      if (data?.status) {
         setActivities(data.activities || []);
         setActivityStats(
           data.stats || {
@@ -226,39 +210,21 @@ export default function Security() {
     setSessionsError('');
 
     try {
-      const res = await fetch(
-        `${API_URL}/apiuser/user/sessions/${sessionId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const data = await del(`/apiuser/user/sessions/${sessionId}`);
 
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || (data && data.status === false)) {
-        if (res.status === 401) {
-          dispatch(logout());
-          navigate('/login');
-          return;
-        }
-        setSessionsError(data?.message || 'Failed to terminate session.');
-        return;
-      }
-
-      if (data.isCurrentDeleted) {
+      if (data?.isCurrentDeleted) {
         dispatch(logout());
         navigate('/login');
         return;
       }
 
-      setSessions(data.sessions || []);
+      setSessions(data?.sessions || []);
       setSessionSuccessMessage('Device session signed out successfully.');
+      toast.success('Device signed out');
       setTimeout(() => setSessionSuccessMessage(''), 4000);
-    } catch {
-      setSessionsError('Unable to reach server to terminate session.');
+    } catch (err) {
+      setSessionsError(err?.message || 'Unable to terminate session.');
+      toast.error('Failed to sign out device');
     } finally {
       setTerminatingId(null);
     }
@@ -281,34 +247,17 @@ export default function Security() {
     setSessionsError('');
 
     try {
-      const res = await fetch(`${API_URL}/apiuser/user/sessions/others`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const data = await del('/apiuser/user/sessions/others');
 
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || (data && data.status === false)) {
-        if (res.status === 401) {
-          dispatch(logout());
-          navigate('/login');
-          return;
-        }
-        setSessionsError(
-          data?.message || 'Failed to sign out other devices.'
-        );
-        return;
-      }
-
-      setSessions(data.sessions || []);
+      setSessions(data?.sessions || []);
       setSessionSuccessMessage(
         'All other active devices have been signed out.'
       );
+      toast.success('Signed out other devices');
       setTimeout(() => setSessionSuccessMessage(''), 4000);
-    } catch {
-      setSessionsError('Unable to reach server to sign out other devices.');
+    } catch (err) {
+      setSessionsError(err?.message || 'Unable to reach server to sign out other devices.');
+      toast.error('Failed to sign out other devices');
     } finally {
       setTerminatingOthers(false);
     }
@@ -328,12 +277,7 @@ export default function Security() {
 
     setTerminatingAll(true);
     try {
-      await fetch(`${API_URL}/apiuser/user/sessions/all`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await del('/apiuser/user/sessions/all');
       dispatch(logout());
       navigate('/login');
     } catch {
@@ -354,29 +298,14 @@ export default function Security() {
     setOtpLoading(true);
 
     try {
-      const res = await fetch(
-        `${API_URL}/apiuser/user/send-password-change-otp`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || (data && data.status === false)) {
-        setOtpError(data?.message || 'Failed to send OTP');
-        return;
-      }
-
+      await post('/apiuser/user/send-password-change-otp');
       setOtpSent(true);
       setOtp('');
       setOtpError('');
-    } catch {
-      setOtpError('Unable to reach the server. Please try again.');
+      toast.success('OTP sent to your email');
+    } catch (err) {
+      setOtpError(err?.message || 'Failed to send OTP');
+      toast.error(err?.message || 'Failed to send OTP');
     } finally {
       setOtpLoading(false);
     }
@@ -393,31 +322,15 @@ export default function Security() {
     setOtpLoading(true);
 
     try {
-      const res = await fetch(
-        `${API_URL}/apiuser/user/verify-password-change-otp`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            otp: otp.trim(),
-          }),
-        }
-      );
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || (data && data.status === false)) {
-        setOtpError(data?.message || 'Invalid OTP');
-        return;
-      }
-
+      await post('/apiuser/user/verify-password-change-otp', {
+        otp: otp.trim(),
+      });
       setOtpVerified(true);
       setOtpError('');
-    } catch {
-      setOtpError('Unable to reach the server. Please try again.');
+      toast.success('OTP verified');
+    } catch (err) {
+      setOtpError(err?.message || 'Invalid OTP');
+      toast.error(err?.message || 'Invalid OTP');
     } finally {
       setOtpLoading(false);
     }
@@ -443,32 +356,11 @@ export default function Security() {
       }
 
       try {
-        const res = await fetch(
-          `${API_URL}/apiuser/user/updateprofile`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              password: values.newPassword,
-            }),
-          }
-        );
-
-        const data = await res.json().catch(() => null);
-
-        if (!res.ok || (data && data.status === false)) {
-          setApiError(
-            data?.message ||
-              'Could not update password. Please try again.'
-          );
-          return;
-        }
+        await put('/apiuser/user/updateprofile', {
+          password: values.newPassword,
+        });
 
         resetForm();
-
         setOtp('');
         setOtpSent(false);
         setOtpVerified(false);
@@ -476,12 +368,14 @@ export default function Security() {
         setSuccessMessage(
           'Password updated successfully. Please log in with your new key.'
         );
+        toast.success('Password updated successfully');
 
         setTimeout(() => {
           navigate('/login');
         }, 1500);
-      } catch {
-        setApiError('Unable to reach the server. Please try again.');
+      } catch (err) {
+        setApiError(err?.message || 'Could not update password. Please try again.');
+        toast.error(err?.message || 'Could not update password.');
       } finally {
         setSubmitting(false);
       }
@@ -492,6 +386,27 @@ export default function Security() {
 
   return (
     <div className="min-h-screen w-full bg-[#08090C] text-white flex flex-col justify-between font-['Plus_Jakarta_Sans'] selection:bg-white selection:text-black relative overflow-hidden">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "#0E1015",
+            color: "#FFFFFF",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "12px",
+            fontSize: "13px",
+            padding: "12px 16px",
+          },
+          success: {
+            iconTheme: { primary: "#FFFFFF", secondary: "#0E1015" },
+          },
+          error: {
+            iconTheme: { primary: "#F87171", secondary: "#0E1015" },
+          },
+        }}
+      />
+
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle,_rgba(255,255,255,0.06)_0%,_transparent_70%)] pointer-events-none" />
 

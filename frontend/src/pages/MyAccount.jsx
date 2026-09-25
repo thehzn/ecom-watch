@@ -612,6 +612,7 @@ export default function MyAccount() {
   const dispatch = useDispatch();
   const { get, post, put, del, patch } = useApi();
 
+  const token = useSelector((state) => state.auth?.token);
   const user = useSelector((state) => state.auth?.user) || {};
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Valued Client';
   const displayedMobile = user.mobileNumber;
@@ -675,10 +676,12 @@ export default function MyAccount() {
       navigate("/admin/profile", { replace: true });
       return;
     }
-    fetchAddresses();
-    fetchUserProfile();
-    fetchSessions();
-  }, [user?.role]);
+    if (token) {
+      fetchAddresses();
+      fetchUserProfile();
+      fetchSessions();
+    }
+  }, [user?.role, token]);
 
   const handleSaved = (fullList) => {
     dispatch(setAddresses(fullList));
